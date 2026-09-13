@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-navy: #0A1128;
+  --color-brand-indigo: #4F46E5;
+  --color-brand-blue: #3B82F6;
+  --color-brand-violet: #8B5CF6;
+  --color-brand-light: #F8FAFC;
+  --color-brand-gray: #E2E8F0;
+  
+  --color-semantic-success: #10B981;
+  --color-semantic-warning: #F59E0B;
+  --color-semantic-error: #EF4444;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Inter', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-light text-slate-900 font-sans antialiased selection:bg-brand-indigo/30;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight font-semibold text-brand-navy;
+  }
+}
+
+@utility glass {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm;
+}
+@utility glass-dark {
+  @apply bg-brand-navy/80 backdrop-blur-md border border-white/10 shadow-lg text-white;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dark Mode Overrides */
+@layer utilities {
+  .dark body { background-color: #0A1128 !important; color: #F8FAFC !important; }
+  .dark .bg-brand-light { background-color: #0A1128 !important; }
+  .dark .bg-brand-light\/50 { background-color: rgba(10, 17, 40, 0.5) !important; }
+  .dark .bg-brand-light\/30 { background-color: rgba(10, 17, 40, 0.3) !important; }
+  
+  .dark .bg-white { background-color: #0F172A !important; }
+  .dark .bg-white\/80 { background-color: rgba(15, 23, 42, 0.8) !important; }
+  .dark .bg-white\/70 { background-color: rgba(15, 23, 42, 0.7) !important; }
+  .dark .bg-white\/60 { background-color: rgba(15, 23, 42, 0.6) !important; }
+  
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 { color: #FFFFFF !important; }
+  
+  .dark .bg-brand-gray { background-color: #334155 !important; }
+  .dark .bg-brand-gray\/80 { background-color: rgba(51, 65, 85, 0.8) !important; }
+  .dark .bg-brand-gray\/50 { background-color: rgba(51, 65, 85, 0.5) !important; }
+  .dark .bg-brand-gray\/30 { background-color: rgba(51, 65, 85, 0.3) !important; }
+  .dark .bg-brand-gray\/20 { background-color: rgba(51, 65, 85, 0.2) !important; }
+
+  .dark .text-brand-navy { color: #FFFFFF !important; }
+  .dark .text-brand-navy\/80 { color: #F1F5F9 !important; } 
+  .dark .text-brand-navy\/70 { color: #E2E8F0 !important; } 
+  .dark .text-brand-navy\/60 { color: #CBD5E1 !important; } 
+  .dark .text-brand-navy\/50 { color: #94A3B8 !important; } 
+  .dark .text-brand-navy\/40 { color: #64748B !important; } 
+  .dark .text-brand-navy\/30 { color: #475569 !important; }
+  .dark .text-brand-navy\/20 { color: #334155 !important; }
+  
+  .dark .border-brand-gray,
+  .dark .border-brand-gray\/30,
+  .dark .border-brand-gray\/50,
+  .dark .border-brand-gray\/80 { border-color: #1E293B !important; }
+  
+  .dark .divide-brand-gray\/30 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #1E293B !important;
+  }
+}
