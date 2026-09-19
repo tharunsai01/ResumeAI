@@ -4,14 +4,14 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../../lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-brand-light transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
+  "btn-interactive inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-brand-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "bg-brand-indigo text-white hover:bg-brand-indigo/90 shadow-sm hover:shadow-md",
-        secondary: "bg-white text-brand-navy border border-brand-gray hover:bg-brand-light hover:border-brand-navy/20",
-        outline: "border border-brand-indigo/20 text-brand-indigo hover:bg-brand-indigo/10",
-        ghost: "hover:bg-brand-indigo/10 text-brand-navy hover:text-brand-indigo",
+        default: "btn-primary",
+        secondary: "btn-secondary",
+        outline: "btn-outline",
+        ghost: "btn-ghost",
         danger: "bg-semantic-error text-white hover:bg-semantic-error/90",
       },
       size: {

@@ -165,7 +165,7 @@ export default function RecruiterHelp() {
               <motion.div key={category.id} variants={slideUp}>
                 <Card className="overflow-hidden border-brand-gray/30 shadow-sm">
                   <div className="bg-brand-light/30 px-6 py-5 border-b border-brand-gray/20 flex items-start gap-4">
-                    <div className="p-3 bg-white rounded-xl shadow-sm shrink-0">
+                    <div className="glass-card p-3 shrink-0">
                       <category.icon className="w-6 h-6 text-brand-indigo" />
                     </div>
                     <div>

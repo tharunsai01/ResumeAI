@@ -147,7 +147,7 @@ export default function RecruiterJobs() {
         </div>
 
         {/* FILTERS */}
-        <motion.div variants={slideUp} className="bg-white rounded-2xl border border-brand-gray/50 shadow-sm p-4 space-y-4">
+        <motion.div variants={slideUp} className="glass-card p-4 space-y-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl">
               <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
@@ -268,7 +268,7 @@ export default function RecruiterJobs() {
                                   animate={{ opacity: 1, scale: 1, y: 0 }}
                                   exit={{ opacity: 0, scale: 0.95, y: 5 }}
                                   transition={{ duration: 0.15 }}
-                                  className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-brand-gray/30 py-1 z-50 text-left"
+                                  className="glass-card absolute right-0 mt-2 w-48 py-1 z-50 text-left"
                                 >
                                   <button onClick={() => navigate(`/recruiter/jobs/${job.id}`)} className="w-full px-4 py-2 text-sm text-brand-navy hover:bg-brand-light flex items-center">
                                     <Eye className="w-4 h-4 mr-2" /> View Details

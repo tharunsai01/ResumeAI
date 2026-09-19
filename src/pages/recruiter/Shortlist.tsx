@@ -142,7 +142,7 @@ export default function RecruiterShortlist() {
 
         {/* FILTERS */}
         <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1 flex items-center px-4 bg-white border border-brand-gray/40 rounded-xl focus-within:border-brand-indigo/50 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all shadow-sm">
+          <div className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"

@@ -39,7 +39,7 @@ export default function CandidateProfilePreview() {
 
         {/* Public Profile Card */}
         <motion.div variants={slideUp}>
-          <Card className="overflow-hidden border-none shadow-xl bg-white">
+          <Card className="overflow-hidden border-none shadow-xl ">
             <div className="h-40 bg-gradient-to-r from-brand-navy to-brand-indigo relative" />
             
             <CardContent className="px-8 pb-10 pt-0 relative">

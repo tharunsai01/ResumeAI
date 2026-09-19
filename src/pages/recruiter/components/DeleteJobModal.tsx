@@ -30,7 +30,7 @@ export function DeleteJobModal({ isOpen, onClose, onConfirm, jobTitle }: DeleteJ
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.15 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-xl z-50 overflow-hidden"
+            className="glass-card fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50 overflow-hidden"
           >
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">

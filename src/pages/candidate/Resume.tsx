@@ -131,7 +131,7 @@ export default function CandidateResume() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              className="bg-white rounded-2xl border border-brand-gray/50 shadow-sm overflow-hidden"
+              className="glass-card overflow-hidden"
             >
               <div className="p-8 md:p-12">
                 <div className="text-center mb-8">
@@ -206,7 +206,7 @@ export default function CandidateResume() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              className="bg-white rounded-2xl border border-brand-indigo/30 shadow-md p-8"
+              className="glass-card p-8"
             >
               <h2 className="text-xl font-display font-semibold text-brand-navy mb-6">Ready to analyze</h2>
               
@@ -255,7 +255,7 @@ export default function CandidateResume() {
               key="analyzing"
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl border border-brand-gray/50 shadow-lg overflow-hidden"
+              className="glass-card overflow-hidden"
             >
               <div className="grid grid-cols-1 md:grid-cols-2">
                 {/* Left side: Checklist */}

@@ -120,7 +120,7 @@ export default function CandidateApplications() {
               placeholder="Search applications..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full sm:w-72 bg-white border border-brand-gray/50 rounded-xl py-2 pl-10 pr-4 text-sm focus:border-brand-indigo outline-none transition-all shadow-sm group-hover:border-brand-gray"
+              className="glass-card w-full sm:w-72 py-2 pl-10 pr-4 text-sm focus: outline-none transition-all group-hover:"
             />
           </div>
         </motion.div>
@@ -270,7 +270,7 @@ export default function CandidateApplications() {
               ) : (
                 <motion.div variants={staggerContainer} className="space-y-3">
                   {/* Desktop Table View */}
-                  <div className="hidden md:block bg-white rounded-xl border border-brand-gray/50 overflow-hidden shadow-sm">
+                  <div className="glass-card hidden md:block overflow-hidden">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-brand-light/50 border-b border-brand-gray/50">

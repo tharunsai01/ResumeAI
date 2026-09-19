@@ -146,7 +146,7 @@ export default function ComplaintPage() {
                 key="success"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-brand-gray/50 text-center space-y-6"
+                className="glass-card p-8 sm:p-12 text-center space-y-6"
               >
                 <div className="w-20 h-20 bg-semantic-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="w-10 h-10 text-semantic-success" />

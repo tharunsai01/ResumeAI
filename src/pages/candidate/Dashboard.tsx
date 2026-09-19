@@ -71,7 +71,7 @@ export default function CandidateDashboard() {
         className="space-y-6 pb-12"
       >
         {/* Welcome Section */}
-        <motion.div variants={slideUp} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-brand-gray/50 shadow-sm">
+        <motion.div variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
           <div>
             <h1 className="text-2xl font-display font-semibold text-brand-navy">
               Welcome back, {mockResumeAnalysis.personalInfo.name.split(' ')[0]} <span className="inline-block animate-bounce">👋</span>
@@ -157,7 +157,7 @@ export default function CandidateDashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {loading ? (
-                  [1, 2].map(i => <div key={i} className="h-64 bg-white rounded-xl border border-brand-gray/30 animate-pulse" />)
+                  [1, 2].map(i => <div key={i} className="glass-card shadow-sm overflow-hidden" />)
                 ) : (
                   recommendedJobs.slice(0, 2).map(({ job, overallMatch }) => (
                     <JobCard 

@@ -75,7 +75,7 @@ export default function RecruiterCandidateScreening() {
 
         {/* CANDIDATE HEADER */}
         <motion.div variants={slideUp}>
-          <Card className="border-none shadow-md overflow-hidden bg-white">
+          <Card className="border-none shadow-md overflow-hidden">
             <div className="h-2 bg-gradient-to-r from-brand-indigo via-brand-blue to-transparent" />
             <CardContent className="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div className="flex items-center gap-5">

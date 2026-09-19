@@ -178,7 +178,7 @@ export default function RecruiterInterviewDetails() {
 
         {/* DETAILS CARD */}
         <motion.div variants={slideUp}>
-          <Card className="overflow-hidden border-none shadow-md bg-white">
+          <Card className="overflow-hidden border-none shadow-md ">
             <div className="h-2 bg-gradient-to-r from-brand-indigo to-brand-blue" />
             <CardContent className="p-0">
               <div className="p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-brand-gray/20">

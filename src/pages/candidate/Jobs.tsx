@@ -168,7 +168,7 @@ export default function CandidateJobs() {
         </motion.div>
 
         {/* Search Bar */}
-        <motion.div variants={slideUp} className="bg-white rounded-2xl border border-brand-gray/50 shadow-sm p-2 flex items-center relative z-10">
+        <motion.div variants={slideUp} className="glass-card p-2 flex items-center relative z-10">
           <div className="flex-1 flex items-center px-4">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input

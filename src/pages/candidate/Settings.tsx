@@ -117,7 +117,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                   <span className="flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> {profile.careerPreferences.preferredLocations[0] || "Open to Relocate"}</span>
                 </div>
               </div>
-              <button onClick={() => navigate("/candidate/profile")} className="px-4 py-2 bg-[#1e293b] font-medium rounded-lg text-white hover:bg-slate-800 mt-4 sm:mt-0 shrink-0 border border-white/10 transition-colors">
+              <button onClick={() => navigate("/candidate/profile")} className="btn-interactive btn-primary px-4 py-2 mt-4 sm:mt-0 shrink-0 border border-white/10 transition-colors">
                 Edit Profile
               </button>
             </div>
@@ -246,7 +246,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             <h4 className="font-medium text-brand-navy">Password</h4>
                             <p className="text-sm text-brand-navy/60 mt-1">••••••••••••</p>
                           </div>
-                          <button onClick={() => setIsPasswordModalOpen(true)} className="px-4 py-2 bg-brand-light text-brand-navy text-sm font-semibold rounded-lg hover:bg-brand-gray/50 transition-colors">
+                          <button onClick={() => setIsPasswordModalOpen(true)} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
                             Change Password
                           </button>
                         </div>
@@ -325,7 +325,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                         </div>
                       </div>
                       <div className="pt-4 flex justify-end">
-                        <button onClick={() => navigate("/candidate/profile")} className="px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navy/90 transition-colors shadow-sm">
+                        <button onClick={() => navigate("/candidate/profile")} className="btn-interactive btn-primary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
                           Edit Job Preferences in Profile
                         </button>
                       </div>
@@ -461,7 +461,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             <span className="inline-block mt-2 text-xs font-semibold text-semantic-success bg-semantic-success/10 px-2 py-1 rounded">Active now</span>
                           </div>
                         </div>
-                        <button onClick={() => triggerToast("Signed out of all other sessions ✓")} className="w-full py-3 bg-brand-light text-brand-navy font-semibold rounded-xl hover:bg-brand-gray/30 transition-colors">
+                        <button onClick={() => triggerToast("Signed out of all other sessions ✓")} className="btn-interactive btn-secondary w-full py-3 font-semibold rounded-xl transition-colors">
                           Sign Out All Other Sessions
                         </button>
                       </CardContent>
@@ -478,7 +478,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             <h4 className="font-semibold text-brand-navy">Clear Local Data</h4>
                             <p className="text-sm text-brand-navy/60 mt-1">Removes all saved settings, notifications, and mock data from this browser.</p>
                           </div>
-                          <button onClick={handleClearData} className="shrink-0 px-4 py-2 bg-semantic-error/10 text-semantic-error font-semibold rounded-lg hover:bg-semantic-error/20 transition-colors">
+                          <button onClick={handleClearData} className="btn-interactive rounded-lg bg-semantic-error/10 text-semantic-error font-semibold hover:bg-semantic-error/20 shrink-0 px-4 py-2">
                             Clear Data
                           </button>
                         </div>
@@ -487,7 +487,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             <h4 className="font-semibold text-brand-navy">Delete Account</h4>
                             <p className="text-sm text-brand-navy/60 mt-1">Permanently delete your account and all associated data.</p>
                           </div>
-                          <button onClick={() => setIsDeleteModalOpen(true)} className="shrink-0 px-4 py-2 bg-semantic-error text-white font-semibold rounded-lg hover:bg-semantic-error/90 transition-colors">
+                          <button onClick={() => setIsDeleteModalOpen(true)} className="btn-interactive bg-semantic-error text-white font-semibold rounded-lg hover:bg-semantic-error/90 shrink-0 px-4 py-2 transition-colors">
                             Delete Account
                           </button>
                         </div>
@@ -517,8 +517,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
             <Input type="email" placeholder="new.email@example.com" />
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsEmailModalOpen(false)} className="px-4 py-2 font-semibold text-brand-navy hover:bg-brand-light rounded-lg">Cancel</button>
-            <button onClick={() => { setIsEmailModalOpen(false); triggerToast(); }} className="px-4 py-2 bg-brand-indigo text-white font-semibold rounded-lg">Update Email</button>
+            <button onClick={() => setIsEmailModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={() => { setIsEmailModalOpen(false); triggerToast(); }} className="btn-interactive btn-primary px-4 py-2 font-semibold rounded-lg">Update Email</button>
           </div>
         </div>
       </Modal>
@@ -538,8 +538,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
             <Input type="password" placeholder="Minimum 8 characters" />
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsPasswordModalOpen(false)} className="px-4 py-2 font-semibold text-brand-navy hover:bg-brand-light rounded-lg">Cancel</button>
-            <button onClick={() => { setIsPasswordModalOpen(false); triggerToast(); }} className="px-4 py-2 bg-brand-indigo text-white font-semibold rounded-lg">Update Password</button>
+            <button onClick={() => setIsPasswordModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={() => { setIsPasswordModalOpen(false); triggerToast(); }} className="btn-interactive btn-primary px-4 py-2 font-semibold rounded-lg">Update Password</button>
           </div>
         </div>
       </Modal>
@@ -548,8 +548,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
         <div className="mt-4">
           <p className="text-brand-navy/70 mb-6">This action cannot be undone. All your data, applications, and profile information will be permanently removed.</p>
           <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsDeleteModalOpen(false)} className="px-4 py-2 font-semibold text-brand-navy hover:bg-brand-light rounded-lg">Cancel</button>
-            <button onClick={handleClearData} className="px-4 py-2 bg-semantic-error text-white font-semibold rounded-lg">Delete Account</button>
+            <button onClick={() => setIsDeleteModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={handleClearData} className="btn-interactive bg-semantic-error text-white hover:bg-semantic-error/90 px-4 py-2 font-semibold rounded-lg">Delete Account</button>
           </div>
         </div>
       </Modal>

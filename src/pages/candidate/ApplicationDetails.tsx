@@ -346,7 +346,7 @@ export default function CandidateApplicationDetails() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               exit={{ opacity: 0, scale: 0.95, y: 20 }} 
-              className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl border border-brand-gray/50 overflow-hidden z-10"
+              className="glass-card relative w-full max-w-md overflow-hidden z-10"
             >
               <div className="p-6 sm:p-8 text-center flex flex-col items-center">
                 <div className="w-16 h-16 bg-semantic-error/10 rounded-full flex items-center justify-center mb-6">

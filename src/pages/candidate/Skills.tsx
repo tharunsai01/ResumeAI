@@ -704,7 +704,7 @@ export default function CandidateSkills() {
                   <h4 className="text-sm font-semibold text-brand-navy mb-3 flex items-center gap-2 uppercase tracking-wider">
                     <BookOpen className="w-4 h-4 text-brand-indigo" /> Recommended Next Steps
                   </h4>
-                  <div className="space-y-3 text-sm text-brand-navy/70 bg-white border border-brand-gray/50 p-5 rounded-xl shadow-sm">
+                  <div className="glass-card space-y-3 text-sm text-brand-navy/70 p-5">
                     {selectedSkill.recommendation.split('\n').map((step, i) => (
                       <div key={i} className="flex gap-3">
                         {step.match(/^\d+\./) ? (

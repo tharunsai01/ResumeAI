@@ -256,7 +256,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
       <div className="p-4 border-t border-brand-gray/30">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-brand-navy/70 transition-all duration-100 active:scale-95 hover:bg-semantic-error/10 hover:text-semantic-error"
+          className="btn-interactive rounded-lg bg-semantic-error text-white hover:bg-semantic-error/90 shadow-sm flex w-full items-center gap-3 px-3 py-2 text-brand-navy/70 duration-100 active:scale-95 hover:/10 hover:text-semantic-error"
         >
           <LogOut className="h-5 w-5 shrink-0" />
           {(isSidebarOpen || isMobileOpen) && <span>Logout</span>}
@@ -369,7 +369,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-brand-gray/50 z-50 overflow-hidden flex flex-col max-h-[80vh]"
+                      className="glass-card absolute right-0 top-full mt-2 w-80 sm:w-96 z-50 overflow-hidden flex flex-col max-h-[80vh]"
                     >
                       <div className="p-4 border-b border-brand-gray/30 flex items-center justify-between bg-brand-light/30">
                         <h3 className="font-semibold text-brand-navy">Notifications</h3>
@@ -441,7 +441,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-brand-gray/50 z-50 overflow-hidden flex flex-col py-2"
+                      className="glass-card absolute right-0 top-full mt-2 w-48 z-50 overflow-hidden flex flex-col py-2"
                     >
                       <button onClick={() => { setIsProfileOpen(false); navigate(`/${type}/profile`); }} className="w-full text-left px-4 py-2 text-sm text-brand-navy/70 hover:bg-brand-light hover:text-brand-indigo transition-colors flex items-center gap-2">
                         <User className="w-4 h-4" /> Profile

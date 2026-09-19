@@ -130,14 +130,14 @@ export default function Landing() {
                   </svg>
                   
                   {/* Resume Node */}
-                  <motion.div animate={{ y: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4 }} className="absolute left-10 top-24 bg-white p-5 rounded-2xl shadow-xl border border-brand-gray/30 w-48 z-10">
+                  <motion.div animate={{ y: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4 }} className="glass-card absolute left-10 top-24 p-5 w-48 z-10">
                     <FileText className="w-8 h-8 text-brand-blue mb-3" />
                     <div className="h-2 w-24 bg-brand-gray rounded mb-2"></div>
                     <div className="h-2 w-16 bg-brand-gray rounded"></div>
                   </motion.div>
                   
                   {/* Job Node */}
-                  <motion.div animate={{ y: [5, -5, 5] }} transition={{ repeat: Infinity, duration: 5 }} className="absolute left-10 bottom-24 bg-white p-5 rounded-2xl shadow-xl border border-brand-gray/30 w-48 z-10">
+                  <motion.div animate={{ y: [5, -5, 5] }} transition={{ repeat: Infinity, duration: 5 }} className="glass-card absolute left-10 bottom-24 p-5 w-48 z-10">
                     <Briefcase className="w-8 h-8 text-brand-violet mb-3" />
                     <div className="h-2 w-24 bg-brand-gray rounded mb-2"></div>
                     <div className="h-2 w-16 bg-brand-gray rounded"></div>
@@ -152,7 +152,7 @@ export default function Landing() {
                   </motion.div>
 
                   {/* Match Node */}
-                  <motion.div animate={{ y: [-8, 8, -8] }} transition={{ repeat: Infinity, duration: 4.5 }} className="absolute right-10 top-1/2 -translate-y-1/2 bg-white p-6 rounded-2xl shadow-xl border border-brand-gray/30 w-56 z-10">
+                  <motion.div animate={{ y: [-8, 8, -8] }} transition={{ repeat: Infinity, duration: 4.5 }} className="glass-card absolute right-10 top-1/2 -translate-y-1/2 p-6 w-56 z-10">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-semibold text-brand-navy">Best Match</h3>
                       <MatchScore score={94} size="sm" />
@@ -265,7 +265,7 @@ export default function Landing() {
                 </Button>
               </div>
               <div className="mt-12 lg:mt-0 relative">
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-2xl">
+                <div className="glass-card /10 backdrop-blur-xl -white/20 p-6">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="h-12 w-12 bg-brand-blue rounded-full flex items-center justify-center font-bold text-xl">
                       JD
@@ -302,7 +302,7 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center flex flex-col-reverse lg:flex-row">
               <div className="mt-12 lg:mt-0 relative w-full">
-                <div className="bg-white border border-brand-gray/50 p-6 rounded-2xl shadow-xl">
+                <div className="glass-card p-6">
                   <div className="flex justify-between items-center mb-6 border-b border-brand-gray/30 pb-4">
                     <h4 className="font-bold text-brand-navy">AI Screening Results</h4>
                     <span className="text-xs font-bold text-brand-indigo bg-brand-indigo/10 px-3 py-1 rounded-full">Frontend Dev</span>
@@ -390,7 +390,7 @@ export default function Landing() {
                   </div>
                 </div>
 
-                <div className="bg-white p-8 rounded-2xl shadow-xl border border-brand-indigo/10 flex flex-col items-center justify-center text-center">
+                <div className="glass-card p-8 flex flex-col items-center justify-center text-center">
                   <h3 className="font-bold text-brand-navy mb-8">AI Match Breakdown</h3>
                   
                   <div className="w-full space-y-4 mb-8">
@@ -541,7 +541,7 @@ function SparkleIcon(props: React.SVGProps<SVGSVGElement>) {
 
 function FeatureCard({ icon: Icon, title, desc }: { icon: any, title: string, desc: string }) {
   return (
-    <div className="bg-white p-6 rounded-2xl border border-brand-gray/50 shadow-sm hover:shadow-md transition-shadow">
+    <div className="glass-card p-6 shadow-sm hover: transition-shadow">
       <div className="w-12 h-12 bg-brand-indigo/10 rounded-xl flex items-center justify-center mb-6">
         <Icon className="w-6 h-6 text-brand-indigo" />
       </div>

@@ -227,7 +227,7 @@ export default function RecruiterSettings() {
                       </div>
                     </div>
                     <div className="mt-6 flex justify-end">
-                      <Button onClick={handleSaveProfile} className="bg-brand-indigo hover:bg-brand-blue text-white">Save Changes</Button>
+                      <Button onClick={handleSaveProfile} className="btn-interactive btn-primary">Save Changes</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -276,7 +276,7 @@ export default function RecruiterSettings() {
                       <textarea value={company.about} onChange={e => setCompany({...company, about: e.target.value})} className="w-full bg-brand-light border border-brand-gray/40 rounded-xl p-4 text-sm focus:border-brand-indigo/50 outline-none min-h-[100px] resize-none" />
                     </div>
                     <div className="mt-8 flex justify-end">
-                      <Button onClick={handleSaveCompany} className="bg-brand-indigo hover:bg-brand-blue">Save Changes</Button>
+                      <Button onClick={handleSaveCompany} className="btn-interactive btn-primary">Save Changes</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -319,7 +319,7 @@ export default function RecruiterSettings() {
                       </div>
                     </div>
                     <div className="mt-8 flex justify-end">
-                      <Button onClick={handleSavePrefs} className="bg-brand-indigo hover:bg-brand-blue">Save Preferences</Button>
+                      <Button onClick={handleSavePrefs} className="btn-interactive btn-primary">Save Preferences</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -365,7 +365,7 @@ export default function RecruiterSettings() {
                     </div>
 
                     <div className="mt-8 pt-6 flex justify-end border-t border-brand-gray/20">
-                      <Button onClick={handleSaveAI} className="bg-brand-indigo hover:bg-brand-blue">Save AI Settings</Button>
+                      <Button onClick={handleSaveAI} className="btn-interactive btn-primary">Save AI Settings</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -422,7 +422,7 @@ export default function RecruiterSettings() {
                           <span className="inline-block mt-2 text-xs font-semibold text-semantic-success bg-semantic-success/10 px-2 py-1 rounded">Active now</span>
                         </div>
                       </div>
-                      <button onClick={() => showToast("Signed out of all other sessions ✓")} className="w-full py-3 bg-brand-light text-brand-navy font-semibold rounded-xl hover:bg-brand-gray/30 transition-colors">
+                      <button onClick={() => showToast("Signed out of all other sessions ✓")} className="btn-interactive btn-secondary w-full py-3 font-semibold rounded-xl transition-colors">
                         Sign Out All Other Sessions
                       </button>
                     </CardContent>
@@ -439,7 +439,7 @@ export default function RecruiterSettings() {
                           <h4 className="font-medium text-brand-navy">Password</h4>
                           <p className="text-sm text-brand-navy/60 mt-1">••••••••••••</p>
                         </div>
-                        <button onClick={() => setIsPasswordModalOpen(true)} className="px-4 py-2 bg-brand-light text-brand-navy text-sm font-semibold rounded-lg hover:bg-brand-gray/50 transition-colors">
+                        <button onClick={() => setIsPasswordModalOpen(true)} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
                           Change Password
                         </button>
                       </div>
@@ -449,7 +449,7 @@ export default function RecruiterSettings() {
                           <h4 className="font-medium text-brand-navy">Two-Factor Authentication</h4>
                           <p className="text-sm text-brand-navy/60 mt-1">Protect your account with an extra security layer.</p>
                         </div>
-                        <button onClick={() => setIs2FAModalOpen(true)} className="px-4 py-2 bg-brand-light text-brand-navy text-sm font-semibold rounded-lg hover:bg-brand-gray/50 transition-colors">
+                        <button onClick={() => setIs2FAModalOpen(true)} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
                           Enable 2FA
                         </button>
                       </div>
@@ -515,8 +515,8 @@ export default function RecruiterSettings() {
             <Input type="email" placeholder="new.email@example.com" />
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsEmailModalOpen(false)} className="px-4 py-2 font-semibold text-brand-navy hover:bg-brand-gray/20 rounded-lg">Cancel</button>
-            <button onClick={() => { setIsEmailModalOpen(false); showToast("Email successfully updated ✓"); }} className="px-4 py-2 bg-brand-indigo text-white font-semibold rounded-lg hover:bg-brand-indigo/90 transition-colors">Update Email</button>
+            <button onClick={() => setIsEmailModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={() => { setIsEmailModalOpen(false); showToast("Email successfully updated ✓"); }} className="btn-interactive btn-primary px-4 py-2 font-semibold rounded-lg transition-colors">Update Email</button>
           </div>
         </div>
       </Modal>
@@ -536,8 +536,8 @@ export default function RecruiterSettings() {
             <Input type="password" placeholder="Minimum 8 characters" />
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsPasswordModalOpen(false)} className="px-4 py-2 font-semibold text-brand-navy hover:bg-brand-gray/20 rounded-lg">Cancel</button>
-            <button onClick={() => { setIsPasswordModalOpen(false); showToast("Password successfully changed ✓"); }} className="px-4 py-2 bg-brand-indigo text-white font-semibold rounded-lg hover:bg-brand-indigo/90 transition-colors">Update Password</button>
+            <button onClick={() => setIsPasswordModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={() => { setIsPasswordModalOpen(false); showToast("Password successfully changed ✓"); }} className="btn-interactive btn-primary px-4 py-2 font-semibold rounded-lg transition-colors">Update Password</button>
           </div>
         </div>
       </Modal>
@@ -545,7 +545,7 @@ export default function RecruiterSettings() {
       <Modal isOpen={is2FAModalOpen} onClose={() => setIs2FAModalOpen(false)} title="Enable 2-Factor Authentication">
         <div className="mt-4">
           <p className="text-brand-navy/70 mb-6 text-sm">Scan this QR code with your authenticator app (like Google Authenticator or Authy) to add a secondary layer of security.</p>
-          <div className="w-48 h-48 bg-white rounded-xl mx-auto flex items-center justify-center shadow-inner mb-6">
+          <div className="glass-card w-48 h-48 mx-auto flex items-center justify-center mb-6">
             <div className="w-32 h-32 border-4 border-brand-navy border-dashed opacity-50 flex items-center justify-center"><span className="text-brand-navy font-bold">QR Mock</span></div>
           </div>
           <div>
@@ -553,8 +553,8 @@ export default function RecruiterSettings() {
             <Input type="text" placeholder="000000" maxLength={6} className="text-center tracking-[0.5em] text-lg font-bold font-mono" />
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIs2FAModalOpen(false)} className="px-4 py-2 font-semibold text-brand-navy hover:bg-brand-gray/20 rounded-lg">Cancel</button>
-            <button onClick={() => { setIs2FAModalOpen(false); showToast("2FA Successfully Enabled ✓"); }} className="px-4 py-2 bg-semantic-success text-white font-semibold rounded-lg hover:bg-emerald-600 transition-colors">Verify & Enable</button>
+            <button onClick={() => setIs2FAModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={() => { setIs2FAModalOpen(false); showToast("2FA Successfully Enabled ✓"); }} className="btn-interactive bg-semantic-success text-white px-4 py-2 font-semibold rounded-lg transition-colors">Verify & Enable</button>
           </div>
         </div>
       </Modal>

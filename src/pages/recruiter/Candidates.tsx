@@ -153,7 +153,7 @@ export default function RecruiterCandidates() {
         </div>
 
         {/* FILTERS */}
-        <motion.div variants={slideUp} className="bg-white rounded-2xl border border-brand-gray/50 shadow-sm p-4 space-y-4">
+        <motion.div variants={slideUp} className="glass-card p-4 space-y-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl focus-within:border-brand-indigo/50 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
               <Search className="w-5 h-5 text-brand-navy/40 mr-3" />

@@ -66,7 +66,7 @@ export default function RecruiterDashboard() {
 
   const StatCard = ({ title, data, icon: Icon, color, delay }: any) => (
     <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default h-full border-brand-gray/40 bg-white">
+      <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default h-full border-brand-gray/40">
         <CardContent className="p-5 flex flex-col h-full justify-between">
           <div className="flex items-start justify-between mb-4">
             <div className={cn("p-2.5 rounded-xl border", color.bg, color.text, color.border)}>
@@ -137,7 +137,7 @@ export default function RecruiterDashboard() {
                         onClick={() => navigate(stage.route)}
                         className="group relative z-10 flex flex-col items-center flex-1 cursor-pointer w-full sm:w-auto py-3 sm:py-0 mb-2 sm:mb-0 hover:bg-brand-light/50 sm:hover:bg-transparent rounded-xl transition-colors"
                       >
-                        <div className="w-12 h-12 rounded-2xl bg-white border border-brand-gray/50 flex items-center justify-center shadow-sm mb-3 group-hover:border-brand-indigo group-hover:text-brand-indigo group-hover:shadow-md transition-all duration-200 group-active:scale-95">
+                        <div className="w-12 h-12 rounded-2xl glass-card flex items-center justify-center shadow-sm mb-3 group-hover:border-brand-indigo group-hover:text-brand-indigo group-hover:shadow-md transition-all duration-200 group-active:scale-95">
                           {loading ? (
                             <div className="w-5 h-5 bg-brand-gray/20 rounded-full animate-pulse" />
                           ) : (

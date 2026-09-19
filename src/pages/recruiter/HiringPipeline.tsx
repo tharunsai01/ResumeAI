@@ -91,7 +91,7 @@ export default function RecruiterHiringPipeline() {
             <h1 className="text-3xl font-display font-semibold text-brand-navy">Hiring Pipeline</h1>
             <p className="text-brand-navy/60 mt-1">Track candidates from shortlist through final hiring decisions.</p>
           </div>
-          <div className="flex items-center px-4 bg-white border border-brand-gray/40 rounded-xl focus-within:border-brand-indigo/50 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all shadow-sm w-full sm:w-72 shrink-0">
+          <div className="glass-card flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all w-full sm:w-72 shrink-0">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"
@@ -124,7 +124,7 @@ export default function RecruiterHiringPipeline() {
                     {columnCandidates.map(cand => (
                       <div 
                         key={cand.id} 
-                        className="bg-white rounded-xl border border-brand-gray/30 p-4 shadow-sm hover:shadow-md hover:border-brand-indigo/30 transition-all cursor-pointer group flex flex-col"
+                        className="glass-card p-4 shadow-sm hover: hover: transition-all cursor-pointer group flex flex-col"
                         onClick={() => navigate(`/recruiter/candidates/${cand.id}`)}
                       >
                         <div className="flex items-start justify-between mb-2">

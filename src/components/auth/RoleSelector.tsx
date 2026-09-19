@@ -26,7 +26,7 @@ export function RoleSelector({ isOpen, onClose, onSelectRole }: RoleSelectorProp
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col"
+          className="glass-card relative w-full max-w-2xl overflow-hidden flex flex-col"
         >
           <div className="flex items-center justify-between p-6 border-b border-brand-gray/30">
             <h2 className="text-2xl font-display font-semibold text-brand-navy">How will you use HireSmart AI?</h2>

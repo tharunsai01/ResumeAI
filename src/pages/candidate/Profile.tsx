@@ -82,7 +82,7 @@ export default function CandidateProfilePage() {
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-5xl mx-auto space-y-6 pb-20">
         
         {/* PAGE HEADER */}
-        <motion.div variants={slideUp} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-brand-gray/50 shadow-sm">
+        <motion.div variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
           <div>
             <h1 className="text-2xl font-display font-semibold text-brand-navy">My Profile</h1>
             <p className="text-brand-navy/60">Manage your professional profile and career preferences.</p>
@@ -93,20 +93,20 @@ export default function CandidateProfilePage() {
               Profile Completion: {profile.profileCompletion}%
             </div>
             {!isEditing ? (
-              <button onClick={() => setIsEditing(true)} className="px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navy/90 transition-colors shadow-sm">
+              <button onClick={() => setIsEditing(true)} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 text-sm font-semibold rounded-lg shadow-sm">
                 Edit Profile
               </button>
             ) : (
               <div className="flex gap-2">
-                <button onClick={handleCancel} className="px-4 py-2 bg-brand-light text-brand-navy text-sm font-semibold rounded-lg hover:bg-brand-gray/50 transition-colors">
+                <button onClick={handleCancel} className="btn-interactive btn-secondary rounded-lg px-4 py-2 text-sm font-semibold">
                   Cancel
                 </button>
-                <button onClick={handleSave} className="px-4 py-2 bg-brand-indigo text-white text-sm font-semibold rounded-lg hover:bg-brand-indigo/90 transition-colors shadow-sm">
+                <button onClick={handleSave} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
                   Save Changes
                 </button>
               </div>
             )}
-            <button onClick={() => navigate("/candidate/profile/preview")} className="px-4 py-2 bg-white border border-brand-gray/80 text-brand-navy text-sm font-semibold rounded-lg hover:bg-brand-gray/30 transition-colors shadow-sm flex items-center gap-2">
+            <button onClick={() => navigate("/candidate/profile/preview")} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg shadow-sm flex items-center gap-2">
               <Eye className="w-4 h-4" />
               Preview
             </button>
@@ -268,7 +268,7 @@ export default function CandidateProfilePage() {
                           </div>
                           {isEditing && (
                             <div className="flex gap-2">
-                              <button onClick={() => profileService.removeExperience(exp.id)} className="p-1.5 text-semantic-error hover:bg-semantic-error/10 rounded-md transition-colors"><Trash2 className="w-4 h-4" /></button>
+                              <button onClick={() => profileService.removeExperience(exp.id)} className="btn-interactive p-1.5 text-semantic-error hover:bg-semantic-error/10 rounded-md transition-colors"><Trash2 className="w-4 h-4" /></button>
                             </div>
                           )}
                         </div>
@@ -298,7 +298,7 @@ export default function CandidateProfilePage() {
                           <p className="text-sm text-brand-navy/60 mt-1">{edu.startYear} – {edu.endYear} {edu.grade && `• ${edu.grade}`}</p>
                         </div>
                         {isEditing && (
-                          <button onClick={() => profileService.removeEducation(edu.id)} className="p-1.5 text-semantic-error hover:bg-semantic-error/10 rounded-md transition-colors"><Trash2 className="w-4 h-4" /></button>
+                          <button onClick={() => profileService.removeEducation(edu.id)} className="btn-interactive p-1.5 text-semantic-error hover:bg-semantic-error/10 rounded-md transition-colors"><Trash2 className="w-4 h-4" /></button>
                         )}
                       </div>
                     ))}
@@ -473,7 +473,7 @@ export default function CandidateProfilePage() {
             <option>Advanced</option>
             <option>Expert</option>
           </select>
-          <button onClick={() => { setIsSkillModalOpen(false); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }} className="w-full bg-brand-navy text-white h-10 rounded-xl font-semibold mt-4">Save Skill</button>
+          <button onClick={() => { setIsSkillModalOpen(false); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }} className="btn-interactive btn-primary bg-brand-navy w-full h-10 rounded-xl font-semibold mt-4">Save Skill</button>
         </div>
       </Modal>
 
@@ -487,7 +487,7 @@ export default function CandidateProfilePage() {
             <Input placeholder="End Date (e.g. Present)" />
           </div>
           <textarea placeholder="Description" className="w-full h-24 p-3 text-sm rounded-xl border border-brand-gray/50 focus:outline-none focus:ring-2 focus:ring-brand-indigo/50 bg-white text-brand-navy resize-none" />
-          <button onClick={() => { setIsExpModalOpen(false); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }} className="w-full bg-brand-navy text-white h-10 rounded-xl font-semibold mt-4">Save Experience</button>
+          <button onClick={() => { setIsExpModalOpen(false); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }} className="btn-interactive btn-primary bg-brand-navy w-full h-10 rounded-xl font-semibold mt-4">Save Experience</button>
         </div>
       </Modal>
 
@@ -500,7 +500,7 @@ export default function CandidateProfilePage() {
             <Input placeholder="Start Year (e.g. 2016)" />
             <Input placeholder="End Year (e.g. 2020)" />
           </div>
-          <button onClick={() => { setIsEduModalOpen(false); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }} className="w-full bg-brand-navy text-white h-10 rounded-xl font-semibold mt-4">Save Education</button>
+          <button onClick={() => { setIsEduModalOpen(false); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }} className="btn-interactive btn-primary bg-brand-navy w-full h-10 rounded-xl font-semibold mt-4">Save Education</button>
         </div>
       </Modal>
 
@@ -508,7 +508,7 @@ export default function CandidateProfilePage() {
       <Modal isOpen={isInterestModalOpen} onClose={() => setIsInterestModalOpen(false)} title="Add Career Interest">
         <div className="space-y-4 mt-4">
           <Input placeholder="Interest (e.g. Open Source, AI Research)" />
-          <button onClick={() => { setIsInterestModalOpen(false); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }} className="w-full bg-brand-navy text-white h-10 rounded-xl font-semibold mt-4">Save Interest</button>
+          <button onClick={() => { setIsInterestModalOpen(false); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }} className="btn-interactive btn-primary bg-brand-navy w-full h-10 rounded-xl font-semibold mt-4">Save Interest</button>
         </div>
       </Modal>
 

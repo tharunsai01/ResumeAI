@@ -34,6 +34,252 @@
   @apply bg-brand-navy/80 backdrop-blur-md border border-white/10 shadow-lg text-white;
 }
 
+@layer components {
+  .glass-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+    border-radius: 1.25rem; /* 20px */
+    transition: all 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
+    isolation: isolate;
+  }
+
+  /* Ensure all direct content sits above pseudo-element overlays */
+  .glass-card > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Glass Reflection — kept very subtle so text is never obscured */
+  .glass-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0) 100%);
+    opacity: 0.4;
+    pointer-events: none;
+    transition: opacity 300ms ease;
+    z-index: 0;
+  }
+
+  /* Ambient Glow — sits behind the card content */
+  .glass-card::after {
+    content: "";
+    position: absolute;
+    inset: -24px;
+    background: radial-gradient(circle at 50% 0%, rgba(79, 70, 229, 0.12) 0%, transparent 60%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms ease;
+    z-index: -1;
+    filter: blur(24px);
+    border-radius: inherit;
+  }
+
+  /* Hover States */
+  @media (prefers-reduced-motion: no-preference) {
+    .glass-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+    .glass-card:hover::before {
+      opacity: 0.5;
+    }
+    .glass-card:hover::after {
+      opacity: 1;
+    }
+  }
+
+  /* Dark Mode Adjustments */
+  .dark .glass-card {
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .glass-card::before {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0) 100%);
+    opacity: 0.3;
+  }
+
+  .dark .glass-card::after {
+    background: radial-gradient(circle at 50% 0%, rgba(79, 70, 229, 0.25) 0%, transparent 60%);
+  }
+
+  .dark .glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .dark .glass-card:hover::before {
+    opacity: 0.2;
+  }
+
+  /* --- Interactive Button System --- */
+  .btn-interactive {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: transform 300ms cubic-bezier(0.25, 0.8, 0.25, 1), 
+                box-shadow 300ms cubic-bezier(0.25, 0.8, 0.25, 1),
+                border-color 300ms ease;
+  }
+  
+  .btn-interactive > * {
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Radial expanding layer (Hover) */
+  .btn-interactive::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 400ms ease;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  /* Glass reflection */
+  .btn-interactive::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.15) 25%,
+      transparent 30%
+    );
+    transform: translateX(-100%);
+    transition: transform 600ms ease;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Hover triggers */
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-interactive:not(:disabled):hover {
+      transform: translateY(-2px) scale(1.01);
+    }
+    
+    .btn-interactive:not(:disabled):active {
+      transform: translateY(0) scale(0.99);
+    }
+    
+    .btn-interactive:not(:disabled):hover::before {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    
+    .btn-interactive:not(:disabled):hover::after {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Primary Button Specifics */
+  .btn-primary {
+    background-color: var(--color-brand-indigo, #4F46E5);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+  }
+  
+  .btn-primary::before {
+    background: radial-gradient(circle, #6366F1 0%, #4F46E5 100%);
+  }
+
+  .btn-primary:not(:disabled):hover {
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3), 0 0 12px rgba(99, 102, 241, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Secondary Button Specifics */
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--color-brand-navy, #0A1128);
+    border: 1px solid rgba(10, 17, 40, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .dark .btn-secondary {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .btn-secondary::before {
+    background: rgba(79, 70, 229, 0.08);
+  }
+  
+  .dark .btn-secondary::before {
+    background: rgba(79, 70, 229, 0.15); 
+  }
+
+  .btn-secondary:not(:disabled):hover {
+    border-color: rgba(79, 70, 229, 0.5);
+  }
+
+  /* Outline Button Specifics */
+  .btn-outline {
+    background-color: transparent;
+    color: var(--color-brand-indigo, #4F46E5);
+    border: 1px solid rgba(79, 70, 229, 0.3);
+  }
+  
+  .btn-outline::before {
+    background: rgba(79, 70, 229, 0.1);
+  }
+
+  .btn-outline:not(:disabled):hover {
+    border-color: rgba(79, 70, 229, 0.8);
+  }
+
+  /* Ghost Button Specifics */
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--color-brand-navy, #0A1128);
+    transition: color 200ms ease, background-color 200ms ease;
+  }
+  
+  .dark .btn-ghost {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .btn-ghost::before {
+    background: rgba(79, 70, 229, 0.08);
+  }
+
+  .btn-ghost:not(:disabled):hover {
+    color: var(--color-brand-indigo, #4F46E5);
+  }
+
+  /* Disable hover state overrides */
+  .btn-interactive:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* Icon Micro-interactions */
+  .btn-interactive:not(:disabled):hover svg {
+    transform: scale(1.05);
+    transition: transform 300ms ease;
+  }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -50,6 +296,14 @@
   .dark .bg-brand-light { background-color: #0A1128 !important; }
   .dark .bg-brand-light\/50 { background-color: rgba(10, 17, 40, 0.5) !important; }
   .dark .bg-brand-light\/30 { background-color: rgba(10, 17, 40, 0.3) !important; }
+  
+  /* Prevent white backgrounds on hover in dark mode */
+  .dark .hover\:bg-brand-light:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
+  .dark .hover\:bg-brand-gray\/50:hover { background-color: rgba(255, 255, 255, 0.1) !important; }
+  .dark .hover\:bg-brand-gray\/30:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
+  .dark .hover\:bg-brand-gray\/20:hover { background-color: rgba(255, 255, 255, 0.03) !important; }
+  .dark .hover\:bg-white\/5:hover { background-color: rgba(255, 255, 255, 0.08) !important; }
+  .dark .hover\:bg-white:hover { background-color: rgba(255, 255, 255, 0.1) !important; }
   
   .dark .bg-white { background-color: #0F172A !important; }
   .dark .bg-white\/80 { background-color: rgba(15, 23, 42, 0.8) !important; }

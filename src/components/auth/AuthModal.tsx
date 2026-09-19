@@ -87,7 +87,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col"
+          className="glass-card relative w-full max-w-md overflow-hidden flex flex-col"
         >
           <div className="absolute top-4 right-4 z-10">
             <button onClick={onClose} className="p-2 text-brand-navy/40 hover:bg-brand-gray/50 rounded-full transition-colors">
@@ -221,7 +221,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
               type="button"
               onClick={handleGoogleAuth}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 bg-white border-2 border-brand-gray/30 hover:border-brand-gray/50 text-brand-navy font-semibold py-3 rounded-xl transition-all h-12"
+              className="btn-interactive btn-secondary rounded-lg w-full flex items-center justify-center gap-3 border-2 hover:-brand-gray/50 font-semibold py-3 h-12"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
