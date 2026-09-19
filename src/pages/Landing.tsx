@@ -9,7 +9,7 @@ import { MatchScore } from "../components/shared/MatchScore"
 import { RoleSelector } from "../components/auth/RoleSelector"
 import { AuthModal } from "../components/auth/AuthModal"
 import { useAuth } from "../context/AuthContext"
-import { Navigate } from "react-router-dom"
+import { Navigate, Link } from "react-router-dom"
 import type { UserRole } from "../services/authService"
 
 export default function Landing() {
@@ -486,18 +486,18 @@ export default function Landing() {
             <div>
               <h4 className="text-white font-bold mb-6">Support</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" onClick={(e) => { e.preventDefault(); handleGetStarted(); }} className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); handleGetStarted(); }} className="hover:text-white transition-colors">Report a Complaint</a></li>
+                <li><Link to="/recruiter/help" className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link to="/recruiter/complaint" className="hover:text-white transition-colors">Report a Complaint</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="text-white font-bold mb-6">Legal</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" onClick={(e) => { e.preventDefault(); handleGetStarted(); }} className="hover:text-white transition-colors">Safety Tips</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); handleGetStarted(); }} className="hover:text-white transition-colors">Terms & Conditions</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); handleGetStarted(); }} className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); handleGetStarted(); }} className="hover:text-white transition-colors">About HireSmart AI</a></li>
+                <li><Link to="/recruiter/safety" className="hover:text-white transition-colors">Safety Tips</Link></li>
+                <li><Link to="/recruiter/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
+                <li><Link to="/recruiter/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/recruiter/about" className="hover:text-white transition-colors">About HireSmart AI</Link></li>
               </ul>
             </div>
           </div>

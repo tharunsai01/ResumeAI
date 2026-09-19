@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, Search, Briefcase, 
   Settings, LogOut, Bell, User, Menu, BarChart,
   CheckCircle2, AlertCircle, Calendar, Star, Check,
-  HelpCircle, AlertTriangle, Shield, FileText as FileTextIcon, Lock, Info, ChevronDown, ChevronUp
+  HelpCircle, AlertTriangle, Shield, FileText as FileTextIcon, Lock, Info, ChevronDown, ChevronUp, Sun, Moon
 } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { notificationService } from "../../services/notificationService"
@@ -22,11 +22,24 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true)
   const [isMobileOpen, setIsMobileOpen] = React.useState(false)
   const [isMoreOpen, setIsMoreOpen] = React.useState(false)
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false)
   
   // Notification State
   const [isNotifOpen, setIsNotifOpen] = React.useState(false)
   const [notifications, setNotifications] = React.useState<AppNotification[]>([])
   const unreadCount = notifications.filter(n => !n.read).length
+
+  // Theme Toggle State
+  const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove("dark")
+      setIsDark(false)
+    } else {
+      document.documentElement.classList.add("dark")
+      setIsDark(true)
+    }
+  }
 
   React.useEffect(() => {
     // Load initial
@@ -59,15 +72,15 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
   ]
 
   const helpSupportLinks = [
-    { name: "Help Center", icon: HelpCircle, href: "/candidate/help" },
-    { name: "Report a Complaint", icon: AlertTriangle, href: "/candidate/complaint" },
+    { name: "Help Center", icon: HelpCircle, href: `/${type}/help` },
+    { name: "Report a Complaint", icon: AlertTriangle, href: `/${type}/complaint` },
   ]
 
   const moreLinks = [
-    { name: "Safety Tips", icon: Shield, href: "/candidate/safety" },
-    { name: "Terms & Conditions", icon: FileTextIcon, href: "/candidate/terms" },
-    { name: "Privacy Policy", icon: Lock, href: "/candidate/privacy" },
-    { name: "About HireSmart AI", icon: Info, href: "/candidate/about" },
+    { name: "Safety Tips", icon: Shield, href: `/${type}/safety` },
+    { name: "Terms & Conditions", icon: FileTextIcon, href: `/${type}/terms` },
+    { name: "Privacy Policy", icon: Lock, href: `/${type}/privacy` },
+    { name: "About HireSmart AI", icon: Info, href: `/${type}/about` },
   ]
 
   const recruiterLinks = [
@@ -77,6 +90,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
     { name: "AI Screening", icon: Search, href: "/recruiter/screening" },
     { name: "Shortlist", icon: CheckCircle2, href: "/recruiter/shortlist" },
     { name: "Interviews", icon: Calendar, href: "/recruiter/interviews" },
+    { name: "Hiring Pipeline", icon: Star, href: "/recruiter/hiring" },
     { name: "Analytics", icon: BarChart, href: "/recruiter/analytics" },
     { name: "Settings", icon: Settings, href: "/recruiter/settings" },
   ]
@@ -138,12 +152,17 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
             
             {/* EXPLORE SECTION */}
             <div>
-              <h4 className="px-3 text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-2">Explore</h4>
+              { (isSidebarOpen || isMobileOpen) ? (
+                <h4 className="px-3 text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-2">Explore</h4>
+              ) : (
+                <div className="w-8 h-px bg-brand-gray/30 mx-auto mb-4 mt-2" />
+              )}
               <div className="space-y-1">
                 {links.map((link) => (
                   <NavLink
                     key={link.name}
                     to={link.href}
+                    onClick={() => { if (isMobileOpen) setIsMobileOpen(false) }}
                     className={({ isActive }) => cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-100 active:scale-95",
                       isActive 
@@ -160,12 +179,17 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
 
             {/* HELP & SUPPORT SECTION */}
             <div>
-              <h4 className="px-3 text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-2">Help & Support</h4>
+              { (isSidebarOpen || isMobileOpen) ? (
+                <h4 className="px-3 text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-2">Help & Support</h4>
+              ) : (
+                <div className="w-8 h-px bg-brand-gray/30 mx-auto mb-4 mt-4" />
+              )}
                 <div className="space-y-1">
                   {helpSupportLinks.map((link) => (
                     <NavLink
                       key={link.name}
                       to={link.href}
+                      onClick={() => { if (isMobileOpen) setIsMobileOpen(false) }}
                       className={({ isActive }) => cn(
                         "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-100 active:scale-95",
                         isActive 
@@ -208,6 +232,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                             <NavLink
                               key={link.name}
                               to={link.href}
+                              onClick={() => { if (isMobileOpen) setIsMobileOpen(false) }}
                               className={({ isActive }) => cn(
                                 "flex items-center gap-2 rounded-lg px-2 py-1.5 transition-all duration-100 active:scale-95 text-sm",
                                 isActive 
@@ -305,6 +330,15 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
           
           <div className="flex items-center gap-4">
             
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-brand-navy/60 hover:bg-brand-gray/50 rounded-lg transition-colors"
+              title="Toggle Theme"
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+
             {/* Notification Center */}
             <div className="relative">
               <button 
@@ -386,14 +420,46 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
             </div>
 
             <div className="h-8 w-px bg-brand-gray/50" />
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-brand-navy">{userName}</p>
-                <p className="text-xs text-brand-navy/60 capitalize">{type}</p>
-              </div>
-              <div className="h-9 w-9 rounded-full bg-brand-indigo/10 text-brand-indigo flex items-center justify-center font-semibold border border-brand-indigo/20">
-                {userName.charAt(0)}
-              </div>
+            
+            <div className="relative">
+              <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-3 focus:outline-none">
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-medium text-brand-navy">{userName}</p>
+                  <p className="text-xs text-brand-navy/60 capitalize">{type}</p>
+                </div>
+                <div className="h-9 w-9 rounded-full bg-brand-indigo/10 text-brand-indigo flex items-center justify-center font-semibold border border-brand-indigo/20">
+                  {userName.charAt(0)}
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-brand-gray/50 z-50 overflow-hidden flex flex-col py-2"
+                    >
+                      <button onClick={() => { setIsProfileOpen(false); navigate(`/${type}/profile`); }} className="w-full text-left px-4 py-2 text-sm text-brand-navy/70 hover:bg-brand-light hover:text-brand-indigo transition-colors flex items-center gap-2">
+                        <User className="w-4 h-4" /> Profile
+                      </button>
+                      <button onClick={() => { setIsProfileOpen(false); navigate(`/${type}/settings`); }} className="w-full text-left px-4 py-2 text-sm text-brand-navy/70 hover:bg-brand-light hover:text-brand-indigo transition-colors flex items-center gap-2">
+                        <Settings className="w-4 h-4" /> Settings
+                      </button>
+                      <button onClick={() => { setIsProfileOpen(false); navigate(`/${type}/help`); }} className="w-full text-left px-4 py-2 text-sm text-brand-navy/70 hover:bg-brand-light hover:text-brand-indigo transition-colors flex items-center gap-2">
+                        <HelpCircle className="w-4 h-4" /> Help Center
+                      </button>
+                      <div className="h-px w-full bg-brand-gray/30 my-1" />
+                      <button onClick={() => { setIsProfileOpen(false); handleLogout(); }} className="w-full text-left px-4 py-2 text-sm text-semantic-error/80 hover:bg-semantic-error/10 transition-colors flex items-center gap-2">
+                        <LogOut className="w-4 h-4" /> Logout
+                      </button>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </header>

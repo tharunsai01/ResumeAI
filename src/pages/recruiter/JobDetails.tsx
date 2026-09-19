@@ -1,181 +1,250 @@
 import * as React from "react"
-import { motion } from "framer-motion"
-import { Briefcase, MapPin, ChevronLeft, Edit, Users, Sparkles, CheckCircle2, PlayCircle } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, Edit, Users, Search, CheckCircle2, Calendar, Award, Building, MapPin, Briefcase, Clock, DollarSign, Sparkles, XCircle } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
 import { Button } from "../../components/ui/Button"
-import { jobService } from "../../services/jobService"
-import { applicationService, type Application } from "../../services/applicationService"
-import type { Job } from "../../data/mockJobs"
 import { staggerContainer, slideUp } from "../../lib/animations"
+import { initialRecruiterJobs } from "../../data/recruiterMockData"
+import { cn } from "../../lib/utils"
 
 export default function RecruiterJobDetails() {
-  const { jobId } = useParams()
   const navigate = useNavigate()
-  const [job, setJob] = React.useState<Job | null>(null)
-  const [applications, setApplications] = React.useState<Application[]>([])
+  const { jobId } = useParams()
   
-  React.useEffect(() => {
-    if (!jobId) return
-    const fetchJob = async () => {
-      const found = await jobService.getJobById(jobId)
-      if (found) {
-        setJob(found)
-        setApplications(applicationService.getApplicationsByJob(jobId))
-      }
+  const [job, setJob] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState(true)
+  const [toastMsg, setToastMsg] = React.useState<string | null>(null)
+
+  const handleCloseJob = () => {
+    if (window.confirm("Are you sure you want to close this job? It will no longer accept applications.")) {
+      setToastMsg("Job closed successfully ✓")
+      setTimeout(() => setToastMsg(null), 3000)
     }
-    fetchJob()
+  }
+
+  React.useEffect(() => {
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      const foundJob = initialRecruiterJobs.find(j => j.id === jobId)
+      setJob(foundJob)
+      setLoading(false)
+    }, 300)
+    return () => clearTimeout(timer)
   }, [jobId])
 
-  if (!job) return null
+  if (loading) {
+    return (
+      <DashboardShell type="recruiter" userName="Recruiter">
+        <div className="max-w-5xl mx-auto flex justify-center py-20 text-brand-navy/40">
+          <div className="w-8 h-8 border-2 border-brand-navy/20 border-t-brand-indigo rounded-full animate-spin" />
+        </div>
+      </DashboardShell>
+    )
+  }
 
-  const screened = applications.filter(a => a.aiScreening || a.status !== "Applied").length
-  const shortlisted = applications.filter(a => ["Shortlisted", "Interview", "Offer", "Hired"].includes(a.status)).length
-  const hired = applications.filter(a => a.status === "Hired").length
+  if (!job) {
+    return (
+      <DashboardShell type="recruiter" userName="Recruiter">
+        <div className="max-w-5xl mx-auto text-center py-20">
+          <h2 className="text-2xl font-semibold text-brand-navy mb-2">Job not found</h2>
+          <Button onClick={() => navigate("/recruiter/jobs")}>Back to Jobs</Button>
+        </div>
+      </DashboardShell>
+    )
+  }
+
+  // Mock application breakdown based on total applications
+  const appSummary = {
+    total: job.applications,
+    screened: Math.floor(job.applications * 0.8),
+    shortlisted: Math.floor(job.applications * 0.3),
+    interviews: Math.floor(job.applications * 0.1),
+    hired: job.applications > 0 ? 1 : 0
+  }
+
+  const SummaryCard = ({ title, value, icon: Icon, color, route }: any) => (
+    <Card 
+      onClick={() => navigate(route)}
+      className="cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200 group border-brand-gray/40 bg-white"
+    >
+      <CardContent className="p-4 flex flex-col justify-between h-full">
+        <div className="flex justify-between items-start mb-3">
+          <div className={cn("p-2 rounded-xl border", color.bg, color.text, color.border)}>
+            <Icon className="w-4 h-4" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-2xl font-display font-bold text-brand-navy group-hover:text-brand-indigo transition-colors">{value}</h3>
+          <p className="text-xs font-medium text-brand-navy/60">{title}</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case "Active": return "bg-semantic-success/10 text-semantic-success border-semantic-success/20"
+      case "Draft": return "bg-brand-gray/20 text-brand-navy/70 border-brand-gray/30"
+      case "Closed": return "bg-semantic-error/10 text-semantic-error border-semantic-error/20"
+    }
+  }
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
-      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-5xl mx-auto pb-12">
-        <motion.div variants={slideUp} className="mb-6 flex items-start gap-4">
-          <button 
-            onClick={() => navigate("/recruiter/jobs")}
-            className="p-2 rounded-lg hover:bg-brand-gray/50 transition-colors text-brand-navy/60 mt-1"
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 right-6 z-50 bg-semantic-success text-white px-4 py-3 rounded-lg flex items-center gap-2 shadow-xl"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <span className="text-sm font-medium">{toastMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-6xl mx-auto pb-16 space-y-6">
+        
+        {/* HEADER */}
+        <motion.div variants={slideUp}>
+          <button onClick={() => navigate("/recruiter/jobs")} className="flex items-center text-sm font-medium text-brand-navy/60 hover:text-brand-indigo transition-colors mb-4">
+            <ChevronLeft className="w-4 h-4 mr-1" /> Back to Jobs
           </button>
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-display font-semibold text-brand-navy">{job.title}</h1>
-                <div className="flex items-center gap-4 mt-2 text-brand-navy/60 text-sm">
-                  <span className="flex items-center gap-1"><Briefcase className="w-4 h-4" /> {job.type}</span>
-                  <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {job.location}</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-semantic-success/10 text-semantic-success">
-                    Active
-                  </span>
-                </div>
+          
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-display font-bold text-brand-navy">{job.title}</h1>
+                <span className={cn(
+                  "inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border",
+                  getStatusStyle(job.status)
+                )}>
+                  {job.status}
+                </span>
               </div>
-              <div className="flex gap-3">
-                <Button variant="outline" className="hidden sm:flex">
-                  <Edit className="w-4 h-4 mr-2" /> Edit Job
-                </Button>
-                <Button onClick={() => navigate(`/recruiter/screening?jobId=${job.id}`)}>
-                  <Sparkles className="w-4 h-4 mr-2" /> Screen Candidates
-                </Button>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-brand-navy/70">
+                <span className="flex items-center"><Building className="w-4 h-4 mr-1.5" /> {job.company}</span>
+                <span className="flex items-center"><MapPin className="w-4 h-4 mr-1.5" /> {job.location} ({job.workMode})</span>
+                <span className="flex items-center"><Clock className="w-4 h-4 mr-1.5" /> {job.postedDate}</span>
               </div>
+            </div>
+            
+            <div className="flex items-center gap-3 shrink-0">
+              <Button variant="outline" onClick={() => navigate(`/recruiter/jobs/${job.id}/edit`)}>
+                <Edit className="w-4 h-4 mr-2" /> Edit Job
+              </Button>
+              <Button variant="outline" className="text-semantic-error hover:bg-semantic-error/5 hover:text-semantic-error border-brand-gray/40" onClick={handleCloseJob}>
+                <XCircle className="w-4 h-4 mr-2" /> Close Job
+              </Button>
+              <Button onClick={() => navigate("/recruiter/candidates")} className="bg-gradient-to-r from-brand-indigo to-brand-blue">
+                <Users className="w-4 h-4 mr-2" /> View Candidates
+              </Button>
             </div>
           </div>
         </motion.div>
 
+        {/* APPLICATION SUMMARY */}
+        <motion.div variants={slideUp}>
+          <h2 className="text-sm font-semibold text-brand-navy/60 uppercase tracking-wider mb-3 px-1">Application Pipeline</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <SummaryCard title="Total Applications" value={appSummary.total} icon={Users} route="/recruiter/candidates" color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo", border: "border-brand-indigo/20" }} />
+            <SummaryCard title="AI Screened" value={appSummary.screened} icon={Search} route="/recruiter/screening" color={{ bg: "bg-brand-blue/10", text: "text-brand-blue", border: "border-brand-blue/20" }} />
+            <SummaryCard title="Shortlisted" value={appSummary.shortlisted} icon={CheckCircle2} route="/recruiter/shortlist" color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning", border: "border-semantic-warning/20" }} />
+            <SummaryCard title="Interviews" value={appSummary.interviews} icon={Calendar} route="/recruiter/interviews" color={{ bg: "bg-semantic-success/10", text: "text-semantic-success", border: "border-semantic-success/20" }} />
+            <SummaryCard title="Hired" value={appSummary.hired} icon={Award} route="/recruiter/candidates" color={{ bg: "bg-emerald-500/10", text: "text-emerald-500", border: "border-emerald-500/20" }} />
+          </div>
+        </motion.div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* JOB DETAILS MAIN CONTENT */}
           <motion.div variants={slideUp} className="lg:col-span-2 space-y-6">
             <Card>
-              <CardHeader>
+              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <CardTitle>Job Description</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-brand-navy/70 whitespace-pre-wrap leading-relaxed text-sm">
-                  {job.description}
-                </p>
-                <h4 className="font-semibold text-brand-navy mt-6 mb-3">Requirements</h4>
-                <ul className="list-disc pl-5 space-y-2 text-sm text-brand-navy/70">
-                  {job.requirements?.map((req, i) => (
-                    <li key={i}>{req}</li>
-                  ))}
-                </ul>
+              <CardContent className="p-6">
+                <div className="prose prose-sm prose-slate max-w-none">
+                  <p className="text-brand-navy/80 leading-relaxed whitespace-pre-wrap">{job.description}</p>
+                  
+                  <h4 className="text-brand-navy font-semibold mt-6 mb-2">Responsibilities</h4>
+                  <ul className="list-disc pl-5 text-brand-navy/80 space-y-1">
+                    <li>Design and implement scalable solutions.</li>
+                    <li>Collaborate with cross-functional teams to define requirements.</li>
+                    <li>Write clean, maintainable, and efficient code.</li>
+                    <li>Participate in code reviews and architecture discussions.</li>
+                  </ul>
+                  
+                  <h4 className="text-brand-navy font-semibold mt-6 mb-2">Requirements</h4>
+                  <ul className="list-disc pl-5 text-brand-navy/80 space-y-1">
+                    <li>Proven experience in the field.</li>
+                    <li>Strong problem-solving skills and attention to detail.</li>
+                    <li>Excellent communication and teamwork abilities.</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* SIDEBAR INFO */}
+          <motion.div variants={slideUp} className="space-y-6">
+            <Card>
+              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <CardTitle>Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="p-5 space-y-5">
+                <div className="flex items-start gap-3 text-sm">
+                  <Briefcase className="w-5 h-5 text-brand-indigo mt-0.5 shrink-0" />
+                  <div>
+                    <div className="font-medium text-brand-navy">Job Type</div>
+                    <div className="text-brand-navy/70">{job.jobType}</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 text-sm">
+                  <MapPin className="w-5 h-5 text-brand-blue mt-0.5 shrink-0" />
+                  <div>
+                    <div className="font-medium text-brand-navy">Work Mode</div>
+                    <div className="text-brand-navy/70">{job.workMode}</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 text-sm">
+                  <Award className="w-5 h-5 text-semantic-warning mt-0.5 shrink-0" />
+                  <div>
+                    <div className="font-medium text-brand-navy">Experience</div>
+                    <div className="text-brand-navy/70">{job.experience}</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 text-sm">
+                  <DollarSign className="w-5 h-5 text-semantic-success mt-0.5 shrink-0" />
+                  <div>
+                    <div className="font-medium text-brand-navy">Salary Range</div>
+                    <div className="text-brand-navy/70">{job.salary}</div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Required Skills</CardTitle>
+              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-brand-indigo" /> Required Skills
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-5">
                 <div className="flex flex-wrap gap-2">
-                  {job.skills.map(s => (
-                    <span key={s} className="px-3 py-1.5 bg-brand-light border border-brand-gray/50 rounded-lg text-sm text-brand-navy font-medium">
-                      {s}
+                  {job.skills.map((skill: string) => (
+                    <span key={skill} className="px-3 py-1 bg-brand-indigo/10 text-brand-indigo text-xs font-bold rounded-md border border-brand-indigo/20">
+                      {skill}
                     </span>
                   ))}
                 </div>
               </CardContent>
             </Card>
           </motion.div>
-
-          <motion.div variants={slideUp} className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recruitment Pipeline</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center p-3 rounded-xl bg-brand-light">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-brand-blue/10 rounded-lg text-brand-blue">
-                      <Users className="w-5 h-5" />
-                    </div>
-                    <span className="font-medium text-brand-navy">Total Applicants</span>
-                  </div>
-                  <span className="text-xl font-bold">{applications.length}</span>
-                </div>
-                
-                <div className="flex justify-between items-center p-3 rounded-xl bg-semantic-info/10">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/50 rounded-lg text-semantic-info">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    <span className="font-medium text-brand-navy">AI Screened</span>
-                  </div>
-                  <span className="text-xl font-bold text-semantic-info">{screened}</span>
-                </div>
-                
-                <div className="flex justify-between items-center p-3 rounded-xl bg-semantic-warning/10">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/50 rounded-lg text-semantic-warning">
-                      <PlayCircle className="w-5 h-5" />
-                    </div>
-                    <span className="font-medium text-brand-navy">Shortlisted</span>
-                  </div>
-                  <span className="text-xl font-bold text-semantic-warning">{shortlisted}</span>
-                </div>
-                
-                <div className="flex justify-between items-center p-3 rounded-xl bg-semantic-success/10">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/50 rounded-lg text-semantic-success">
-                      <CheckCircle2 className="w-5 h-5" />
-                    </div>
-                    <span className="font-medium text-brand-navy">Hired</span>
-                  </div>
-                  <span className="text-xl font-bold text-semantic-success">{hired}</span>
-                </div>
-
-                <Button variant="outline" className="w-full mt-4" onClick={() => navigate("/recruiter/candidates")}>
-                  View All Candidates
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Job Settings</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-brand-navy/60">Experience</span>
-                  <span className="text-sm font-medium">{job.experience}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-brand-navy/60">Salary</span>
-                  <span className="text-sm font-medium">{job.salary}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-brand-navy/60">Posted On</span>
-                  <span className="text-sm font-medium">{job.postedDate}</span>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
         </div>
+        
       </motion.div>
     </DashboardShell>
   )

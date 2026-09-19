@@ -22,13 +22,26 @@ import CandidateAbout from "./pages/candidate/About"
 import RecruiterDashboard from "./pages/recruiter/Dashboard"
 import RecruiterJobs from "./pages/recruiter/Jobs"
 import RecruiterCreateJob from "./pages/recruiter/CreateJob"
+import RecruiterEditJob from "./pages/recruiter/EditJob"
 import RecruiterJobDetails from "./pages/recruiter/JobDetails"
 import RecruiterCandidates from "./pages/recruiter/Candidates"
 import RecruiterCandidateProfile from "./pages/recruiter/CandidateProfile"
 import RecruiterScreening from "./pages/recruiter/Screening"
+import RecruiterJobScreening from "./pages/recruiter/JobScreening"
+import RecruiterCandidateScreening from "./pages/recruiter/CandidateScreening"
 import RecruiterShortlist from "./pages/recruiter/Shortlist"
 import RecruiterInterviews from "./pages/recruiter/Interviews"
+import RecruiterInterviewDetails from "./pages/recruiter/InterviewDetails"
+import RecruiterHiringPipeline from "./pages/recruiter/HiringPipeline"
 import RecruiterAnalytics from "./pages/recruiter/Analytics"
+import RecruiterProfile from "./pages/recruiter/Profile"
+import RecruiterSettings from "./pages/recruiter/Settings"
+import RecruiterHelp from "./pages/recruiter/Help"
+import RecruiterComplaint from "./pages/recruiter/Complaint"
+import RecruiterSafety from "./pages/recruiter/Safety"
+import RecruiterTerms from "./pages/recruiter/Terms"
+import RecruiterPrivacy from "./pages/recruiter/Privacy"
+import RecruiterAbout from "./pages/recruiter/About"
 
 import { AnimatePresence } from "framer-motion"
 import { useEffect } from "react"
@@ -78,13 +91,25 @@ function App() {
               <Route path="/recruiter/jobs" element={<RecruiterJobs />} />
               <Route path="/recruiter/jobs/create" element={<RecruiterCreateJob />} />
               <Route path="/recruiter/jobs/:jobId" element={<RecruiterJobDetails />} />
+              <Route path="/recruiter/jobs/:jobId/edit" element={<RecruiterEditJob />} />
               <Route path="/recruiter/candidates" element={<RecruiterCandidates />} />
               <Route path="/recruiter/candidates/:candidateId" element={<RecruiterCandidateProfile />} />
               <Route path="/recruiter/screening" element={<RecruiterScreening />} />
+              <Route path="/recruiter/screening/:jobId" element={<RecruiterJobScreening />} />
+              <Route path="/recruiter/screening/:jobId/:candidateId" element={<RecruiterCandidateScreening />} />
               <Route path="/recruiter/shortlist" element={<RecruiterShortlist />} />
               <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
+              <Route path="/recruiter/interviews/:interviewId" element={<RecruiterInterviewDetails />} />
+              <Route path="/recruiter/hiring" element={<RecruiterHiringPipeline />} />
               <Route path="/recruiter/analytics" element={<RecruiterAnalytics />} />
-              <Route path="/recruiter/settings" element={<CandidateSettings type="recruiter" />} />
+              <Route path="/recruiter/profile" element={<RecruiterProfile />} />
+              <Route path="/recruiter/settings" element={<RecruiterSettings />} />
+              <Route path="/recruiter/help" element={<RecruiterHelp />} />
+              <Route path="/recruiter/complaint" element={<RecruiterComplaint />} />
+              <Route path="/recruiter/safety" element={<RecruiterSafety />} />
+              <Route path="/recruiter/terms" element={<RecruiterTerms />} />
+              <Route path="/recruiter/privacy" element={<RecruiterPrivacy />} />
+              <Route path="/recruiter/about" element={<RecruiterAbout />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

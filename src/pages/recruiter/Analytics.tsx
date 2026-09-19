@@ -1,199 +1,245 @@
 import * as React from "react"
 import { motion } from "framer-motion"
-import { BarChart as BarChartIcon, TrendingUp, Users, CheckCircle2 } from "lucide-react"
+import { BarChart, Users, CheckCircle2, User, Search, Download, Briefcase, Calendar, ChevronRight } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
-import { applicationService } from "../../services/applicationService"
+import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
+
+const MOCK_STATS = {
+  totalApplications: 245,
+  aiScreened: 186,
+  aiQualified: 142,
+  shortlisted: 42,
+  interviews: 16,
+  hired: 7,
+  averageMatch: 78
+}
+
+const MOCK_JOBS = [
+  { id: 1, title: "Software Engineer", apps: 85, qualified: 45, shortlisted: 15, interviews: 5, hired: 2 },
+  { id: 2, title: "AI Engineer", apps: 60, qualified: 35, shortlisted: 12, interviews: 4, hired: 1 },
+  { id: 3, title: "Frontend Developer", apps: 55, qualified: 40, shortlisted: 10, interviews: 4, hired: 2 },
+  { id: 4, title: "Product Manager", apps: 45, qualified: 22, shortlisted: 5, interviews: 3, hired: 2 },
+]
 
 export default function RecruiterAnalytics() {
-  const [stats] = React.useState(() => {
-    const apps = applicationService.getApplications()
-    return {
-      total: apps.length,
-      screened: apps.filter(a => a.status !== "Applied").length,
-      screening: apps.filter(a => a.status === "AI Screened").length,
-      shortlisted: apps.filter(a => ["Shortlisted", "Interview", "Offer", "Hired"].includes(a.status)).length,
-      interview: apps.filter(a => a.status === "Interview").length,
-      hired: apps.filter(a => a.status === "Hired").length,
-      rejected: apps.filter(a => a.status === "Rejected").length
-    }
-  })
+  const [loading, setLoading] = React.useState(true)
+  const [dateFilter, setDateFilter] = React.useState("30 Days")
+  const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    // If we need to listen for application updates, do it here
+    const timer = setTimeout(() => setLoading(false), 500)
+    return () => clearTimeout(timer)
   }, [])
 
-  const funnelData = [
-    { name: 'Applied', value: stats.total },
-    { name: 'AI Screened', value: stats.screened },
-    { name: 'Shortlisted', value: stats.shortlisted },
-    { name: 'Hired', value: stats.hired },
-  ]
+  const handleExport = () => {
+    setToastMsg("Report export will be available after backend integration.")
+    setTimeout(() => setToastMsg(null), 3000)
+  }
 
-  const trendData = [
-    { name: 'Week 1', applicants: 12 },
-    { name: 'Week 2', applicants: 19 },
-    { name: 'Week 3', applicants: 15 },
-    { name: 'Week 4', applicants: 28 },
-    { name: 'Week 5', applicants: Math.max(stats.total, 35) },
-  ]
+  const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
+    <motion.div variants={slideUp} custom={delay}>
+      <Card className="hover:-translate-y-0.5 transition-all duration-200 h-full">
+        <CardContent className="p-5 flex flex-col justify-between h-full">
+          <div className="flex justify-between items-start mb-4">
+            <div className={`p-2.5 rounded-lg ${color.bg} ${color.text}`}>
+              <Icon className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <h3 className="text-2xl font-display font-bold text-brand-navy">
+              {loading ? <div className="h-8 w-16 bg-brand-gray/20 rounded animate-pulse" /> : value}
+            </h3>
+            <p className="text-sm font-medium text-brand-navy/60 mt-1">{title}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  )
 
-  const matchData = [
-    { name: '<60%', count: Math.round(stats.total * 0.1) },
-    { name: '60-75%', count: Math.round(stats.total * 0.4) },
-    { name: '75-90%', count: Math.round(stats.total * 0.3) },
-    { name: '>90%', count: Math.round(stats.total * 0.2) },
-  ]
+  const FunnelStep = ({ label, value, percent, colorClass, nextPercent }: any) => (
+    <div className="flex flex-col items-center group relative">
+      <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center border-4 border-white shadow-md z-10 transition-transform group-hover:scale-105 ${colorClass}`}>
+        <span className="text-xl sm:text-2xl font-bold">{value}</span>
+        {percent && <span className="text-[10px] sm:text-xs opacity-90">{percent}%</span>}
+      </div>
+      <span className="text-xs sm:text-sm font-semibold text-brand-navy text-center mt-3">{label}</span>
+      
+      {nextPercent && (
+        <div className="hidden sm:flex absolute top-12 left-20 w-[calc(100%-2.5rem)] h-0.5 bg-brand-gray/30 -z-10 items-center justify-center">
+          <span className="bg-white px-2 text-[10px] font-bold text-brand-navy/40 rounded-full border border-brand-gray/20 absolute -top-2.5">
+            {nextPercent}%
+          </span>
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
-      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-7xl mx-auto space-y-6 pb-12">
-        <motion.div variants={slideUp}>
-          <h1 className="text-3xl font-display font-semibold text-brand-navy flex items-center gap-2">
-            <BarChartIcon className="w-8 h-8 text-brand-indigo" /> Analytics & Reports
-          </h1>
-          <p className="text-brand-navy/60 mt-1">Track your recruitment pipeline performance and AI screening efficiency.</p>
+      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-7xl mx-auto space-y-6 pb-12 relative">
+        
+        {/* TOAST */}
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 right-6 z-50 bg-brand-navy text-white px-4 py-3 rounded-lg flex items-center gap-2 shadow-xl"
+          >
+            <span className="text-sm font-medium">{toastMsg}</span>
+          </motion.div>
+        )}
+
+        {/* HEADER */}
+        <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-display font-semibold text-brand-navy">Recruitment Analytics</h1>
+            <p className="text-brand-navy/60 mt-1">Track hiring activity, candidate progress, and AI screening insights.</p>
+          </div>
+          <Button onClick={handleExport} className="bg-white text-brand-navy border border-brand-gray/40 hover:bg-brand-gray/10 shrink-0">
+            <Download className="w-4 h-4 mr-2" /> Export Report
+          </Button>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <motion.div variants={slideUp}>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-brand-blue/10 text-brand-blue rounded-xl">
-                    <Users className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-brand-navy/60">Total Applicants</p>
-                    <h3 className="text-2xl font-bold text-brand-navy">{stats.total}</h3>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          <motion.div variants={slideUp}>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-brand-indigo/10 text-brand-indigo rounded-xl">
-                    <TrendingUp className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-brand-navy/60">Conversion Rate</p>
-                    <h3 className="text-2xl font-bold text-brand-navy">
-                      {stats.total > 0 ? Math.round((stats.hired / stats.total) * 100) : 0}%
-                    </h3>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          <motion.div variants={slideUp}>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-semantic-warning/10 text-semantic-warning rounded-xl">
-                    <CheckCircle2 className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-brand-navy/60">Avg. Match Score</p>
-                    <h3 className="text-2xl font-bold text-brand-navy">78%</h3>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          <motion.div variants={slideUp}>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-semantic-success/10 text-semantic-success rounded-xl">
-                    <Users className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-brand-navy/60">Time to Hire</p>
-                    <h3 className="text-2xl font-bold text-brand-navy">14 Days</h3>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+        {/* SUMMARY CARDS */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+          <StatCard title="Total Applications" value={MOCK_STATS.totalApplications} icon={Users} delay={0} color={{ bg: "bg-brand-gray/10", text: "text-brand-navy" }} />
+          <StatCard title="AI Screened" value={MOCK_STATS.aiScreened} icon={Search} delay={1} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
+          <StatCard title="AI Qualified" value={MOCK_STATS.aiQualified} icon={CheckCircle2} delay={2} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
+          <StatCard title="Shortlisted" value={MOCK_STATS.shortlisted} icon={User} delay={3} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
+          <StatCard title="Interviews" value={MOCK_STATS.interviews} icon={Calendar} delay={4} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
+          <StatCard title="Hired" value={MOCK_STATS.hired} icon={Briefcase} delay={5} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
+          <StatCard title="Avg Match" value={`${MOCK_STATS.averageMatch}%`} icon={BarChart} delay={6} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div variants={slideUp}>
-            <Card className="h-[400px]">
-              <CardHeader>
-                <CardTitle>Application Trend</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorApplicants" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
-                    <Tooltip 
-                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    />
-                    <Area type="monotone" dataKey="applicants" stroke="#4F46E5" strokeWidth={3} fillOpacity={1} fill="url(#colorApplicants)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div variants={slideUp}>
-            <Card className="h-[400px]">
-              <CardHeader>
-                <CardTitle>Recruitment Funnel</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={funnelData} layout="vertical" margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
-                    <XAxis type="number" hide />
-                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#1E293B', fontSize: 13, fontWeight: 500}} width={100} />
-                    <Tooltip 
-                      cursor={{fill: '#F3F4F6'}}
-                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    />
-                    <Bar dataKey="value" fill="#4F46E5" radius={[0, 8, 8, 0]} barSize={32} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </motion.div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* HIRING FUNNEL */}
           <motion.div variants={slideUp} className="lg:col-span-2">
-            <Card className="h-[400px]">
-              <CardHeader>
-                <CardTitle>AI Match Score Distribution</CardTitle>
+            <Card className="h-full">
+              <CardHeader className="border-b border-brand-gray/20">
+                <CardTitle>Hiring Funnel</CardTitle>
               </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={matchData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
-                    <Tooltip 
-                      cursor={{fill: '#F3F4F6'}}
-                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    />
-                    <Bar dataKey="count" fill="#3B82F6" radius={[8, 8, 0, 0]} barSize={48} />
-                  </BarChart>
-                </ResponsiveContainer>
+              <CardContent className="p-8">
+                {loading ? (
+                  <div className="h-40 flex items-center justify-center"><div className="w-8 h-8 border-2 border-brand-indigo border-t-transparent rounded-full animate-spin" /></div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-8 sm:gap-0 mt-4">
+                    <FunnelStep label="Applications" value={MOCK_STATS.totalApplications} percent="100" colorClass="bg-brand-navy text-white" nextPercent="76" />
+                    <ChevronRight className="w-6 h-6 text-brand-gray/40 block sm:hidden" />
+                    <FunnelStep label="AI Screened" value={MOCK_STATS.aiScreened} percent="76" colorClass="bg-brand-blue text-white" nextPercent="76" />
+                    <ChevronRight className="w-6 h-6 text-brand-gray/40 block sm:hidden" />
+                    <FunnelStep label="AI Qualified" value={MOCK_STATS.aiQualified} percent="58" colorClass="bg-brand-indigo text-white" nextPercent="30" />
+                    <ChevronRight className="w-6 h-6 text-brand-gray/40 block sm:hidden" />
+                    <FunnelStep label="Shortlisted" value={MOCK_STATS.shortlisted} percent="17" colorClass="bg-semantic-warning text-white" nextPercent="38" />
+                    <ChevronRight className="w-6 h-6 text-brand-gray/40 block sm:hidden" />
+                    <FunnelStep label="Interviews" value={MOCK_STATS.interviews} percent="6.5" colorClass="bg-emerald-500 text-white" nextPercent="44" />
+                    <ChevronRight className="w-6 h-6 text-brand-gray/40 block sm:hidden" />
+                    <FunnelStep label="Hired" value={MOCK_STATS.hired} percent="2.8" colorClass="bg-semantic-success text-white" />
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
+
+          {/* AI SCREENING INSIGHTS */}
+          <motion.div variants={slideUp}>
+            <Card className="h-full">
+              <CardHeader className="border-b border-brand-gray/20">
+                <CardTitle>AI Screening Insights</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <p className="text-xs text-brand-navy/60 mb-6 leading-relaxed bg-brand-blue/5 p-3 rounded-lg border border-brand-blue/10">
+                  Candidates scoring <span className="font-bold text-brand-indigo">{AI_SCREENING_THRESHOLD}%</span> or above are considered AI-qualified for recruiter review.
+                </p>
+
+                <div className="space-y-5">
+                  <div>
+                    <div className="flex justify-between text-sm font-semibold mb-2">
+                      <span className="text-brand-navy">Strong Matches (90%+)</span>
+                      <span className="text-semantic-success">32</span>
+                    </div>
+                    <div className="w-full bg-brand-gray/20 rounded-full h-2">
+                      <div className="bg-semantic-success h-2 rounded-full" style={{ width: "22%" }} />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm font-semibold mb-2">
+                      <span className="text-brand-navy">Potential Matches (80-89%)</span>
+                      <span className="text-brand-indigo">110</span>
+                    </div>
+                    <div className="w-full bg-brand-gray/20 rounded-full h-2">
+                      <div className="bg-brand-indigo h-2 rounded-full" style={{ width: "77%" }} />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm font-semibold mb-2">
+                      <span className="text-brand-navy">Below Threshold (&lt;80%)</span>
+                      <span className="text-semantic-error">44</span>
+                    </div>
+                    <div className="w-full bg-brand-gray/20 rounded-full h-2">
+                      <div className="bg-semantic-error h-2 rounded-full" style={{ width: "31%" }} />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
         </div>
+
+        {/* JOB PERFORMANCE */}
+        <motion.div variants={slideUp}>
+          <Card>
+            <CardHeader className="border-b border-brand-gray/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <CardTitle>Job Performance</CardTitle>
+              <select 
+                value={dateFilter}
+                onChange={e => setDateFilter(e.target.value)}
+                className="bg-white border border-brand-gray/40 rounded-lg px-3 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-indigo/50"
+              >
+                <option>7 Days</option>
+                <option>30 Days</option>
+                <option>90 Days</option>
+                <option>This Year</option>
+              </select>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left whitespace-nowrap">
+                  <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
+                    <tr>
+                      <th className="px-6 py-4">Job Title</th>
+                      <th className="px-6 py-4 text-center">Applications</th>
+                      <th className="px-6 py-4 text-center">AI Qualified</th>
+                      <th className="px-6 py-4 text-center">Shortlisted</th>
+                      <th className="px-6 py-4 text-center">Interviews</th>
+                      <th className="px-6 py-4 text-center">Hired</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-brand-gray/20">
+                    {MOCK_JOBS.map((job) => (
+                      <tr key={job.id} className="hover:bg-brand-light/50 transition-colors">
+                        <td className="px-6 py-4 font-medium text-brand-navy">{job.title}</td>
+                        <td className="px-6 py-4 text-center text-brand-navy/70">{job.apps}</td>
+                        <td className="px-6 py-4 text-center text-brand-indigo font-medium">{job.qualified}</td>
+                        <td className="px-6 py-4 text-center text-brand-navy/70">{job.shortlisted}</td>
+                        <td className="px-6 py-4 text-center text-brand-navy/70">{job.interviews}</td>
+                        <td className="px-6 py-4 text-center text-semantic-success font-bold">{job.hired}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
       </motion.div>
     </DashboardShell>
   )

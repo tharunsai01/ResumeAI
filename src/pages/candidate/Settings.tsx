@@ -91,6 +91,39 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
           <p className="text-brand-navy/60 mt-2">Manage your account settings and preferences.</p>
         </motion.div>
 
+        {/* PROFILE CARD SUMMARY BANNER */}
+        <motion.div variants={slideUp} className="mb-8">
+          <div className="rounded-2xl shadow-sm overflow-hidden bg-gradient-to-r from-[#2563EB] to-[#60A5FA] relative text-white">
+            <div className="absolute right-0 bottom-0 opacity-20 pointer-events-none transform translate-x-10 translate-y-10">
+              <svg width="250" height="250" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="p-8 flex flex-col sm:flex-row items-center gap-6 relative z-10">
+              <div className="w-20 h-20 rounded-full bg-[#1e293b] flex items-center justify-center border-2 border-white/20 shrink-0 shadow-lg overflow-hidden">
+                {profile.avatar ? (
+                  <img src={profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-3xl font-display font-bold text-white">{profile.fullName.charAt(0)}</span>
+                )}
+              </div>
+              <div className="text-center sm:text-left flex-1">
+                <h2 className="text-2xl font-display font-bold text-white">{profile.fullName}</h2>
+                <div className="text-white/90 font-medium text-sm mt-1">{profile.currentRole}</div>
+                <div className="flex flex-col sm:flex-row items-center gap-4 mt-2 text-xs text-white/80">
+                  <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> {profile.email}</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> {profile.careerPreferences.preferredLocations[0] || "Open to Relocate"}</span>
+                </div>
+              </div>
+              <button onClick={() => navigate("/candidate/profile")} className="px-4 py-2 bg-[#1e293b] font-medium rounded-lg text-white hover:bg-slate-800 mt-4 sm:mt-0 shrink-0 border border-white/10 transition-colors">
+                Edit Profile
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Success Toast */}
         <AnimatePresence>
           {showToast && (
@@ -114,7 +147,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
               <select 
                 value={activeTab}
                 onChange={(e) => setActiveTab(e.target.value as TabId)}
-                className="w-full bg-white border border-brand-gray/50 rounded-xl px-4 py-3 text-brand-navy font-medium focus:outline-none focus:ring-2 focus:ring-brand-indigo/50"
+                className="w-full bg-white border border-brand-gray/50 rounded-xl px-4 py-3 text-brand-navy font-medium focus:outline-none focus:ring-2 focus:ring-brand-indigo/50 dark:bg-[#1e293b] dark:border-white/10"
               >
                 {tabs.map(tab => (
                   <option key={tab.id} value={tab.id}>{tab.label}</option>
@@ -131,8 +164,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                   className={cn(
                     "flex items-center justify-between w-full px-4 py-3 rounded-xl text-left transition-colors",
                     activeTab === tab.id 
-                      ? "bg-brand-indigo/10 text-brand-indigo font-semibold" 
-                      : "text-brand-navy/70 hover:bg-brand-gray/30 hover:text-brand-navy font-medium"
+                      ? "bg-brand-indigo/10 text-brand-indigo font-semibold dark:bg-brand-indigo/20 dark:text-brand-indigo" 
+                      : "text-brand-navy/70 hover:bg-brand-gray/30 hover:text-brand-navy font-medium dark:text-brand-navy/60 dark:hover:bg-white/5 dark:hover:text-white"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -273,16 +306,16 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                     <CardContent className="space-y-6">
                       <div>
                         <label className="block text-sm font-semibold text-brand-navy mb-2">Preferred Job Titles</label>
-                        <Input value={profile.careerPreferences.preferredJobTitles.join(", ")} disabled className="bg-brand-light" />
+                        <Input value={profile.careerPreferences.preferredJobTitles.join(", ")} disabled className="bg-transparent" />
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-brand-navy mb-2">Preferred Locations</label>
-                        <Input value={profile.careerPreferences.preferredLocations.join(", ")} disabled className="bg-brand-light" />
+                        <Input value={profile.careerPreferences.preferredLocations.join(", ")} disabled className="bg-transparent" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-semibold text-brand-navy mb-2">Expected Salary</label>
-                          <Input value={profile.careerPreferences.expectedSalary} disabled className="bg-brand-light" />
+                          <Input value={profile.careerPreferences.expectedSalary} disabled className="bg-transparent" />
                         </div>
                         <div>
                           <label className="block text-sm font-semibold text-brand-navy mb-2">Willing to Relocate</label>
@@ -473,7 +506,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
         <div className="space-y-4 mt-4">
           <div>
             <label className="block text-sm font-medium text-brand-navy mb-1.5">Current Email</label>
-            <Input value={profile.email} disabled className="bg-brand-light" />
+            <Input value={profile.email} disabled className="bg-transparent" />
           </div>
           <div>
             <label className="block text-sm font-medium text-brand-navy mb-1.5">New Email</label>

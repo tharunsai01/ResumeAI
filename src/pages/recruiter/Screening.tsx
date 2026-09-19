@@ -1,212 +1,128 @@
 import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, ChevronRight, Briefcase, Filter } from "lucide-react"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { motion } from "framer-motion"
+import { Search, Brain, CheckCircle2, ChevronRight, FileText, Briefcase, Filter } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Card, CardContent } from "../../components/ui/Card"
 import { Button } from "../../components/ui/Button"
-import { applicationService, type Application } from "../../services/applicationService"
-import { jobService } from "../../services/jobService"
-import { aiScreeningService } from "../../services/aiScreeningService"
-import { mockCandidates } from "../../data/mockCandidates"
-import type { Job } from "../../data/mockJobs"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { cn } from "../../lib/utils"
+import { screeningJobs } from "../../data/screeningMockData"
 
 export default function RecruiterScreening() {
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const initialJobId = searchParams.get("jobId") || ""
-  
-  const [jobs, setJobs] = React.useState<Job[]>([])
-  const [selectedJobId, setSelectedJobId] = React.useState(initialJobId)
-  
-  const [isScreening, setIsScreening] = React.useState(false)
-  const [progress, setProgress] = React.useState(0)
-  
-  type CandidateData = { app: Application; candidate: typeof mockCandidates[0] }
-  const [results, setResults] = React.useState<CandidateData[]>([])
+  const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
-    const fetchJobs = async () => {
-      const allJobs = await jobService.getJobs()
-      setJobs(allJobs)
-      if (!selectedJobId && allJobs.length > 0) {
-        setSelectedJobId(allJobs[0].id)
-      }
-    }
-    fetchJobs()
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 400)
+    return () => clearTimeout(timer)
   }, [])
 
-  React.useEffect(() => {
-    if (selectedJobId) {
-      loadResults(selectedJobId)
-    }
-  }, [selectedJobId])
+  const totalApplications = screeningJobs.reduce((acc, job) => acc + job.applications, 0)
+  const totalScreened = screeningJobs.reduce((acc, job) => acc + job.screened, 0)
+  const totalStrongMatches = screeningJobs.reduce((acc, job) => acc + job.strongMatches, 0)
+  const totalPending = screeningJobs.reduce((acc, job) => acc + job.pending, 0)
 
-  const loadResults = (jobId: string) => {
-    const apps = applicationService.getApplicationsByJob(jobId)
-    const mapped = apps.map(app => {
-      const candidate = mockCandidates.find(c => c.id === app.candidateId)
-      if (!candidate) return null
-      return { app, candidate }
-    }).filter((c): c is CandidateData => c !== null)
-    
-    // Sort by match score if available
-    mapped.sort((a, b) => (b.app.matchScore || 0) - (a.app.matchScore || 0))
-    setResults(mapped)
-  }
-
-  const handleRunScreening = async () => {
-    if (!selectedJobId) return
-    setIsScreening(true)
-    setProgress(0)
-    
-    await aiScreeningService.screenCandidatesForJob(selectedJobId, (p) => {
-      setProgress(p)
-    })
-    
-    loadResults(selectedJobId)
-    setIsScreening(false)
-  }
-
-  const unscreenedCount = results.filter(r => r.app.status === "Applied").length
-  const screenedResults = results.filter(r => r.app.aiScreening || r.app.status !== "Applied")
+  const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
+    <motion.div variants={slideUp} custom={delay}>
+      <Card className="hover:-translate-y-0.5 transition-all duration-200">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
+            <h3 className="text-2xl font-display font-bold text-brand-navy">
+              {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
+            </h3>
+          </div>
+          <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
+            <Icon className="w-5 h-5" />
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  )
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
-      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-6xl mx-auto space-y-6 pb-12">
+      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-5xl mx-auto space-y-6 pb-12">
+        
+        {/* HEADER */}
         <motion.div variants={slideUp}>
-          <h1 className="text-3xl font-display font-semibold text-brand-navy flex items-center gap-2">
-            <Sparkles className="w-8 h-8 text-brand-indigo" /> AI Candidate Screening
-          </h1>
-          <p className="text-brand-navy/60 mt-1">Automatically evaluate and rank applicants based on job requirements.</p>
+          <h1 className="text-3xl font-display font-semibold text-brand-navy">AI Resume Screening</h1>
+          <p className="text-brand-navy/60 mt-1">Use AI-powered analysis to identify candidates who best match your job requirements.</p>
         </motion.div>
 
-        <motion.div variants={slideUp} className="bg-white rounded-2xl border border-brand-gray/50 shadow-sm p-4 relative z-10 flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1 w-full">
-            <label className="block text-sm font-semibold text-brand-navy uppercase tracking-wider mb-2">Select Job</label>
-            <div className="relative">
-              <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-navy/40" />
-              <select
-                value={selectedJobId}
-                onChange={(e) => setSelectedJobId(e.target.value)}
-                className="w-full bg-brand-light border border-brand-gray/50 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-brand-indigo/50 text-brand-navy appearance-none"
-              >
-                {jobs.map(j => (
-                  <option key={j.id} value={j.id}>{j.title}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          
-          <div className="w-full md:w-auto">
-            <Button 
-              onClick={handleRunScreening} 
-              disabled={isScreening || unscreenedCount === 0}
-              className="w-full md:w-auto px-8 py-3 h-12 bg-gradient-to-r from-brand-indigo to-brand-blue"
-            >
-              {isScreening ? (
-                <span className="flex items-center">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                  Screening... {progress}%
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  <Sparkles className="w-4 h-4 mr-2" /> Screen {unscreenedCount} Candidates
-                </span>
-              )}
+        {/* SUMMARY CARDS */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard title="Applications" value={totalApplications} icon={FileText} delay={0} color={{ bg: "bg-brand-gray/20", text: "text-brand-navy/70" }} />
+          <StatCard title="AI Screened" value={totalScreened} icon={Search} delay={1} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
+          <StatCard title="Strong Matches" value={totalStrongMatches} icon={CheckCircle2} delay={2} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
+          <StatCard title="Pending" value={totalPending} icon={Brain} delay={3} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
+        </div>
+
+        {/* JOB SELECTOR */}
+        <motion.div variants={slideUp} className="pt-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-display font-semibold text-brand-navy">Select Job for Screening</h2>
+            <Button variant="outline" size="sm" className="hidden sm:flex">
+              <Filter className="w-4 h-4 mr-2" /> Filter Jobs
             </Button>
-          </div>
-        </motion.div>
-
-        <AnimatePresence mode="wait">
-          {isScreening && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <Card className="border-brand-indigo/20 bg-brand-indigo/5 overflow-hidden">
-                <CardContent className="p-6 flex flex-col items-center justify-center space-y-4">
-                  <Sparkles className="w-12 h-12 text-brand-indigo animate-pulse" />
-                  <div className="text-center">
-                    <h3 className="font-semibold text-brand-navy">AI is analyzing applications...</h3>
-                    <p className="text-sm text-brand-navy/60 mt-1">Comparing resumes against job requirements and calculating match scores.</p>
-                  </div>
-                  <div className="w-full max-w-md h-2 bg-brand-gray/30 rounded-full overflow-hidden mt-2">
-                    <div className="h-full bg-brand-indigo rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <motion.div variants={slideUp} className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-display font-semibold text-brand-navy">Screening Results</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="hidden sm:flex">
-                <Filter className="w-4 h-4 mr-2" /> Filter
-              </Button>
-            </div>
           </div>
 
           <div className="space-y-4">
-            {screenedResults.length > 0 ? (
-              screenedResults.map(({ app, candidate }, index) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  key={app.id}
-                >
-                  <Card className="hover:border-brand-indigo/30 transition-all cursor-pointer group" onClick={() => navigate(`/recruiter/candidates/${app.id}`)}>
-                    <CardContent className="p-0 flex flex-col sm:flex-row items-center">
-                      <div className={cn(
-                        "w-full sm:w-24 p-4 flex flex-col items-center justify-center border-b sm:border-b-0 sm:border-r border-brand-gray/30",
-                        app.matchScore >= 85 ? "bg-semantic-success/5 text-semantic-success" : 
-                        app.matchScore >= 70 ? "bg-semantic-warning/5 text-semantic-warning" : "bg-semantic-error/5 text-semantic-error"
-                      )}>
-                        <span className="text-2xl font-bold">{app.matchScore}%</span>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Match</span>
-                      </div>
-                      
-                      <div className="flex-1 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
-                        <div>
-                          <h3 className="text-lg font-semibold text-brand-navy flex items-center gap-2">
-                            {candidate.personalInfo.name}
-                            {index === 0 && <span className="px-2 py-0.5 rounded-full bg-brand-indigo/10 text-brand-indigo text-xs font-bold uppercase tracking-wider">Top Match</span>}
-                          </h3>
-                          <p className="text-sm text-brand-navy/60 mt-1 truncate max-w-lg">
-                            {app.aiScreening?.strengths[0] || "Strong candidate based on experience."}
-                          </p>
-                        </div>
-                        
-                        <div className="flex items-center gap-4">
-                          <div className="hidden md:flex gap-1">
-                            {app.aiScreening?.missingSkills.slice(0, 1).map(s => (
-                              <span key={s} className="px-2 py-1 rounded-md bg-semantic-error/10 text-semantic-error text-xs font-medium border border-semantic-error/20">
-                                Missing: {s}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="text-brand-indigo group-hover:translate-x-1 transition-transform">
-                            <ChevronRight className="w-5 h-5" />
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+            {loading ? (
+              [1, 2, 3].map(i => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="h-5 w-48 bg-brand-gray/20 rounded mb-2" />
+                    <div className="h-4 w-32 bg-brand-gray/20 rounded mb-4" />
+                    <div className="flex gap-4">
+                      <div className="h-4 w-24 bg-brand-gray/20 rounded" />
+                      <div className="h-4 w-24 bg-brand-gray/20 rounded" />
+                    </div>
+                  </CardContent>
+                </Card>
               ))
             ) : (
-              <div className="bg-white rounded-xl border border-brand-gray/50 p-12 text-center">
-                <Sparkles className="w-12 h-12 text-brand-navy/20 mx-auto mb-4" />
-                <h3 className="text-xl font-display font-semibold text-brand-navy mb-2">No screened candidates</h3>
-                <p className="text-brand-navy/60">Select a job and run screening to see ranked results here.</p>
-              </div>
+              screeningJobs.map(job => (
+                <Card key={job.id} className="group hover:border-brand-indigo/30 hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/recruiter/screening/${job.id}`)}>
+                  <CardContent className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-lg font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors">{job.title}</h3>
+                        {job.pending > 0 && (
+                          <span className="px-2.5 py-0.5 bg-semantic-warning/10 text-semantic-warning text-[10px] font-bold uppercase tracking-wider rounded-md border border-semantic-warning/20">
+                            {job.pending} Pending
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-brand-navy/60">
+                        <Briefcase className="w-4 h-4" />
+                        <span>{job.location}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-6 mt-4">
+                        <div>
+                          <div className="text-xs text-brand-navy/50 mb-0.5">Applications</div>
+                          <div className="font-semibold text-brand-navy">{job.applications}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-brand-navy/50 mb-0.5">Screened</div>
+                          <div className="font-semibold text-brand-navy">{job.screened}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-brand-navy/50 mb-0.5">Strong Matches</div>
+                          <div className="font-semibold text-semantic-success">{job.strongMatches}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Button variant="ghost" className="shrink-0 group-hover:bg-brand-indigo group-hover:text-white transition-colors self-start sm:self-center">
+                      View Screening <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))
             )}
           </div>
         </motion.div>
