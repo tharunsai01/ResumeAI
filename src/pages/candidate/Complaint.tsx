@@ -66,18 +66,17 @@ export default function ComplaintPage() {
   const [error, setError] = React.useState("")
 
   // History State
-  const [reports, setReports] = React.useState<Report[]>([])
-
-  React.useEffect(() => {
+  const [reports, setReports] = React.useState<Report[]>(() => {
     const saved = localStorage.getItem("hiresmart_reports")
     if (saved) {
       try {
-        setReports(JSON.parse(saved))
+        return JSON.parse(saved)
       } catch (e) {
         console.error("Failed to parse reports", e)
       }
     }
-  }, [])
+    return []
+  })
 
   const handleDynamicChange = (field: string, value: string) => {
     setDynamicFields(prev => ({ ...prev, [field]: value }))

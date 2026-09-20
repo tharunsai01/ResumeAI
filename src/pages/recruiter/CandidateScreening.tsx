@@ -23,8 +23,8 @@ export default function RecruiterCandidateScreening() {
   const reqs = jobRequirements[jobId as keyof typeof jobRequirements] || jobRequirements["job_101"]
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
   const handleShortlist = () => {

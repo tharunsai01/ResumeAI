@@ -10,6 +10,24 @@ import { initialInterviews } from "../../data/pipelineMockData"
 import type { MockInterview } from "../../data/pipelineMockData"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 
+const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
+  <motion.div variants={slideUp} custom={delay}>
+    <Card className="hover:-translate-y-0.5 transition-all duration-200">
+      <CardContent className="p-5 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
+          <h3 className="text-2xl font-display font-bold text-brand-navy">
+            {value}
+          </h3>
+        </div>
+        <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
+          <Icon className="w-5 h-5" />
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+)
+
 export default function RecruiterInterviews() {
   const navigate = useNavigate()
   const [loading, setLoading] = React.useState(true)
@@ -24,8 +42,8 @@ export default function RecruiterInterviews() {
   const [statusFilter, setStatusFilter] = React.useState("All")
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
   const showToast = (msg: string) => {
@@ -70,23 +88,6 @@ export default function RecruiterInterviews() {
   const completedCount = interviews.filter(i => i.status === "Completed").length
   const needsDecisionCount = interviews.filter(i => i.status === "Needs Decision").length
 
-  const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
-    <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 transition-all duration-200">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-            <h3 className="text-2xl font-display font-bold text-brand-navy">
-              {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
-            </h3>
-          </div>
-          <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
-            <Icon className="w-5 h-5" />
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
 
   const getStatusBadge = (status: string) => {
     switch (status) {

@@ -24,14 +24,52 @@ const MOCK_JOBS = [
   { id: 4, title: "Product Manager", apps: 45, qualified: 22, shortlisted: 5, interviews: 3, hired: 2 },
 ]
 
+const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
+  <motion.div variants={slideUp} custom={delay}>
+    <Card className="hover:-translate-y-0.5 transition-all duration-200 h-full">
+      <CardContent className="p-5 flex flex-col justify-between h-full">
+        <div className="flex justify-between items-start mb-4">
+          <div className={`p-2.5 rounded-lg ${color.bg} ${color.text}`}>
+            <Icon className="w-5 h-5" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-2xl font-display font-bold text-brand-navy">
+            {loading ? <div className="h-8 w-16 bg-brand-gray/20 rounded animate-pulse" /> : value}
+          </h3>
+          <p className="text-sm font-medium text-brand-navy/60 mt-1">{title}</p>
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+)
+
+const FunnelStep = ({ label, value, percent, colorClass, nextPercent }: any) => (
+  <div className="flex flex-col items-center group relative">
+    <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center border-4 border-white shadow-md z-10 transition-transform group-hover:scale-105 ${colorClass}`}>
+      <span className="text-xl sm:text-2xl font-bold">{value}</span>
+      {percent && <span className="text-[10px] sm:text-xs opacity-90">{percent}%</span>}
+    </div>
+    <span className="text-xs sm:text-sm font-semibold text-brand-navy text-center mt-3">{label}</span>
+    
+    {nextPercent && (
+      <div className="hidden sm:flex absolute top-12 left-20 w-[calc(100%-2.5rem)] h-0.5 bg-brand-gray/30 -z-10 items-center justify-center">
+        <span className="bg-white px-2 text-[10px] font-bold text-brand-navy/40 rounded-full border border-brand-gray/20 absolute -top-2.5">
+          {nextPercent}%
+        </span>
+      </div>
+    )}
+  </div>
+)
+
 export default function RecruiterAnalytics() {
   const [loading, setLoading] = React.useState(true)
   const [dateFilter, setDateFilter] = React.useState("30 Days")
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
   const handleExport = () => {
@@ -39,43 +77,6 @@ export default function RecruiterAnalytics() {
     setTimeout(() => setToastMsg(null), 3000)
   }
 
-  const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
-    <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 transition-all duration-200 h-full">
-        <CardContent className="p-5 flex flex-col justify-between h-full">
-          <div className="flex justify-between items-start mb-4">
-            <div className={`p-2.5 rounded-lg ${color.bg} ${color.text}`}>
-              <Icon className="w-5 h-5" />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-2xl font-display font-bold text-brand-navy">
-              {loading ? <div className="h-8 w-16 bg-brand-gray/20 rounded animate-pulse" /> : value}
-            </h3>
-            <p className="text-sm font-medium text-brand-navy/60 mt-1">{title}</p>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
-
-  const FunnelStep = ({ label, value, percent, colorClass, nextPercent }: any) => (
-    <div className="flex flex-col items-center group relative">
-      <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center border-4 border-white shadow-md z-10 transition-transform group-hover:scale-105 ${colorClass}`}>
-        <span className="text-xl sm:text-2xl font-bold">{value}</span>
-        {percent && <span className="text-[10px] sm:text-xs opacity-90">{percent}%</span>}
-      </div>
-      <span className="text-xs sm:text-sm font-semibold text-brand-navy text-center mt-3">{label}</span>
-      
-      {nextPercent && (
-        <div className="hidden sm:flex absolute top-12 left-20 w-[calc(100%-2.5rem)] h-0.5 bg-brand-gray/30 -z-10 items-center justify-center">
-          <span className="bg-white px-2 text-[10px] font-bold text-brand-navy/40 rounded-full border border-brand-gray/20 absolute -top-2.5">
-            {nextPercent}%
-          </span>
-        </div>
-      )}
-    </div>
-  )
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
@@ -106,13 +107,13 @@ export default function RecruiterAnalytics() {
 
         {/* SUMMARY CARDS */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
-          <StatCard title="Total Applications" value={MOCK_STATS.totalApplications} icon={Users} delay={0} color={{ bg: "bg-brand-gray/10", text: "text-brand-navy" }} />
-          <StatCard title="AI Screened" value={MOCK_STATS.aiScreened} icon={Search} delay={1} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
-          <StatCard title="AI Qualified" value={MOCK_STATS.aiQualified} icon={CheckCircle2} delay={2} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
-          <StatCard title="Shortlisted" value={MOCK_STATS.shortlisted} icon={User} delay={3} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
-          <StatCard title="Interviews" value={MOCK_STATS.interviews} icon={Calendar} delay={4} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
-          <StatCard title="Hired" value={MOCK_STATS.hired} icon={Briefcase} delay={5} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
-          <StatCard title="Avg Match" value={`${MOCK_STATS.averageMatch}%`} icon={BarChart} delay={6} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
+          <StatCard title="Total Applications" value={MOCK_STATS.totalApplications} icon={Users} delay={0} loading={loading} color={{ bg: "bg-brand-gray/10", text: "text-brand-navy" }} />
+          <StatCard title="AI Screened" value={MOCK_STATS.aiScreened} icon={Search} delay={1} loading={loading} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
+          <StatCard title="AI Qualified" value={MOCK_STATS.aiQualified} icon={CheckCircle2} delay={2} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
+          <StatCard title="Shortlisted" value={MOCK_STATS.shortlisted} icon={User} delay={3} loading={loading} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
+          <StatCard title="Interviews" value={MOCK_STATS.interviews} icon={Calendar} delay={4} loading={loading} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
+          <StatCard title="Hired" value={MOCK_STATS.hired} icon={Briefcase} delay={5} loading={loading} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
+          <StatCard title="Avg Match" value={`${MOCK_STATS.averageMatch}%`} icon={BarChart} delay={6} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

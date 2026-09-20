@@ -19,7 +19,6 @@ export default function CandidateJobs() {
 
   const [loading, setLoading] = React.useState(true)
   const [allJobs, setAllJobs] = React.useState<JobMatchResult[]>([])
-  const [filteredJobs, setFilteredJobs] = React.useState<JobMatchResult[]>([])
 
   const [searchTerm, setSearchTerm] = React.useState("")
   const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState("")
@@ -89,7 +88,6 @@ export default function CandidateJobs() {
         // Score all jobs against candidate
         const scored = jobs.map(j => jobService.calculateJobMatch(mockResumeAnalysis, j))
         setAllJobs(scored)
-        setFilteredJobs(scored.sort((a, b) => b.overallMatch - a.overallMatch))
       } finally {
         setLoading(false)
       }
@@ -97,8 +95,8 @@ export default function CandidateJobs() {
     fetchJobs()
   }, [])
 
-  // Apply filters and sort whenever dependencies change
-  React.useEffect(() => {
+  // Apply filters and sort using useMemo
+  const filteredJobs = React.useMemo(() => {
     let result = [...allJobs]
 
     // Search (Debounced)
@@ -140,7 +138,7 @@ export default function CandidateJobs() {
       result.sort((a, b) => a.job.salary.localeCompare(b.job.salary))
     }
 
-    setFilteredJobs(result)
+    return result
   }, [allJobs, debouncedSearchTerm, filters, sortBy])
 
   const clearFilters = () => {

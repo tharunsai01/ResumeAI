@@ -26,7 +26,7 @@ export function RoleSelector({ isOpen, onClose, onSelectRole }: RoleSelectorProp
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="glass-card relative w-full max-w-2xl overflow-hidden flex flex-col"
+          className="glass-card relative w-full max-w-4xl overflow-hidden flex flex-col"
         >
           <div className="flex items-center justify-between p-6 border-b border-brand-gray/30">
             <h2 className="text-2xl font-display font-semibold text-brand-navy">How will you use HireSmart AI?</h2>
@@ -35,21 +35,21 @@ export function RoleSelector({ isOpen, onClose, onSelectRole }: RoleSelectorProp
             </button>
           </div>
           
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Candidate Option */}
             <div 
               onClick={() => onSelectRole("candidate")}
-              className="group cursor-pointer border-2 border-brand-gray/50 hover:border-brand-indigo rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-brand-indigo/10 flex flex-col h-full bg-white relative overflow-hidden"
+              className="group cursor-pointer border-2 border-brand-gray/50 hover:border-brand-blue rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-brand-blue/10 flex flex-col h-full bg-white relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blue/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
               <div className="w-12 h-12 bg-brand-blue/10 text-brand-blue rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <User className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-brand-navy mb-2">I am a Candidate</h3>
-              <p className="text-brand-navy/60 flex-1 mb-6">
+              <p className="text-brand-navy/60 flex-1 mb-6 text-sm">
                 Find jobs, analyze your resume, and discover career opportunities with AI matching.
               </p>
-              <div className="flex items-center text-brand-indigo font-semibold text-sm group-hover:translate-x-1 transition-transform">
+              <div className="flex items-center text-brand-blue font-semibold text-sm group-hover:translate-x-1 transition-transform">
                 Continue as Candidate <ArrowRight className="w-4 h-4 ml-1" />
               </div>
             </div>
@@ -64,11 +64,29 @@ export function RoleSelector({ isOpen, onClose, onSelectRole }: RoleSelectorProp
                 <Briefcase className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-brand-navy mb-2">I am a Recruiter</h3>
-              <p className="text-brand-navy/60 flex-1 mb-6">
+              <p className="text-brand-navy/60 flex-1 mb-6 text-sm">
                 Post jobs, automatically screen candidates, and hire smarter using AI algorithms.
               </p>
               <div className="flex items-center text-brand-violet font-semibold text-sm group-hover:translate-x-1 transition-transform">
                 Continue as Recruiter <ArrowRight className="w-4 h-4 ml-1" />
+              </div>
+            </div>
+
+            {/* Admin Option */}
+            <div 
+              onClick={() => onSelectRole("admin")}
+              className="group cursor-pointer border-2 border-brand-gray/50 hover:border-brand-indigo rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-brand-indigo/10 flex flex-col h-full bg-white relative overflow-hidden"
+            >
+               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-indigo/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+              <div className="w-12 h-12 bg-brand-indigo/10 text-brand-indigo rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <User className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-brand-navy mb-2">I am an Admin</h3>
+              <p className="text-brand-navy/60 flex-1 mb-6 text-sm">
+                Manage the platform, monitor AI fairness, and oversee the ecosystem.
+              </p>
+              <div className="flex items-center text-brand-indigo font-semibold text-sm group-hover:translate-x-1 transition-transform">
+                Continue as Admin <ArrowRight className="w-4 h-4 ml-1" />
               </div>
             </div>
           </div>

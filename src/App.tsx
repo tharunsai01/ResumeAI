@@ -43,6 +43,29 @@ import RecruiterTerms from "./pages/recruiter/Terms"
 import RecruiterPrivacy from "./pages/recruiter/Privacy"
 import RecruiterAbout from "./pages/recruiter/About"
 
+import AdminDashboard from "./pages/admin/Dashboard"
+import AdminUsers from "./pages/admin/Users"
+import UserDetails from "./pages/admin/UserDetails"
+import AdminComplaints from "./pages/admin/Complaints"
+import AdminComplaintDetails from "./pages/admin/ComplaintDetails"
+import AdminSkills from "./pages/admin/Skills"
+import AdminAuditLogs from "./pages/admin/AuditLogs"
+import AdminAiEvaluation from "./pages/admin/AiEvaluation"
+import AdminSystemHealth from "./pages/admin/SystemHealth"
+import AdminSettings from "./pages/admin/Settings"
+import AdminHelp from "./pages/admin/Help"
+import AdminComplaintForm from "./pages/admin/Complaint"
+import AdminSafety from "./pages/admin/Safety"
+import AdminTerms from "./pages/admin/Terms"
+import AdminPrivacy from "./pages/admin/Privacy"
+import AdminAbout from "./pages/admin/About"
+import { AdminUsersOutlet } from "./contexts/AdminUsersContext"
+import { AdminComplaintsOutlet } from "./contexts/AdminComplaintsContext"
+import { AdminSkillsOutlet } from "./contexts/AdminSkillsContext"
+import { AdminAuditLogsOutlet } from "./contexts/AdminAuditLogsContext"
+import { AdminAiEvaluationOutlet } from "./contexts/AdminAiEvaluationContext"
+import { AdminSystemHealthOutlet } from "./contexts/AdminSystemHealthContext"
+import { AdminSettingsOutlet } from "./contexts/AdminSettingsContext"
 import { AnimatePresence } from "framer-motion"
 import { useEffect } from "react"
 import { settingsService } from "./services/settingsService"
@@ -110,6 +133,47 @@ function App() {
               <Route path="/recruiter/terms" element={<RecruiterTerms />} />
               <Route path="/recruiter/privacy" element={<RecruiterPrivacy />} />
               <Route path="/recruiter/about" element={<RecruiterAbout />} />
+            </Route>
+
+            {/* Admin Routes */}
+            <Route element={<ProtectedRoute allowedRole="admin" />}>
+              <Route element={<AdminUsersOutlet />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/users/:userId" element={<UserDetails />} />
+                
+                <Route element={<AdminComplaintsOutlet />}>
+                  <Route path="/admin/complaints" element={<AdminComplaints />} />
+                  <Route path="/admin/complaints/:complaintId" element={<AdminComplaintDetails />} />
+                </Route>
+                
+                <Route element={<AdminSkillsOutlet />}>
+                  <Route path="/admin/skills" element={<AdminSkills />} />
+                </Route>
+
+                <Route element={<AdminAuditLogsOutlet />}>
+                  <Route path="/admin/audit-logs" element={<AdminAuditLogs />} />
+                </Route>
+
+                <Route element={<AdminAiEvaluationOutlet />}>
+                  <Route path="/admin/ai-evaluation" element={<AdminAiEvaluation />} />
+                </Route>
+
+                <Route element={<AdminSystemHealthOutlet />}>
+                  <Route path="/admin/system-health" element={<AdminSystemHealth />} />
+                </Route>
+
+                <Route element={<AdminSettingsOutlet />}>
+                  <Route path="/admin/settings" element={<AdminSettings />} />
+                </Route>
+                
+                <Route path="/admin/help" element={<AdminHelp />} />
+                <Route path="/admin/complaint" element={<AdminComplaintForm />} />
+                <Route path="/admin/safety" element={<AdminSafety />} />
+                <Route path="/admin/terms" element={<AdminTerms />} />
+                <Route path="/admin/privacy" element={<AdminPrivacy />} />
+                <Route path="/admin/about" element={<AdminAbout />} />
+              </Route>
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -13,6 +13,24 @@ import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
 import { cn } from "../../lib/utils"
 
+const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
+  <motion.div variants={slideUp} custom={delay}>
+    <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
+      <CardContent className="p-5 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
+          <h3 className="text-2xl font-display font-bold text-brand-navy">
+            {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
+          </h3>
+        </div>
+        <div className={cn("p-3 rounded-xl", color.bg, color.text)}>
+          <Icon className="w-5 h-5" />
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+)
+
 export default function RecruiterCandidates() {
   const navigate = useNavigate()
   const [loading, setLoading] = React.useState(true)
@@ -31,11 +49,8 @@ export default function RecruiterCandidates() {
   const [shortlistMsg, setShortlistMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setCandidates([...initialRecruiterCandidates])
-      setLoading(false)
-    }, 400)
-    return () => clearTimeout(timer)
+    setCandidates([...initialRecruiterCandidates])
+    setLoading(false)
   }, [])
 
   const filteredAndSorted = React.useMemo(() => {
@@ -99,23 +114,6 @@ export default function RecruiterCandidates() {
     setSortBy("Newest")
   }
 
-  const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
-    <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-            <h3 className="text-2xl font-display font-bold text-brand-navy">
-              {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
-            </h3>
-          </div>
-          <div className={cn("p-3 rounded-xl", color.bg, color.text)}>
-            <Icon className="w-5 h-5" />
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
@@ -146,10 +144,10 @@ export default function RecruiterCandidates() {
 
         {/* SUMMARY CARDS */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Total Candidates" value={stats.total} icon={Users} delay={0} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
-          <StatCard title="New Applications" value={stats.new} icon={UserPlus} delay={1} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
-          <StatCard title="AI Screened" value={stats.screened} icon={Search} delay={2} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
-          <StatCard title="Shortlisted" value={stats.shortlisted} icon={CheckCircle2} delay={3} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
+          <StatCard title="Total Candidates" value={stats.total} icon={Users} delay={0} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
+          <StatCard title="New Applications" value={stats.new} icon={UserPlus} delay={1} loading={loading} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
+          <StatCard title="AI Screened" value={stats.screened} icon={Search} delay={2} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
+          <StatCard title="Shortlisted" value={stats.shortlisted} icon={CheckCircle2} delay={3} loading={loading} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
         </div>
 
         {/* FILTERS */}

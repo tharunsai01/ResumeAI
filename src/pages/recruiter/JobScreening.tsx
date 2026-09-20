@@ -11,6 +11,7 @@ import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
 import { cn } from "../../lib/utils"
+import { AnimatePresence } from "framer-motion"
 
 const PIPELINE_STEPS = [
   "Applications",
@@ -42,32 +43,25 @@ export default function RecruiterJobScreening() {
   // Actions
   const [candidateToReject, setCandidateToReject] = React.useState<{id: string, name: string} | null>(null)
 
+  // Toast
+  const [toastMsg, setToastMsg] = React.useState<string | null>(null)
+  const showToast = (msg: string) => {
+    setToastMsg(msg)
+    setTimeout(() => setToastMsg(null), 3000)
+  }
+
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
   }, [])
 
   const runScreening = () => {
     setIsScreening(true)
-    setScreeningProgress(0)
-    
-    // Simulate fast progressive AI screening
-    const interval = setInterval(() => {
-      setScreeningProgress(p => {
-        if (p >= 100) {
-          clearInterval(interval)
-          setTimeout(() => {
-            setIsScreening(false)
-            setScreeningComplete(true)
-            // mock update to reflect 0 pending
-            job.pending = 0
-            job.screened = job.applications
-          }, 300)
-          return 100
-        }
-        return p + 25
-      })
-    }, 300)
+    setScreeningProgress(100)
+    setScreeningComplete(true)
+    job.pending = 0
+    job.screened = job.applications
+    setIsScreening(false)
+    showToast("AI Screening completed instantly.")
   }
 
   const filteredAndSorted = React.useMemo(() => {
@@ -106,17 +100,34 @@ export default function RecruiterJobScreening() {
   const handleShortlist = (e: React.MouseEvent, id: string) => {
     e.stopPropagation()
     setCandidates(candidates.map(c => c.id === id ? { ...c, status: "Shortlisted" } : c))
+    showToast("Candidate shortlisted.")
   }
 
   const handleReject = () => {
     if (candidateToReject) {
       setCandidates(candidates.map(c => c.id === candidateToReject.id ? { ...c, status: "Rejected" } : c))
+      showToast("Candidate rejected.")
       setCandidateToReject(null)
     }
   }
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
+      {/* TOAST */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 right-6 z-[100] bg-emerald-50 text-emerald-600 px-4 py-3 rounded-lg border border-emerald-200 flex items-center gap-2 shadow-lg"
+          >
+            <CheckCircle2 className="w-5 h-5" />
+            <span className="text-sm font-medium">{toastMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-7xl mx-auto space-y-6 pb-12">
         
         {/* HEADER */}

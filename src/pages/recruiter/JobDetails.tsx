@@ -9,6 +9,28 @@ import { staggerContainer, slideUp } from "../../lib/animations"
 import { initialRecruiterJobs } from "../../data/recruiterMockData"
 import { cn } from "../../lib/utils"
 
+const SummaryCard = ({ title, value, icon: Icon, color, route }: any) => {
+  const navigate = useNavigate()
+  return (
+    <Card 
+      onClick={() => navigate(route)}
+      className="cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200 group border-brand-gray/40 bg-white"
+    >
+      <CardContent className="p-4 flex flex-col justify-between h-full">
+        <div className="flex justify-between items-start mb-3">
+          <div className={cn("p-2 rounded-xl border", color.bg, color.text, color.border)}>
+            <Icon className="w-4 h-4" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-2xl font-display font-bold text-brand-navy group-hover:text-brand-indigo transition-colors">{value}</h3>
+          <p className="text-xs font-medium text-brand-navy/60">{title}</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export default function RecruiterJobDetails() {
   const navigate = useNavigate()
   const { jobId } = useParams()
@@ -26,12 +48,9 @@ export default function RecruiterJobDetails() {
 
   React.useEffect(() => {
     // Simulate loading data
-    const timer = setTimeout(() => {
-      const foundJob = initialRecruiterJobs.find(j => j.id === jobId)
-      setJob(foundJob)
-      setLoading(false)
-    }, 300)
-    return () => clearTimeout(timer)
+    const foundJob = initialRecruiterJobs.find(j => j.id === jobId)
+    setJob(foundJob)
+    setLoading(false)
   }, [jobId])
 
   if (loading) {
@@ -64,24 +83,7 @@ export default function RecruiterJobDetails() {
     hired: job.applications > 0 ? 1 : 0
   }
 
-  const SummaryCard = ({ title, value, icon: Icon, color, route }: any) => (
-    <Card 
-      onClick={() => navigate(route)}
-      className="cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200 group border-brand-gray/40 bg-white"
-    >
-      <CardContent className="p-4 flex flex-col justify-between h-full">
-        <div className="flex justify-between items-start mb-3">
-          <div className={cn("p-2 rounded-xl border", color.bg, color.text, color.border)}>
-            <Icon className="w-4 h-4" />
-          </div>
-        </div>
-        <div>
-          <h3 className="text-2xl font-display font-bold text-brand-navy group-hover:text-brand-indigo transition-colors">{value}</h3>
-          <p className="text-xs font-medium text-brand-navy/60">{title}</p>
-        </div>
-      </CardContent>
-    </Card>
-  )
+
 
   const getStatusStyle = (status: string) => {
     switch (status) {

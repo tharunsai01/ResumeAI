@@ -12,6 +12,26 @@ import type { MockInterview } from "../../data/pipelineMockData"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import { cn } from "../../lib/utils"
 
+const RatingStars = ({ value, onChange, readonly }: { value: number, onChange?: (val: number) => void, readonly?: boolean }) => (
+  <div className="flex items-center gap-1">
+    {[1, 2, 3, 4, 5].map(star => (
+      <button
+        key={star}
+        type="button"
+        disabled={readonly}
+        onClick={() => onChange && onChange(star)}
+        className={cn(
+          "p-1 transition-colors focus:outline-none",
+          readonly ? "cursor-default" : "cursor-pointer hover:scale-110",
+          star <= value ? "text-semantic-warning" : "text-brand-gray/40"
+        )}
+      >
+        <Star className={cn("w-5 h-5", star <= value ? "fill-current" : "")} />
+      </button>
+    ))}
+  </div>
+)
+
 export default function RecruiterInterviewDetails() {
   const navigate = useNavigate()
   const { interviewId } = useParams()
@@ -34,8 +54,8 @@ export default function RecruiterInterviewDetails() {
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
   const showToast = (msg: string) => {
@@ -110,25 +130,6 @@ export default function RecruiterInterviewDetails() {
     }
   }
 
-  const RatingStars = ({ value, onChange, readonly }: { value: number, onChange?: (val: number) => void, readonly?: boolean }) => (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map(star => (
-        <button
-          key={star}
-          type="button"
-          disabled={readonly}
-          onClick={() => onChange && onChange(star)}
-          className={cn(
-            "p-1 transition-colors focus:outline-none",
-            readonly ? "cursor-default" : "cursor-pointer hover:scale-110",
-            star <= value ? "text-semantic-warning" : "text-brand-gray/40"
-          )}
-        >
-          <Star className={cn("w-5 h-5", star <= value ? "fill-current" : "")} />
-        </button>
-      ))}
-    </div>
-  )
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">

@@ -13,10 +13,7 @@ export default function RecruiterScreening() {
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
   }, [])
 
   const totalApplications = screeningJobs.reduce((acc, job) => acc + job.applications, 0)

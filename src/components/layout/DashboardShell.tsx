@@ -11,6 +11,7 @@ import { cn } from "../../lib/utils"
 import { notificationService } from "../../services/notificationService"
 import { authService } from "../../services/authService"
 import type { AppNotification } from "../../data/mockNotifications"
+import { PageTransition } from "./PageTransition"
 
 interface DashboardShellProps {
   children: React.ReactNode
@@ -26,7 +27,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
   
   // Notification State
   const [isNotifOpen, setIsNotifOpen] = React.useState(false)
-  const [notifications, setNotifications] = React.useState<AppNotification[]>([])
+  const [notifications, setNotifications] = React.useState<AppNotification[]>(() => notificationService.getNotifications())
   const unreadCount = notifications.filter(n => !n.read).length
 
   // Theme Toggle State
@@ -132,7 +133,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
     }
   }
 
-  const SidebarContent = () => (
+  const renderSidebarContent = () => (
     <div className="flex h-full flex-col justify-between">
       <div>
         <div className="flex h-16 items-center px-6 border-b border-brand-gray/30">
@@ -273,7 +274,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
         animate={{ width: isSidebarOpen ? 260 : 80 }}
         className="hidden lg:block z-20 h-full bg-white border-r border-brand-gray/50 shadow-sm"
       >
-        <SidebarContent />
+        {renderSidebarContent()}
       </motion.aside>
 
       {/* Mobile Sidebar */}
@@ -294,7 +295,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
               className="fixed inset-y-0 left-0 z-40 w-[260px] bg-white border-r border-brand-gray/50 shadow-2xl lg:hidden"
             >
-              <SidebarContent />
+              {renderSidebarContent()}
             </motion.aside>
           </>
         )}
@@ -464,10 +465,13 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
           </div>
         </header>
 
-        {/* Main Content Scroll Area */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-brand-light">
-          <div className="mx-auto max-w-7xl">
-            {children}
+          <div className="mx-auto max-w-7xl h-full">
+            <AnimatePresence mode="wait">
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </AnimatePresence>
           </div>
         </main>
       </div>

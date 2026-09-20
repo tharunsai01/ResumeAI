@@ -8,6 +8,33 @@ import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 
+const StatCard = ({ title, data, icon: Icon, color, delay, loading }: any) => (
+  <motion.div variants={slideUp} custom={delay}>
+    <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default h-full border-brand-gray/40">
+      <CardContent className="p-5 flex flex-col h-full justify-between">
+        <div className="flex items-start justify-between mb-4">
+          <div className={cn("p-2.5 rounded-xl border", color.bg, color.text, color.border)}>
+            <Icon className="w-5 h-5" />
+          </div>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
+          <div className="flex items-end gap-3">
+            <h3 className="text-3xl font-display font-bold text-brand-navy">
+              {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : data.value}
+            </h3>
+          </div>
+          {!loading && (
+            <p className="text-xs font-medium text-brand-indigo mt-2 bg-brand-indigo/5 inline-block px-2 py-0.5 rounded-md">
+              {data.indicator}
+            </p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+)
+
 export default function RecruiterDashboard() {
   const navigate = useNavigate()
   const [loading, setLoading] = React.useState(true)
@@ -60,36 +87,10 @@ export default function RecruiterDashboard() {
 
   React.useEffect(() => {
     // Simulate initial data loading for micro-interactions
-    const timer = setTimeout(() => setLoading(false), 300)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
-  const StatCard = ({ title, data, icon: Icon, color, delay }: any) => (
-    <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default h-full border-brand-gray/40">
-        <CardContent className="p-5 flex flex-col h-full justify-between">
-          <div className="flex items-start justify-between mb-4">
-            <div className={cn("p-2.5 rounded-xl border", color.bg, color.text, color.border)}>
-              <Icon className="w-5 h-5" />
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-            <div className="flex items-end gap-3">
-              <h3 className="text-3xl font-display font-bold text-brand-navy">
-                {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : data.value}
-              </h3>
-            </div>
-            {!loading && (
-              <p className="text-xs font-medium text-brand-indigo mt-2 bg-brand-indigo/5 inline-block px-2 py-0.5 rounded-md">
-                {data.indicator}
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
@@ -111,12 +112,12 @@ export default function RecruiterDashboard() {
 
         {/* 2. STATISTICS CARDS */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <StatCard title="Active Jobs" data={stats.activeJobs} icon={Briefcase} delay={0} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo", border: "border-brand-indigo/20" }} />
-          <StatCard title="Total Candidates" data={stats.totalCandidates} icon={Users} delay={1} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue", border: "border-brand-blue/20" }} />
-          <StatCard title="AI Screened" data={stats.aiScreened} icon={Sparkles} delay={2} color={{ bg: "bg-semantic-info/10", text: "text-semantic-info", border: "border-semantic-info/20" }} />
-          <StatCard title="Shortlisted" data={stats.shortlisted} icon={CheckCircle2} delay={3} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning", border: "border-semantic-warning/20" }} />
-          <StatCard title="Interviews" data={stats.interviews} icon={Calendar} delay={4} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success", border: "border-semantic-success/20" }} />
-          <StatCard title="Hired" data={stats.hired} icon={Award} delay={5} color={{ bg: "bg-emerald-500/10", text: "text-emerald-500", border: "border-emerald-500/20" }} />
+          <StatCard title="Active Jobs" data={stats.activeJobs} icon={Briefcase} delay={0} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo", border: "border-brand-indigo/20" }} />
+          <StatCard title="Total Candidates" data={stats.totalCandidates} icon={Users} delay={1} loading={loading} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue", border: "border-brand-blue/20" }} />
+          <StatCard title="AI Screened" data={stats.aiScreened} icon={Sparkles} delay={2} loading={loading} color={{ bg: "bg-semantic-info/10", text: "text-semantic-info", border: "border-semantic-info/20" }} />
+          <StatCard title="Shortlisted" data={stats.shortlisted} icon={CheckCircle2} delay={3} loading={loading} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning", border: "border-semantic-warning/20" }} />
+          <StatCard title="Interviews" data={stats.interviews} icon={Calendar} delay={4} loading={loading} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success", border: "border-semantic-success/20" }} />
+          <StatCard title="Hired" data={stats.hired} icon={Award} delay={5} loading={loading} color={{ bg: "bg-emerald-500/10", text: "text-emerald-500", border: "border-emerald-500/20" }} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

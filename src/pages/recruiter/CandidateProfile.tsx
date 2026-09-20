@@ -23,12 +23,9 @@ export default function RecruiterCandidateProfile() {
   const [shortlistMsg, setShortlistMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      const found = initialRecruiterCandidates.find(c => c.id === candidateId)
-      if (found) setCandidate(found)
-      setLoading(false)
-    }, 400)
-    return () => clearTimeout(timer)
+    const found = initialRecruiterCandidates.find(c => c.id === candidateId)
+    if (found) setCandidate(found)
+    setLoading(false)
   }, [candidateId])
 
   const handleShortlist = () => {

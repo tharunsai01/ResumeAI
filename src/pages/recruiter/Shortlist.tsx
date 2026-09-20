@@ -32,8 +32,8 @@ export default function RecruiterShortlist() {
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
   const showToast = (msg: string) => {
