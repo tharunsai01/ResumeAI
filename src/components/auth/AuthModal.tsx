@@ -98,7 +98,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
           <div className="p-8">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-display font-semibold text-brand-navy">
-                {mode === "login" ? "Welcome back" : `Create ${role === 'candidate' ? 'Candidate' : 'Recruiter'} Account`}
+                {mode === "login" ? "Welcome back" : `Create ${role === 'candidate' ? 'Candidate' : role === 'admin' ? 'Admin' : 'Recruiter'} Account`}
               </h2>
               <p className="text-brand-navy/60 mt-2 text-sm">
                 {mode === "login" 

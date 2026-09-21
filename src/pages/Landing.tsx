@@ -22,7 +22,8 @@ export default function Landing() {
 
   // If already logged in, redirect to dashboard
   if (user) {
-    return <Navigate to={`/${user.role}/dashboard`} replace />
+    const dashboardPath = user.role === "admin" ? "/admin" : `/${user.role}/dashboard`
+    return <Navigate to={dashboardPath} replace />
   }
 
   const handleGetStarted = () => {
