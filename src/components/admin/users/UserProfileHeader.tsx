@@ -1,9 +1,10 @@
 import type { AdminUser } from "../../../data/mockAdminUsers"
 import { UserRoleBadge, UserStatusBadge, UserVerificationBadge } from "./UserBadges"
+import SpotlightCard from "../../ui/SpotlightCard";
 
 export function UserProfileHeader({ user }: { user: AdminUser }) {
   return (
-    <div className="glass-card p-6 mb-6 flex flex-col md:flex-row items-start md:items-center gap-6">
+    <SpotlightCard className="glass-card p-6 mb-6 flex flex-col md:flex-row items-start md:items-center gap-6">
       <div className="w-20 h-20 rounded-full bg-brand-indigo/10 text-brand-indigo flex items-center justify-center text-3xl font-bold shrink-0">
         {user.name.charAt(0)}
       </div>
@@ -20,6 +21,6 @@ export function UserProfileHeader({ user }: { user: AdminUser }) {
         <div><span className="font-medium text-brand-navy/80">Joined:</span> {user.joinedAt}</div>
         <div><span className="font-medium text-brand-navy/80">Last Active:</span> {user.lastActive}</div>
       </div>
-    </div>
+    </SpotlightCard>
   )
 }

@@ -9,6 +9,7 @@ import { staggerContainer, slideUp } from "../../lib/animations"
 import { initialInterviews } from "../../data/pipelineMockData"
 import type { MockInterview } from "../../data/pipelineMockData"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
   <motion.div variants={slideUp} custom={delay}>
@@ -140,7 +141,7 @@ export default function RecruiterInterviews() {
 
         {/* FILTERS */}
         <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-4">
-          <div className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
+          <SpotlightCard className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"
@@ -149,7 +150,7 @@ export default function RecruiterInterviews() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
             />
-          </div>
+          </SpotlightCard>
           <div className="flex flex-col sm:flex-row gap-3 lg:flex">
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Statuses</option>

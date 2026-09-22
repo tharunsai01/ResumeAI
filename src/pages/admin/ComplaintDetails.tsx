@@ -8,6 +8,7 @@ import { useAdminComplaints } from "../../contexts/AdminComplaintsContext"
 import { ArrowLeft, MessageSquareX, ExternalLink, Activity, ArrowRight, ShieldAlert, CheckCircle2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import type { ComplaintStatus, ComplaintPriority } from "../../data/mockAdminComplaints"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 export default function AdminComplaintDetails() {
   const { complaintId } = useParams()
@@ -124,7 +125,7 @@ export default function AdminComplaintDetails() {
         }
       />
 
-      <div className="glass-card p-6 mb-6 flex flex-col md:flex-row items-start md:items-center gap-6 justify-between">
+      <SpotlightCard className="glass-card p-6 mb-6 flex flex-col md:flex-row items-start md:items-center gap-6 justify-between">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h2 className="text-2xl font-display font-semibold text-brand-navy">{complaint.subject}</h2>
@@ -164,7 +165,7 @@ export default function AdminComplaintDetails() {
             </select>
           </div>
         </div>
-      </div>
+      </SpotlightCard>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2 space-y-6">

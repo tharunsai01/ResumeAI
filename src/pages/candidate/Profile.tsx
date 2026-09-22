@@ -14,6 +14,9 @@ import {
   Camera, CheckCircle2, MapPin, Mail, 
   Phone, Plus, Trash2, Eye, Sparkles, Check
 } from "lucide-react"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 export default function CandidateProfilePage() {
   const navigate = useNavigate()
@@ -82,7 +85,7 @@ export default function CandidateProfilePage() {
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-5xl mx-auto space-y-6 pb-20">
         
         {/* PAGE HEADER */}
-        <motion.div variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
+        <MotionSpotlightCard variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
           <div>
             <h1 className="text-2xl font-display font-semibold text-brand-navy">My Profile</h1>
             <p className="text-brand-navy/60">Manage your professional profile and career preferences.</p>
@@ -111,7 +114,7 @@ export default function CandidateProfilePage() {
               Preview
             </button>
           </div>
-        </motion.div>
+        </MotionSpotlightCard>
 
         {/* Success Toast */}
         <AnimatePresence>

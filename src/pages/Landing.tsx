@@ -11,6 +11,7 @@ import { AuthModal } from "../components/auth/AuthModal"
 import { useAuth } from "../context/AuthContext"
 import { Navigate, Link } from "react-router-dom"
 import type { UserRole } from "../services/authService"
+import LightRays from "../components/ui/LightRays"
 
 export default function Landing() {
   const { user } = useAuth()
@@ -83,7 +84,22 @@ export default function Landing() {
       <main className="flex-1 pt-20">
         {/* A. Hero Section */}
         <section className="relative pt-20 pb-24 lg:pt-32 lg:pb-32 overflow-hidden bg-white">
-          <div className="absolute top-0 inset-x-0 h-full overflow-hidden pointer-events-none">
+          <LightRays
+            raysOrigin="top-center"
+            raysColor="#8B5CF6"
+            raysSpeed={1.5}
+            lightSpread={1.2}
+            rayLength={3}
+            followMouse={true}
+            mouseInfluence={0.15}
+            noiseAmount={0.02}
+            distortion={0}
+            className="opacity-40"
+            pulsating={true}
+            fadeDistance={1}
+            saturation={1}
+          />
+          <div className="absolute top-0 inset-x-0 h-full overflow-hidden pointer-events-none z-0">
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-indigo/5 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3"></div>
             <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-violet/5 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3"></div>
           </div>

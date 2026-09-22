@@ -10,6 +10,7 @@ import { initialPipelineCandidates } from "../../data/pipelineMockData"
 import type { PipelineCandidate, PipelineStage } from "../../data/pipelineMockData"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 const COLUMNS: { id: PipelineStage; label: string; color: string; bg: string }[] = [
   { id: "Shortlisted", label: "Shortlisted", color: "text-brand-navy", bg: "bg-brand-gray/20 border-brand-gray/30" },
@@ -91,7 +92,7 @@ export default function RecruiterHiringPipeline() {
             <h1 className="text-3xl font-display font-semibold text-brand-navy">Hiring Pipeline</h1>
             <p className="text-brand-navy/60 mt-1">Track candidates from shortlist through final hiring decisions.</p>
           </div>
-          <div className="glass-card flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all w-full sm:w-72 shrink-0">
+          <SpotlightCard className="glass-card flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all w-full sm:w-72 shrink-0">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"
@@ -100,7 +101,7 @@ export default function RecruiterHiringPipeline() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11 text-sm"
             />
-          </div>
+          </SpotlightCard>
         </motion.div>
 
         {/* KANBAN BOARD */}
@@ -122,7 +123,7 @@ export default function RecruiterHiringPipeline() {
                   {/* Column Content Area (Scrollable vertically) */}
                   <div className="p-3 flex-1 overflow-y-auto space-y-3 no-scrollbar">
                     {columnCandidates.map(cand => (
-                      <div 
+                      <SpotlightCard 
                         key={cand.id} 
                         className="glass-card p-4 shadow-sm hover: hover: transition-all cursor-pointer group flex flex-col"
                         onClick={() => navigate(`/recruiter/candidates/${cand.id}`)}
@@ -188,7 +189,7 @@ export default function RecruiterHiringPipeline() {
                             </Button>
                           </div>
                         )}
-                      </div>
+                      </SpotlightCard>
                     ))}
                     
                     {columnCandidates.length === 0 && (

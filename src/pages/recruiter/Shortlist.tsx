@@ -11,6 +11,7 @@ import { initialPipelineCandidates } from "../../data/pipelineMockData"
 import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 export default function RecruiterShortlist() {
   const navigate = useNavigate()
@@ -142,7 +143,7 @@ export default function RecruiterShortlist() {
 
         {/* FILTERS */}
         <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-4">
-          <div className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
+          <SpotlightCard className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"
@@ -151,7 +152,7 @@ export default function RecruiterShortlist() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
             />
-          </div>
+          </SpotlightCard>
           <div className="flex flex-col sm:flex-row gap-3 lg:flex">
             <select value={jobFilter} onChange={(e) => setJobFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Jobs</option>

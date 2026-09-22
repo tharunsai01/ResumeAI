@@ -12,7 +12,9 @@ import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
     <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
@@ -151,7 +153,7 @@ export default function RecruiterCandidates() {
         </div>
 
         {/* FILTERS */}
-        <motion.div variants={slideUp} className="glass-card p-4 space-y-4">
+        <MotionSpotlightCard variants={slideUp} className="glass-card p-4 space-y-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl focus-within:border-brand-indigo/50 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
               <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
@@ -206,7 +208,7 @@ export default function RecruiterCandidates() {
               </button>
             </div>
           )}
-        </motion.div>
+        </MotionSpotlightCard>
 
         {/* CANDIDATE LIST */}
         <motion.div variants={slideUp}>

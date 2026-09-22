@@ -12,6 +12,9 @@ import {
   AlertTriangle, UploadCloud, Shield, CheckCircle2, 
   ArrowLeft, LayoutDashboard, Clock, FileText
 } from "lucide-react"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 // Types
 type ComplaintType = 
@@ -141,7 +144,7 @@ export default function ComplaintPage() {
 
           <AnimatePresence mode="wait">
             {isSuccess ? (
-              <motion.div
+              <MotionSpotlightCard
                 key="success"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -166,7 +169,7 @@ export default function ComplaintPage() {
                     <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
                   </Button>
                 </div>
-              </motion.div>
+              </MotionSpotlightCard>
             ) : (
               <motion.form 
                 key="form"

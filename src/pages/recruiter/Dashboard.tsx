@@ -1,3 +1,4 @@
+import SpotlightCard from '../../components/ui/SpotlightCard';
 import * as React from "react"
 import { motion } from "framer-motion"
 import { Briefcase, Users, Search, CheckCircle2, Calendar, Award, ChevronRight, Sparkles, ArrowRight, Play } from "lucide-react"
@@ -138,13 +139,13 @@ export default function RecruiterDashboard() {
                         onClick={() => navigate(stage.route)}
                         className="group relative z-10 flex flex-col items-center flex-1 cursor-pointer w-full sm:w-auto py-3 sm:py-0 mb-2 sm:mb-0 hover:bg-brand-light/50 sm:hover:bg-transparent rounded-xl transition-colors"
                       >
-                        <div className="w-12 h-12 rounded-2xl glass-card flex items-center justify-center shadow-sm mb-3 group-hover:border-brand-indigo group-hover:text-brand-indigo group-hover:shadow-md transition-all duration-200 group-active:scale-95">
+                        <SpotlightCard className="w-12 h-12 rounded-2xl glass-card flex items-center justify-center shadow-sm mb-3 group-hover:border-brand-indigo group-hover:text-brand-indigo group-hover:shadow-md transition-all duration-200 group-active:scale-95">
                           {loading ? (
                             <div className="w-5 h-5 bg-brand-gray/20 rounded-full animate-pulse" />
                           ) : (
                             <span className="text-lg font-bold text-brand-navy group-hover:text-brand-indigo transition-colors">{stage.value}</span>
                           )}
-                        </div>
+                        </SpotlightCard>
                         <span className="text-sm font-semibold text-brand-navy/70 group-hover:text-brand-indigo transition-colors flex items-center gap-1.5">
                           <stage.icon className="w-3.5 h-3.5" />
                           {stage.label}

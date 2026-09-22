@@ -4,8 +4,7 @@ import { Sparkles, Target, Brain, Globe, User, Briefcase, CheckCircle2 } from "l
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Card, CardContent } from "../../components/ui/Card"
 import { staggerContainer, slideUp } from "../../lib/animations"
-
-
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 export default function RecruiterAbout() {
   return (
@@ -76,9 +75,9 @@ export default function RecruiterAbout() {
         <motion.div variants={slideUp} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="border-brand-gray/30 shadow-sm hover:border-brand-indigo/30 transition-colors">
             <div className="bg-brand-indigo/5 px-8 py-6 border-b border-brand-indigo/10 flex items-center gap-4">
-              <div className="glass-card p-3 text-brand-indigo shrink-0">
+              <SpotlightCard className="glass-card p-3 text-brand-indigo shrink-0">
                 <Briefcase className="w-6 h-6" />
-              </div>
+              </SpotlightCard>
               <h3 className="text-xl font-bold text-brand-navy">For Recruiters</h3>
             </div>
             <CardContent className="p-8">
@@ -96,9 +95,9 @@ export default function RecruiterAbout() {
 
           <Card className="border-brand-gray/30 shadow-sm hover:border-brand-blue/30 transition-colors">
             <div className="bg-brand-blue/5 px-8 py-6 border-b border-brand-blue/10 flex items-center gap-4">
-              <div className="glass-card p-3 text-brand-blue shrink-0">
+              <SpotlightCard className="glass-card p-3 text-brand-blue shrink-0">
                 <User className="w-6 h-6" />
-              </div>
+              </SpotlightCard>
               <h3 className="text-xl font-bold text-brand-navy">For Candidates</h3>
             </div>
             <CardContent className="p-8">

@@ -3,6 +3,7 @@ import { Shield, ShieldAlert, CheckCircle2, Lock, FileText, Brain, Users, AlertT
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Card, CardContent } from "../../components/ui/Card"
 import { staggerContainer, slideUp } from "../../lib/animations"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 const SECTIONS = [
   {
@@ -111,9 +112,9 @@ export default function RecruiterSafety() {
             <motion.div key={idx} variants={slideUp}>
               <Card className="border-brand-gray/30 shadow-sm overflow-hidden">
                 <div className="bg-brand-light/30 px-6 py-5 border-b border-brand-gray/20 flex items-start gap-4">
-                  <div className="glass-card p-3 shrink-0">
+                  <SpotlightCard className="glass-card p-3 shrink-0">
                     <section.icon className="w-6 h-6 text-brand-indigo" />
-                  </div>
+                  </SpotlightCard>
                   <div className="mt-1">
                     <h2 className="text-xl font-bold text-brand-navy">{section.title}</h2>
                   </div>

@@ -11,6 +11,7 @@ import { SkillBadge } from "../../components/shared/SkillBadge"
 import { skillService } from "../../services/skillService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard"
 import type { SkillData, CareerPath, SkillTrend, SkillRoleComparison } from "../../data/mockSkills"
 
 export default function CandidateSkills() {
@@ -704,7 +705,7 @@ export default function CandidateSkills() {
                   <h4 className="text-sm font-semibold text-brand-navy mb-3 flex items-center gap-2 uppercase tracking-wider">
                     <BookOpen className="w-4 h-4 text-brand-indigo" /> Recommended Next Steps
                   </h4>
-                  <div className="glass-card space-y-3 text-sm text-brand-navy/70 p-5">
+                  <SpotlightCard className="glass-card space-y-3 text-sm text-brand-navy/70 p-5">
                     {selectedSkill.recommendation.split('\n').map((step, i) => (
                       <div key={i} className="flex gap-3">
                         {step.match(/^\d+\./) ? (
@@ -715,7 +716,7 @@ export default function CandidateSkills() {
                         <span className="leading-relaxed">{step.replace(/^\d+\.\s*/, '')}</span>
                       </div>
                     ))}
-                  </div>
+                  </SpotlightCard>
                   
                   <div className="flex gap-4 mt-4 px-1">
                     <div className="flex items-center gap-1.5 text-xs font-medium text-brand-navy/60">

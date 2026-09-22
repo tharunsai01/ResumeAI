@@ -12,6 +12,9 @@ import { useJobActions } from "../../hooks/useJobActions"
 import { mockResumeAnalysis } from "../../data/mockResume"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 export default function CandidateJobs() {
   const navigate = useNavigate()
@@ -166,7 +169,7 @@ export default function CandidateJobs() {
         </motion.div>
 
         {/* Search Bar */}
-        <motion.div variants={slideUp} className="glass-card p-2 flex items-center relative z-10">
+        <MotionSpotlightCard variants={slideUp} className="glass-card p-2 flex items-center relative z-10">
           <div className="flex-1 flex items-center px-4">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
@@ -181,7 +184,7 @@ export default function CandidateJobs() {
           <Button variant="outline" className="sm:hidden mr-2" onClick={(e) => { e.preventDefault(); setIsMobileFiltersOpen(!isMobileFiltersOpen); }}>
             <SlidersHorizontal className="w-5 h-5" />
           </Button>
-        </motion.div>
+        </MotionSpotlightCard>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Desktop Filters Sidebar */}

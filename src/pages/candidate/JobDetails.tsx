@@ -13,6 +13,9 @@ import { useJobActions } from "../../hooks/useJobActions"
 import { mockResumeAnalysis } from "../../data/mockResume"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 export default function CandidateJobDetails() {
   const { jobId } = useParams<{ jobId: string }>()
@@ -333,7 +336,7 @@ export default function CandidateJobDetails() {
               className="absolute inset-0 bg-brand-navy/40 backdrop-blur-sm"
               onClick={closeApplyModal}
             />
-            <motion.div 
+            <MotionSpotlightCard 
               initial={{ opacity: 0, scale: 0.95, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               exit={{ opacity: 0, scale: 0.95, y: 20 }} 
@@ -406,7 +409,7 @@ export default function CandidateJobDetails() {
                   </div>
                 </>
               )}
-            </motion.div>
+            </MotionSpotlightCard>
           </div>
         )}
       </AnimatePresence>

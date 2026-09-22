@@ -10,7 +10,9 @@ import { initialRecruiterJobs } from "../../data/recruiterMockData"
 import type { RecruiterJob, JobStatus, JobType, WorkMode } from "../../data/recruiterMockData"
 import { DeleteJobModal } from "./components/DeleteJobModal"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
     <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
@@ -145,7 +147,7 @@ export default function RecruiterJobs() {
         </div>
 
         {/* FILTERS */}
-        <motion.div variants={slideUp} className="glass-card p-4 space-y-4">
+        <MotionSpotlightCard variants={slideUp} className="glass-card p-4 space-y-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl">
               <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
@@ -187,7 +189,7 @@ export default function RecruiterJobs() {
               </select>
             </div>
           </div>
-        </motion.div>
+        </MotionSpotlightCard>
 
         {/* JOB LIST */}
         <motion.div variants={slideUp}>
@@ -261,7 +263,7 @@ export default function RecruiterJobs() {
                             {/* Actions Dropdown */}
                             <AnimatePresence>
                               {openDropdownId === job.id && (
-                                <motion.div
+                                <MotionSpotlightCard
                                   initial={{ opacity: 0, scale: 0.95, y: 5 }}
                                   animate={{ opacity: 1, scale: 1, y: 0 }}
                                   exit={{ opacity: 0, scale: 0.95, y: 5 }}
@@ -285,7 +287,7 @@ export default function RecruiterJobs() {
                                   <button onClick={() => setJobToDelete({id: job.id, title: job.title})} className="w-full px-4 py-2 text-sm text-semantic-error hover:bg-semantic-error/5 flex items-center font-medium">
                                     <Trash2 className="w-4 h-4 mr-2" /> Delete Job
                                   </button>
-                                </motion.div>
+                                </MotionSpotlightCard>
                               )}
                             </AnimatePresence>
                           </div>

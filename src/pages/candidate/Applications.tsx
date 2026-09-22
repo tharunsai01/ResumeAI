@@ -11,6 +11,7 @@ import { useJobActions } from "../../hooks/useJobActions"
 import { mockResumeAnalysis } from "../../data/mockResume"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 export default function CandidateApplications() {
   const navigate = useNavigate()
@@ -270,7 +271,7 @@ export default function CandidateApplications() {
               ) : (
                 <motion.div variants={staggerContainer} className="space-y-3">
                   {/* Desktop Table View */}
-                  <div className="glass-card hidden md:block overflow-hidden">
+                  <SpotlightCard className="glass-card hidden md:block overflow-hidden">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-brand-light/50 border-b border-brand-gray/50">
@@ -316,7 +317,7 @@ export default function CandidateApplications() {
                         ))}
                       </tbody>
                     </table>
-                  </div>
+                  </SpotlightCard>
 
                   {/* Mobile Card View */}
                   <div className="md:hidden space-y-3">

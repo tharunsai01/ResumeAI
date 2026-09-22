@@ -3,6 +3,7 @@ import { UserRoleBadge, UserStatusBadge, UserVerificationBadge } from "./UserBad
 import { UserActionMenu } from "./UserActionMenu"
 import { useNavigate } from "react-router-dom"
 import { Ban } from "lucide-react"
+import SpotlightCard from "../../ui/SpotlightCard";
 
 interface UserTableProps {
   users: AdminUser[]
@@ -20,7 +21,7 @@ export function UserTable({ users, selectedUserIds, onSelectAll, onSelectUser, o
   const someSelected = selectedUserIds.length > 0 && !allSelected
 
   return (
-    <div className="glass-card overflow-hidden">
+    <SpotlightCard className="glass-card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -102,7 +103,7 @@ export function UserTable({ users, selectedUserIds, onSelectAll, onSelectUser, o
           </tbody>
         </table>
       </div>
-    </div>
+    </SpotlightCard>
   )
 }
 
@@ -117,7 +118,7 @@ export function BulkActionBar({ selectedCount, onSuspend, onClear }: BulkActionB
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
-      <div className="glass-card shadow-xl px-6 py-4 flex items-center gap-6 rounded-full border border-brand-indigo/20 bg-white/95 backdrop-blur-md">
+      <SpotlightCard className="glass-card shadow-xl px-6 py-4 flex items-center gap-6 rounded-full border border-brand-indigo/20 bg-white/95 backdrop-blur-md">
         <span className="font-medium text-brand-navy">
           <span className="text-brand-indigo font-bold">{selectedCount}</span> users selected
         </span>
@@ -135,7 +136,7 @@ export function BulkActionBar({ selectedCount, onSuspend, onClear }: BulkActionB
             Cancel
           </button>
         </div>
-      </div>
+      </SpotlightCard>
     </div>
   )
 }

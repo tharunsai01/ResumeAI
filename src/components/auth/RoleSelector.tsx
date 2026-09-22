@@ -1,6 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { User, Briefcase, X, ArrowRight } from "lucide-react"
 import type { UserRole } from "../../services/authService"
+import SpotlightCard from "../ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 interface RoleSelectorProps {
   isOpen: boolean
@@ -22,7 +25,7 @@ export function RoleSelector({ isOpen, onClose, onSelectRole }: RoleSelectorProp
           className="absolute inset-0 bg-brand-navy/60 backdrop-blur-sm"
         />
         
-        <motion.div
+        <MotionSpotlightCard
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -90,7 +93,7 @@ export function RoleSelector({ isOpen, onClose, onSelectRole }: RoleSelectorProp
               </div>
             </div>
           </div>
-        </motion.div>
+        </MotionSpotlightCard>
       </div>
     </AnimatePresence>
   )

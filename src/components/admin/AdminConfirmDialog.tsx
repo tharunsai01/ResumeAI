@@ -1,6 +1,9 @@
 import React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { AlertTriangle, X } from "lucide-react"
+import SpotlightCard from "../ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 interface AdminConfirmDialogProps {
   isOpen: boolean
@@ -55,7 +58,7 @@ export function AdminConfirmDialog({
           onClick={onCancel}
           className="absolute inset-0 bg-brand-navy/60 backdrop-blur-sm"
         />
-        <motion.div
+        <MotionSpotlightCard
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -90,7 +93,7 @@ export function AdminConfirmDialog({
               {confirmLabel}
             </button>
           </div>
-        </motion.div>
+        </MotionSpotlightCard>
       </div>
     </AnimatePresence>
   )

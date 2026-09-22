@@ -1,5 +1,6 @@
 import { Search, Filter, X } from "lucide-react"
 import type { AdminUserRole, AdminUserStatus, AdminUserVerification } from "../../../data/mockAdminUsers"
+import SpotlightCard from "../../ui/SpotlightCard";
 
 interface UserFiltersProps {
   searchQuery: string
@@ -24,7 +25,7 @@ export function UserFilters({
   const hasActiveFilters = searchQuery !== "" || selectedRole !== "All Roles" || selectedStatus !== "All Status" || selectedVerification !== "All"
 
   return (
-    <div className="glass-card p-4 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+    <SpotlightCard className="glass-card p-4 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
       <div className="relative w-full md:w-96">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-navy/40" />
         <input 
@@ -81,6 +82,6 @@ export function UserFilters({
           </button>
         )}
       </div>
-    </div>
+    </SpotlightCard>
   )
 }

@@ -10,6 +10,7 @@ import { staggerContainer, slideUp } from "../../lib/animations"
 import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
 import { cn } from "../../lib/utils"
 import { settingsService } from "../../services/settingsService"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 export default function RecruiterSettings() {
   const [activeTab, setActiveTab] = React.useState("profile")
@@ -545,9 +546,9 @@ export default function RecruiterSettings() {
       <Modal isOpen={is2FAModalOpen} onClose={() => setIs2FAModalOpen(false)} title="Enable 2-Factor Authentication">
         <div className="mt-4">
           <p className="text-brand-navy/70 mb-6 text-sm">Scan this QR code with your authenticator app (like Google Authenticator or Authy) to add a secondary layer of security.</p>
-          <div className="glass-card w-48 h-48 mx-auto flex items-center justify-center mb-6">
+          <SpotlightCard className="glass-card w-48 h-48 mx-auto flex items-center justify-center mb-6">
             <div className="w-32 h-32 border-4 border-brand-navy border-dashed opacity-50 flex items-center justify-center"><span className="text-brand-navy font-bold">QR Mock</span></div>
-          </div>
+          </SpotlightCard>
           <div>
             <label className="block text-sm font-medium text-brand-navy mb-1.5">Enter 6-digit verification code</label>
             <Input type="text" placeholder="000000" maxLength={6} className="text-center tracking-[0.5em] text-lg font-bold font-mono" />

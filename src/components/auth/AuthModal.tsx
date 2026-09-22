@@ -4,6 +4,9 @@ import { X, Mail, Lock, User as UserIcon, Building2, AlertCircle } from "lucide-
 import { Button } from "../ui/Button"
 import { authService, type UserRole } from "../../services/authService"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 interface AuthModalProps {
   isOpen: boolean
@@ -83,7 +86,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
           className="absolute inset-0 bg-brand-navy/60 backdrop-blur-sm"
         />
         
-        <motion.div
+        <MotionSpotlightCard
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -245,7 +248,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
               </p>
             </div>
           </div>
-        </motion.div>
+        </MotionSpotlightCard>
       </div>
     </AnimatePresence>
   )

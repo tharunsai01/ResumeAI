@@ -5,6 +5,7 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Card, CardContent } from "../../components/ui/Card"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard"
 
 const HELP_CATEGORIES = [
   {
@@ -165,9 +166,9 @@ export default function RecruiterHelp() {
               <motion.div key={category.id} variants={slideUp}>
                 <Card className="overflow-hidden border-brand-gray/30 shadow-sm">
                   <div className="bg-brand-light/30 px-6 py-5 border-b border-brand-gray/20 flex items-start gap-4">
-                    <div className="glass-card p-3 shrink-0">
+                    <SpotlightCard className="glass-card p-3 shrink-0">
                       <category.icon className="w-6 h-6 text-brand-indigo" />
-                    </div>
+                    </SpotlightCard>
                     <div>
                       <h3 className="text-xl font-bold text-brand-navy">{category.title}</h3>
                       <p className="text-sm text-brand-navy/70 mt-1 leading-relaxed">{category.description}</p>

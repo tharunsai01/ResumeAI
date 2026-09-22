@@ -12,6 +12,9 @@ import { notificationService } from "../../services/notificationService"
 import { authService } from "../../services/authService"
 import type { AppNotification } from "../../data/mockNotifications"
 import { PageTransition } from "./PageTransition"
+import SpotlightCard from "../ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 interface DashboardShellProps {
   children: React.ReactNode
@@ -365,7 +368,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                       className="fixed inset-0 z-40"
                       onClick={() => setIsNotifOpen(false)}
                     />
-                    <motion.div 
+                    <MotionSpotlightCard 
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -414,7 +417,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                           ))
                         )}
                       </div>
-                    </motion.div>
+                    </MotionSpotlightCard>
                   </>
                 )}
               </AnimatePresence>
@@ -437,7 +440,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                 {isProfileOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />
-                    <motion.div 
+                    <MotionSpotlightCard 
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -457,7 +460,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                       <button onClick={() => { setIsProfileOpen(false); handleLogout(); }} className="w-full text-left px-4 py-2 text-sm text-semantic-error/80 hover:bg-semantic-error/10 transition-colors flex items-center gap-2">
                         <LogOut className="w-4 h-4" /> Logout
                       </button>
-                    </motion.div>
+                    </MotionSpotlightCard>
                   </>
                 )}
               </AnimatePresence>
