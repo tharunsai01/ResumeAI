@@ -15,8 +15,16 @@ node_modules/
 # ------------------------------------------
 dist/
 **/dist/
+
 build/
 **/build/
+
+.next/
+**/.next/
+
+out/
+**/out/
+
 .vite/
 **/.vite/
 
@@ -40,7 +48,7 @@ pnpm-debug.log*
 
 
 # ------------------------------------------
-# Generated Output / Temporary Files
+# Generated / Temporary Project Files
 # ------------------------------------------
 build_output.txt
 lint_output.txt
@@ -49,12 +57,11 @@ search_results.txt
 placeholders.txt
 buttons.txt
 
-# Temporary development scripts/folders
 scratch/
 
 
 # ------------------------------------------
-# Coverage / Testing
+# Testing / Coverage
 # ------------------------------------------
 coverage/
 .nyc_output/
@@ -105,10 +112,12 @@ Desktop.ini
 
 
 # ------------------------------------------
-# Tooling / Cache
+# Cache
 # ------------------------------------------
 .cache/
 .eslintcache/
+.parcel-cache/
+.turbo/
 
 
 # ------------------------------------------
@@ -116,6 +125,7 @@ Desktop.ini
 # ------------------------------------------
 uploads/
 **/uploads/
+
 generated/
 **/generated/
 
@@ -132,3 +142,17 @@ generated/
 # Vite Temporary Files
 # ------------------------------------------
 vite.config.*.timestamp-*
+
+
+# ------------------------------------------
+# Debug / Profiling
+# ------------------------------------------
+*.cpuprofile
+*.heapprofile
+
+
+# ------------------------------------------
+# OS / Tool Temporary Files
+# ------------------------------------------
+*.orig
+*.rej
