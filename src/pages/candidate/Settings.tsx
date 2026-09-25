@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from "../../components/ui/PremiumCard"
 import { Input } from "../../components/ui/Input"
 import { Modal } from "../../components/ui/Modal"
 import { settingsService } from "../../services/settingsService"
@@ -165,7 +165,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                     "flex items-center justify-between w-full px-4 py-3 rounded-xl text-left transition-colors",
                     activeTab === tab.id 
                       ? "bg-brand-indigo/10 text-brand-indigo font-semibold dark:bg-brand-indigo/20 dark:text-brand-indigo" 
-                      : "text-brand-navy/70 hover:bg-brand-gray/30 hover:text-brand-navy font-medium dark:text-brand-navy/60 dark:hover:bg-white/5 dark:hover:text-white"
+                      : "text-brand-navy/70 hover:bg-brand-gray/30 hover:text-brand-navy font-medium dark:text-white/70 dark:hover:bg-white/5 dark:hover:text-white dark:hover:bg-white/10"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -195,12 +195,12 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                 {/* ------------------------------------------------ */}
                 {activeTab === "account" && (
                   <>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Account Information</CardTitle>
-                        <CardDescription>Manage your personal profile and contact details.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Account Information</PremiumCardTitle>
+                        <PremiumCardDescription>Manage your personal profile and contact details.</PremiumCardDescription>
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="space-y-6">
                         <div className="flex items-center gap-6">
                           <div className="w-20 h-20 rounded-full bg-brand-light flex items-center justify-center border-2 border-brand-gray/50 overflow-hidden shrink-0">
                             {profile.avatar ? (
@@ -233,14 +233,14 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Authentication</CardTitle>
-                      </CardHeader>
-                      <CardContent>
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Authentication</PremiumCardTitle>
+                      </PremiumCardHeader>
+                      <PremiumCardContent>
                         <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-medium text-brand-navy">Password</h4>
@@ -250,8 +250,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             Change Password
                           </button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
                   </>
                 )}
 
@@ -259,12 +259,12 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                 {/* NOTIFICATIONS */}
                 {/* ------------------------------------------------ */}
                 {activeTab === "notifications" && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Notification Preferences</CardTitle>
-                      <CardDescription>Choose which notifications you want to receive.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-0 divide-y divide-brand-gray/30">
+                  <PremiumCard>
+                    <PremiumCardHeader>
+                      <PremiumCardTitle>Notification Preferences</PremiumCardTitle>
+                      <PremiumCardDescription>Choose which notifications you want to receive.</PremiumCardDescription>
+                    </PremiumCardHeader>
+                    <PremiumCardContent className="space-y-0 divide-y divide-brand-gray/30">
                       {[
                         { id: "jobMatchAlerts", title: "Job Match Alerts", desc: "Get notified when new jobs strongly match your profile." },
                         { id: "applicationStatusUpdates", title: "Application Updates", desc: "Get notified when your application status changes." },
@@ -290,20 +290,20 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                           </button>
                         </div>
                       ))}
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 )}
 
                 {/* ------------------------------------------------ */}
                 {/* JOB PREFERENCES */}
                 {/* ------------------------------------------------ */}
                 {activeTab === "job_preferences" && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Job Preferences</CardTitle>
-                      <CardDescription>Control how HireSmart AI finds and recommends opportunities for you. These settings sync with your candidate profile.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
+                  <PremiumCard>
+                    <PremiumCardHeader>
+                      <PremiumCardTitle>Job Preferences</PremiumCardTitle>
+                      <PremiumCardDescription>Control how HireSmart AI finds and recommends opportunities for you. These settings sync with your candidate profile.</PremiumCardDescription>
+                    </PremiumCardHeader>
+                    <PremiumCardContent className="space-y-6">
                       <div>
                         <label className="block text-sm font-semibold text-brand-navy mb-2">Preferred Job Titles</label>
                         <Input value={profile.careerPreferences.preferredJobTitles.join(", ")} disabled className="bg-transparent" />
@@ -329,8 +329,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                           Edit Job Preferences in Profile
                         </button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 )}
 
                 {/* ------------------------------------------------ */}
@@ -338,12 +338,12 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                 {/* ------------------------------------------------ */}
                 {activeTab === "privacy" && (
                   <div className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Privacy Settings</CardTitle>
-                        <CardDescription>Control your visibility to recruiters.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-0 divide-y divide-brand-gray/30">
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Privacy Settings</PremiumCardTitle>
+                        <PremiumCardDescription>Control your visibility to recruiters.</PremiumCardDescription>
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="space-y-0 divide-y divide-brand-gray/30">
                         {[
                           { id: "visibleToRecruiters", title: "Visible to Recruiters", desc: "Recruiters can discover your professional profile when you are open to opportunities." },
                           { id: "allowRecruitersToContact", title: "Allow Recruiters to Contact Me", desc: "Receive direct messages and interview requests from verified recruiters." },
@@ -362,15 +362,15 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             </button>
                           </div>
                         ))}
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>AI Recommendation Preferences</CardTitle>
-                        <CardDescription>Determine which parts of your profile HireSmart AI uses when recommending jobs.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-0 divide-y divide-brand-gray/30">
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>AI Recommendation Preferences</PremiumCardTitle>
+                        <PremiumCardDescription>Determine which parts of your profile HireSmart AI uses when recommending jobs.</PremiumCardDescription>
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="space-y-0 divide-y divide-brand-gray/30">
                         {[
                           { id: "useResumeSkills", title: "Use Resume Skills", desc: "Match jobs based on skills extracted from your resume." },
                           { id: "useCareerPreferences", title: "Use Career Preferences", desc: "Factor in your preferred roles, locations, and salary." },
@@ -389,8 +389,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             </button>
                           </div>
                         ))}
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
                   </div>
                 )}
 
@@ -398,12 +398,12 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                 {/* APPEARANCE */}
                 {/* ------------------------------------------------ */}
                 {activeTab === "appearance" && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Appearance</CardTitle>
-                      <CardDescription>Customize the interface of HireSmart AI.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-8">
+                  <PremiumCard>
+                    <PremiumCardHeader>
+                      <PremiumCardTitle>Appearance</PremiumCardTitle>
+                      <PremiumCardDescription>Customize the interface of HireSmart AI.</PremiumCardDescription>
+                    </PremiumCardHeader>
+                    <PremiumCardContent className="space-y-8">
                       <div>
                         <h4 className="font-semibold text-brand-navy mb-4">Theme</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -439,8 +439,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                           <motion.div layout className="w-4 h-4 bg-white rounded-full mx-1 shadow-sm" animate={{ x: settings.appearance.reduceMotion ? 24 : 0 }} />
                         </button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 )}
 
                 {/* ------------------------------------------------ */}
@@ -448,12 +448,12 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                 {/* ------------------------------------------------ */}
                 {activeTab === "security" && (
                   <div className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Active Sessions</CardTitle>
-                        <CardDescription>Manage your active logins across devices.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Active Sessions</PremiumCardTitle>
+                        <PremiumCardDescription>Manage your active logins across devices.</PremiumCardDescription>
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="space-y-4">
                         <div className="flex items-start justify-between p-4 border border-brand-gray/50 rounded-xl bg-brand-indigo/5">
                           <div>
                             <h4 className="font-semibold text-brand-navy">Chrome on Windows</h4>
@@ -464,15 +464,15 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                         <button onClick={() => triggerToast("Signed out of all other sessions ✓")} className="btn-interactive btn-secondary w-full py-3 font-semibold rounded-xl transition-colors">
                           Sign Out All Other Sessions
                         </button>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
 
-                    <Card className="border-semantic-error/30">
-                      <CardHeader>
-                        <CardTitle className="text-semantic-error flex items-center gap-2"><AlertTriangle className="w-5 h-5" /> Danger Zone</CardTitle>
-                        <CardDescription>Irreversible and destructive actions for your account.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
+                    <PremiumCard className="border-semantic-error/30">
+                      <PremiumCardHeader>
+                        <PremiumCardTitle className="text-semantic-error flex items-center gap-2"><AlertTriangle className="w-5 h-5" /> Danger Zone</PremiumCardTitle>
+                        <PremiumCardDescription>Irreversible and destructive actions for your account.</PremiumCardDescription>
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="space-y-4">
                         <div className="flex items-center justify-between p-4 bg-semantic-error/5 rounded-xl">
                           <div>
                             <h4 className="font-semibold text-brand-navy">Clear Local Data</h4>
@@ -491,8 +491,8 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             Delete Account
                           </button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
                   </div>
                 )}
               </motion.div>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, Edit, Users, Search, CheckCircle2, Calendar, Award, Building, MapPin, Briefcase, Clock, DollarSign, Sparkles, XCircle } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { initialRecruiterJobs } from "../../data/recruiterMockData"
@@ -12,11 +12,11 @@ import { cn } from "../../lib/utils"
 const SummaryCard = ({ title, value, icon: Icon, color, route }: any) => {
   const navigate = useNavigate()
   return (
-    <Card 
+    <PremiumCard 
       onClick={() => navigate(route)}
       className="cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200 group border-brand-gray/40 bg-white"
     >
-      <CardContent className="p-4 flex flex-col justify-between h-full">
+      <PremiumCardContent className="p-4 flex flex-col justify-between h-full">
         <div className="flex justify-between items-start mb-3">
           <div className={cn("p-2 rounded-xl border", color.bg, color.text, color.border)}>
             <Icon className="w-4 h-4" />
@@ -26,8 +26,8 @@ const SummaryCard = ({ title, value, icon: Icon, color, route }: any) => {
           <h3 className="text-2xl font-display font-bold text-brand-navy group-hover:text-brand-indigo transition-colors">{value}</h3>
           <p className="text-xs font-medium text-brand-navy/60">{title}</p>
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }
 
@@ -163,11 +163,11 @@ export default function RecruiterJobDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* JOB DETAILS MAIN CONTENT */}
           <motion.div variants={slideUp} className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Job Description</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Job Description</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6">
                 <div className="prose prose-sm prose-slate max-w-none">
                   <p className="text-brand-navy/80 leading-relaxed whitespace-pre-wrap">{job.description}</p>
                   
@@ -186,17 +186,17 @@ export default function RecruiterJobDetails() {
                     <li>Excellent communication and teamwork abilities.</li>
                   </ul>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
 
           {/* SIDEBAR INFO */}
           <motion.div variants={slideUp} className="space-y-6">
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5 space-y-5">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Overview</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5 space-y-5">
                 <div className="flex items-start gap-3 text-sm">
                   <Briefcase className="w-5 h-5 text-brand-indigo mt-0.5 shrink-0" />
                   <div>
@@ -225,16 +225,16 @@ export default function RecruiterJobDetails() {
                     <div className="text-brand-navy/70">{job.salary}</div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle className="flex items-center gap-2">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-brand-indigo" /> Required Skills
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-5">
+                </PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5">
                 <div className="flex flex-wrap gap-2">
                   {job.skills.map((skill: string) => (
                     <span key={skill} className="px-3 py-1 bg-brand-indigo/10 text-brand-indigo text-xs font-bold rounded-md border border-brand-indigo/20">
@@ -242,8 +242,8 @@ export default function RecruiterJobDetails() {
                     </span>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
         </div>
         

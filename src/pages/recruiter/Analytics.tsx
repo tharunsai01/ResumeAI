@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion } from "framer-motion"
 import { BarChart, Users, CheckCircle2, User, Search, Download, Briefcase, Calendar, ChevronRight } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
@@ -26,8 +26,8 @@ const MOCK_JOBS = [
 
 const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
-    <Card className="hover:-translate-y-0.5 transition-all duration-200 h-full">
-      <CardContent className="p-5 flex flex-col justify-between h-full">
+    <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200 h-full">
+      <PremiumCardContent className="p-5 flex flex-col justify-between h-full">
         <div className="flex justify-between items-start mb-4">
           <div className={`p-2.5 rounded-lg ${color.bg} ${color.text}`}>
             <Icon className="w-5 h-5" />
@@ -39,8 +39,8 @@ const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
           </h3>
           <p className="text-sm font-medium text-brand-navy/60 mt-1">{title}</p>
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   </motion.div>
 )
 
@@ -120,11 +120,11 @@ export default function RecruiterAnalytics() {
           
           {/* HIRING FUNNEL */}
           <motion.div variants={slideUp} className="lg:col-span-2">
-            <Card className="h-full">
-              <CardHeader className="border-b border-brand-gray/20">
-                <CardTitle>Hiring Funnel</CardTitle>
-              </CardHeader>
-              <CardContent className="p-8">
+            <PremiumCard className="h-full">
+              <PremiumCardHeader className="border-b border-brand-gray/20">
+                <PremiumCardTitle>Hiring Funnel</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-8">
                 {loading ? (
                   <div className="h-40 flex items-center justify-center"><div className="w-8 h-8 border-2 border-brand-indigo border-t-transparent rounded-full animate-spin" /></div>
                 ) : (
@@ -142,17 +142,17 @@ export default function RecruiterAnalytics() {
                     <FunnelStep label="Hired" value={MOCK_STATS.hired} percent="2.8" colorClass="bg-semantic-success text-white" />
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
 
           {/* AI SCREENING INSIGHTS */}
           <motion.div variants={slideUp}>
-            <Card className="h-full">
-              <CardHeader className="border-b border-brand-gray/20">
-                <CardTitle>AI Screening Insights</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
+            <PremiumCard className="h-full">
+              <PremiumCardHeader className="border-b border-brand-gray/20">
+                <PremiumCardTitle>AI Screening Insights</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6">
                 <p className="text-xs text-brand-navy/60 mb-6 leading-relaxed bg-brand-blue/5 p-3 rounded-lg border border-brand-blue/10">
                   Candidates scoring <span className="font-bold text-brand-indigo">{AI_SCREENING_THRESHOLD}%</span> or above are considered AI-qualified for recruiter review.
                 </p>
@@ -188,17 +188,17 @@ export default function RecruiterAnalytics() {
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
 
         </div>
 
         {/* JOB PERFORMANCE */}
         <motion.div variants={slideUp}>
-          <Card>
-            <CardHeader className="border-b border-brand-gray/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <CardTitle>Job Performance</CardTitle>
+          <PremiumCard>
+            <PremiumCardHeader className="border-b border-brand-gray/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <PremiumCardTitle>Job Performance</PremiumCardTitle>
               <select 
                 value={dateFilter}
                 onChange={e => setDateFilter(e.target.value)}
@@ -209,8 +209,8 @@ export default function RecruiterAnalytics() {
                 <option>90 Days</option>
                 <option>This Year</option>
               </select>
-            </CardHeader>
-            <CardContent className="p-0">
+            </PremiumCardHeader>
+            <PremiumCardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left whitespace-nowrap">
                   <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
@@ -237,8 +237,8 @@ export default function RecruiterAnalytics() {
                   </tbody>
                 </table>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
       </motion.div>

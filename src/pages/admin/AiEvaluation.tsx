@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
 import { AdminStatCard } from "../../components/admin/AdminStatCard"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { 
   Play, Info, AlertTriangle, ShieldAlert, Target, Scale, EyeOff, 
@@ -97,15 +97,15 @@ export default function AdminAiEvaluation() {
             
             {/* FAIRNESS EVALUATION */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-2">
                     <Scale className="w-5 h-5 text-brand-indigo" />
                     Fairness Evaluation
-                  </CardTitle>
+                  </PremiumCardTitle>
                   <p className="text-sm text-brand-navy/60 mt-1">The evaluation compares AI results for equivalent resumes while controlled identity-related details are changed.</p>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-6">
                   
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-brand-light/30 p-4 rounded-xl border border-brand-gray/20">
                     <div>
@@ -173,21 +173,21 @@ export default function AdminAiEvaluation() {
                       </table>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* SKILL EXTRACTION EVALUATION */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-2">
                     <Target className="w-5 h-5 text-brand-indigo" />
                     Skill Extraction Evaluation
-                  </CardTitle>
+                  </PremiumCardTitle>
                   <p className="text-sm text-brand-navy/60 mt-1">Measures agreement between expected skills and extracted skills in the evaluation dataset.</p>
-                </CardHeader>
-                <CardContent>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
                     <div className="w-32 h-32 rounded-full border-[12px] border-brand-indigo/10 flex flex-col items-center justify-center shrink-0 relative">
                       <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
@@ -220,20 +220,20 @@ export default function AdminAiEvaluation() {
                   <div className="text-xs text-brand-navy/40 flex items-center gap-1 justify-end">
                     <Info className="w-3.5 h-3.5" /> Demo Evaluation Result
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* EVALUATION HISTORY */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-2">
                     <History className="w-5 h-5 text-brand-indigo" />
                     Evaluation History
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                       <thead className="text-xs text-brand-navy/50 uppercase bg-brand-light/50 border-b border-brand-gray/30">
@@ -267,8 +267,8 @@ export default function AdminAiEvaluation() {
                       </tbody>
                     </table>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
           </div>
@@ -278,14 +278,14 @@ export default function AdminAiEvaluation() {
             
             {/* AI MODEL INFORMATION */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-2">
                     <BrainCircuit className="w-5 h-5 text-brand-indigo" />
                     AI Model Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-3">
                   <div className="flex justify-between items-center py-2 border-b border-brand-gray/10">
                     <span className="text-sm font-medium text-brand-navy/60">Version</span>
                     <span className="text-sm font-medium text-brand-navy">{evaluationData.modelInfo.modelVersion}</span>
@@ -302,20 +302,20 @@ export default function AdminAiEvaluation() {
                     <span className="text-sm font-medium text-brand-navy/60">Status</span>
                     <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md border inline-flex items-center justify-center bg-semantic-success/10 text-semantic-success border-semantic-success/20">Available</span>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* SCORE STABILITY */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[16px]">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-2 text-[16px]">
                     <Activity className="w-4 h-4 text-brand-blue" />
                     Score Stability
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <div className="flex items-end justify-between mb-4">
                     <div className="text-3xl font-display font-bold text-brand-navy">{evaluationData.scoreStability.stability}</div>
                     <div className="text-xs text-brand-navy/50 font-medium pb-1 uppercase">Stable</div>
@@ -332,20 +332,20 @@ export default function AdminAiEvaluation() {
                       <span className="font-medium text-brand-navy">{evaluationData.scoreStability.changedResults}</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* RESUME AI SECURITY */}
             <motion.div variants={slideUp}>
-              <Card className="border-t-4 border-t-semantic-warning">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[16px]">
+              <PremiumCard className="border-t-4 border-t-semantic-warning">
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-2 text-[16px]">
                     <ShieldAlert className="w-4 h-4 text-semantic-warning" />
                     Resume AI Security
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <p className="text-xs text-brand-navy/60 mb-4 leading-relaxed">Resume content is treated as untrusted input. Instruction-like content should be isolated before AI processing.</p>
                   
                   <div className="bg-brand-light/30 rounded-xl p-3 border border-brand-gray/20 space-y-3">
@@ -371,20 +371,20 @@ export default function AdminAiEvaluation() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* BLIND SCREENING */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[16px]">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-2 text-[16px]">
                     <EyeOff className="w-4 h-4 text-brand-purple" />
                     Blind Screening
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <p className="text-xs text-brand-navy/60 mb-4 leading-relaxed">Designed to reduce potential influence by hiding selected identity-related fields from recruiter-facing screening views.</p>
                   
                   <div className="space-y-2 text-sm bg-brand-light/30 p-3 rounded-lg border border-brand-gray/20">
@@ -397,20 +397,20 @@ export default function AdminAiEvaluation() {
                       <span className="font-medium text-brand-navy text-xs">{evaluationData.blindScreening.identityFieldsHidden.join(", ")}</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* FINDINGS & REVIEW */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[16px]">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-2 text-[16px]">
                     <FileText className="w-4 h-4 text-brand-navy" />
                     Evaluation Findings
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-4">
                   <ul className="space-y-2">
                     {evaluationData.findings.map((finding, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm">
@@ -440,32 +440,32 @@ export default function AdminAiEvaluation() {
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* AUDIT LOG CONNECTION */}
             <motion.div variants={slideUp}>
-              <Card className="bg-brand-indigo/5 border-brand-indigo/10">
-                <CardContent className="p-4 flex items-center justify-between">
+              <PremiumCard className="bg-brand-indigo/5 border-brand-indigo/10">
+                <PremiumCardContent className="p-4 flex items-center justify-between">
                   <p className="text-xs font-medium text-brand-navy/70 max-w-[180px]">Evaluation activity is recorded in the administrative audit log.</p>
                   <Button variant="outline" onClick={() => window.location.href = '/admin/audit-logs'} className="h-8 px-3 text-xs bg-white border-brand-indigo/20 text-brand-indigo hover:bg-brand-indigo/5 shrink-0">
                     Audit Logs <ArrowRight className="w-3.5 h-3.5 ml-1" />
                   </Button>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* RESPONSIBLE AI INFO */}
             <motion.div variants={slideUp}>
-              <Card className="bg-brand-navy text-white">
-                <CardHeader className="pb-3 border-b border-white/10">
-                  <CardTitle className="text-[16px] text-white flex items-center gap-2">
+              <PremiumCard className="bg-brand-navy text-white">
+                <PremiumCardHeader className="pb-3 border-b border-white/10">
+                  <PremiumCardTitle className="text-[16px] text-white flex items-center gap-2">
                     <Info className="w-4 h-4 text-white/70" />
                     Responsible AI Principles
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4 space-y-4">
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="pt-4 space-y-4">
                   <div>
                     <h5 className="text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">Human-in-the-loop</h5>
                     <p className="text-xs text-white/60 leading-relaxed">Recruiters make final hiring decisions.</p>
@@ -478,8 +478,8 @@ export default function AdminAiEvaluation() {
                     <h5 className="text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">Security & Fairness</h5>
                     <p className="text-xs text-white/60 leading-relaxed">Inputs are treated as untrusted. Equivalent inputs can be compared to identify score differences.</p>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
           </div>

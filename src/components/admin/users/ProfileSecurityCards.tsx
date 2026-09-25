@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import type { AdminUser } from "../../../data/mockAdminUsers"
 import { ShieldCheck, ShieldAlert, CheckCircle2, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -7,11 +7,11 @@ export function ProfileInformationCard({ user }: { user: AdminUser }) {
   const p = user.profile || {}
   
   return (
-    <Card>
-      <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
-        <CardTitle className="text-lg font-display font-semibold text-brand-navy">Profile Information</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <PremiumCard>
+      <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+        <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Profile Information</PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent>
         <div className="space-y-4 text-sm">
           {p.headline && (
             <div>
@@ -57,8 +57,8 @@ export function ProfileInformationCard({ user }: { user: AdminUser }) {
             <div className="text-brand-navy/50 italic">No specific profile information available.</div>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }
 
@@ -67,12 +67,12 @@ export function AccountSecurityCard({ user }: { user: AdminUser }) {
   const hasEvents = user.security && user.security.events > 0
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4 flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-display font-semibold text-brand-navy">Account Security & Audit</CardTitle>
+    <PremiumCard className="h-full flex flex-col">
+      <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4 flex flex-row items-center justify-between">
+        <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Account Security & Audit</PremiumCardTitle>
         {hasEvents ? <ShieldAlert className="w-5 h-5 text-semantic-warning" /> : <ShieldCheck className="w-5 h-5 text-semantic-success" />}
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
+      </PremiumCardHeader>
+      <PremiumCardContent className="flex-1 flex flex-col">
         <div className="space-y-3 mb-6">
           <div className="flex justify-between items-center text-sm">
             <span className="text-brand-navy/70">Email Verification</span>
@@ -101,7 +101,7 @@ export function AccountSecurityCard({ user }: { user: AdminUser }) {
             View Audit Logs <ArrowRight className="w-4 h-4" />
           </button>
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

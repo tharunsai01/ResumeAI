@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Search, Users, CheckCircle2, UserPlus, Filter, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { initialRecruiterCandidates } from "../../data/recruiterMockData"
@@ -17,8 +17,8 @@ import SpotlightCard from "../../components/ui/SpotlightCard";
 let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
-    <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
-      <CardContent className="p-5 flex items-center justify-between">
+    <PremiumCard className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
+      <PremiumCardContent className="p-5 flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
           <h3 className="text-2xl font-display font-bold text-brand-navy">
@@ -28,8 +28,8 @@ const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
         <div className={cn("p-3 rounded-xl", color.bg, color.text)}>
           <Icon className="w-5 h-5" />
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   </motion.div>
 )
 
@@ -212,7 +212,7 @@ export default function RecruiterCandidates() {
 
         {/* CANDIDATE LIST */}
         <motion.div variants={slideUp}>
-          <Card>
+          <PremiumCard>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-brand-light text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
@@ -328,7 +328,7 @@ export default function RecruiterCandidates() {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </PremiumCard>
         </motion.div>
       </motion.div>
 

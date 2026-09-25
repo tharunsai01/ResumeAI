@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
 import { Briefcase, MapPin, DollarSign, Building, Bookmark, BookmarkCheck } from "lucide-react"
-import { Card, CardContent, CardFooter, CardHeader } from "../ui/Card"
+import { CardHeader, CardContent, CardFooter } from "../ui/Card"
+import { PremiumCard } from "../ui/PremiumCard"
 import { Badge } from "../ui/Badge"
 import { Button } from "../ui/Button"
 import { MatchScore } from "./MatchScore"
@@ -40,13 +41,13 @@ export function JobCard({
 }: JobCardProps) {
   return (
     <motion.div variants={hoverElevation} whileHover="whileHover" onClick={onClick} className={onClick ? "cursor-pointer" : ""}>
-      <Card className="h-full flex flex-col group hover:border-brand-indigo/30 transition-colors">
+      <PremiumCard className="h-full flex flex-col group transition-colors">
         <CardHeader className="pb-3 flex-row items-start justify-between">
           <div>
-            <h3 className="font-display font-semibold text-lg text-brand-navy group-hover:text-brand-indigo transition-colors line-clamp-1">
+            <h3 className="premium-card-text font-display font-semibold text-lg text-slate-800 dark:text-slate-200 transition-colors line-clamp-1">
               {title}
             </h3>
-            <div className="flex items-center text-sm text-brand-navy/60 mt-1">
+            <div className="premium-card-text flex items-center text-sm text-slate-600 dark:text-slate-400 mt-1">
               <Building className="w-4 h-4 mr-1" />
               {company}
             </div>
@@ -56,7 +57,7 @@ export function JobCard({
           )}
         </CardHeader>
         <CardContent className="flex-1 pb-4">
-          <div className="flex flex-wrap gap-3 mb-4 text-sm text-brand-navy/70">
+          <div className="premium-card-text flex flex-wrap gap-3 mb-4 text-sm text-slate-600 dark:text-slate-400">
             <div className="flex items-center">
               <MapPin className="w-4 h-4 mr-1 opacity-70" />
               {location}
@@ -106,7 +107,7 @@ export function JobCard({
             {isSaved ? <BookmarkCheck className="w-5 h-5 text-brand-indigo" /> : <Bookmark className="w-5 h-5 text-brand-navy/60" />}
           </Button>
         </CardFooter>
-      </Card>
+      </PremiumCard>
     </motion.div>
   )
 }

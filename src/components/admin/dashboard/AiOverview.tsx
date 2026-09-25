@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import { aiEvaluationOverview } from "../../../data/mockAdminDashboard"
 import { BrainCircuit, ArrowRight, ShieldCheck, CheckCircle2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -8,15 +8,15 @@ export function AiOverview() {
   const { processing, security, evaluation } = aiEvaluationOverview
 
   return (
-    <Card className="col-span-1 lg:col-span-2 flex flex-col">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-display font-semibold text-brand-navy flex items-center gap-2">
+    <PremiumCard className="col-span-1 lg:col-span-2 flex flex-col">
+      <PremiumCardHeader className="pb-2">
+        <PremiumCardTitle className="text-xl font-display font-semibold text-brand-navy flex items-center gap-2">
           <BrainCircuit className="w-5 h-5 text-brand-violet" />
           AI & Responsible AI
-        </CardTitle>
+        </PremiumCardTitle>
         <p className="text-sm text-brand-navy/60">Monitoring AI fairness, processing health, and resume security.</p>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col mt-4">
+      </PremiumCardHeader>
+      <PremiumCardContent className="flex-1 flex flex-col mt-4">
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
           {/* Processing */}
@@ -94,7 +94,7 @@ export function AiOverview() {
           </button>
         </div>
 
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

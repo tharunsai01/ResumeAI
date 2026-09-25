@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import { Users, AlertOctagon, Tags, ScrollText, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
@@ -13,13 +13,13 @@ export function QuickActions() {
   ]
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-display font-semibold text-brand-navy">
+    <PremiumCard className="flex flex-col">
+      <PremiumCardHeader className="pb-2">
+        <PremiumCardTitle className="text-xl font-display font-semibold text-brand-navy">
           Quick Actions
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 mt-4">
+        </PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent className="flex-1 mt-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
           {actions.map((action, idx) => (
             <button
@@ -37,7 +37,7 @@ export function QuickActions() {
             </button>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
 import { AdminStatCard } from "../../components/admin/AdminStatCard"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { Search, Plus, Filter, Download, Activity, CheckCircle2, Layers, BookOpen, AlertCircle, Edit2, Eye, Power, X } from "lucide-react"
 import { useAdminSkills } from "../../contexts/AdminSkillsContext"
@@ -233,7 +233,7 @@ export default function AdminSkills() {
 
             {/* TABLE */}
             <motion.div variants={slideUp}>
-              <Card>
+              <PremiumCard>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
@@ -362,19 +362,19 @@ export default function AdminSkills() {
                     </div>
                   </div>
                 )}
-              </Card>
+              </PremiumCard>
             </motion.div>
           </div>
           
           <div className="lg:col-span-1">
             <motion.div variants={slideUp} className="sticky top-24">
-              <Card>
-                <CardHeader className="border-b border-brand-gray/20 pb-4">
-                  <CardTitle className="flex items-center gap-2">
+              <PremiumCard>
+                <PremiumCardHeader className="border-b border-brand-gray/20 pb-4">
+                  <PremiumCardTitle className="flex items-center gap-2">
                     <Activity className="w-5 h-5 text-brand-indigo" /> Recent Taxonomy Activity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="p-0">
                   <div className="divide-y divide-brand-gray/10">
                     {activities.slice(0, 8).map(act => (
                       <div key={act.id} className="p-4 hover:bg-brand-light/30 transition-colors">
@@ -398,8 +398,8 @@ export default function AdminSkills() {
                       View Audit Logs →
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
           </div>
         </div>

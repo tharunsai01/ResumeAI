@@ -31,6 +31,40 @@ export default function RecruiterHiringPipeline() {
   const [activeCandidate, setActiveCandidate] = React.useState<PipelineCandidate | null>(null)
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
+  
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    
+    const handleWheel = (e: WheelEvent) => {
+      if (e.shiftKey) return;
+      
+      const target = e.target as HTMLElement;
+      const scrollableNode = target.closest('.overflow-y-auto');
+      
+      if (scrollableNode) {
+        const nodeEl = scrollableNode as HTMLElement;
+        const canScrollDown = nodeEl.scrollHeight > nodeEl.clientHeight && Math.ceil(nodeEl.scrollTop) < nodeEl.scrollHeight - nodeEl.clientHeight;
+        const canScrollUp = nodeEl.scrollTop > 0;
+        
+        if ((e.deltaY > 0 && canScrollDown) || (e.deltaY < 0 && canScrollUp)) {
+          return; // Let native vertical scroll happen
+        }
+      }
+      
+      // Convert vertical scroll to horizontal and prevent default vertical page scroll
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+    
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, []);
+
   const showToast = (msg: string) => {
     setToastMsg(msg)
     setTimeout(() => setToastMsg(null), 3000)
@@ -105,7 +139,11 @@ export default function RecruiterHiringPipeline() {
         </motion.div>
 
         {/* KANBAN BOARD */}
-        <motion.div variants={slideUp} className="flex-1 overflow-x-auto overflow-y-hidden pb-4">
+        <motion.div 
+          variants={slideUp} 
+          ref={scrollContainerRef}
+          className="flex-1 overflow-x-auto overflow-y-hidden pb-4 custom-scrollbar"
+        >
           <div className="flex gap-4 h-full min-w-max pb-2">
             {COLUMNS.map(column => {
               const columnCandidates = filteredCandidates.filter(c => c.stage === column.id)
@@ -121,7 +159,7 @@ export default function RecruiterHiringPipeline() {
                   </div>
                   
                   {/* Column Content Area (Scrollable vertically) */}
-                  <div className="p-3 flex-1 overflow-y-auto space-y-3 no-scrollbar">
+                  <div className="p-3 flex-1 overflow-y-auto overflow-x-hidden space-y-3 no-scrollbar">
                     {columnCandidates.map(cand => (
                       <SpotlightCard 
                         key={cand.id} 

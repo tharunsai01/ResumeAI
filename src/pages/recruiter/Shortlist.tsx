@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Search, Calendar, User, CheckCircle2, AlertCircle, Trash2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { Modal } from "../../components/ui/Modal"
 import { staggerContainer, slideUp } from "../../lib/animations"
@@ -79,8 +79,8 @@ export default function RecruiterShortlist() {
 
   const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
     <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 transition-all duration-200">
-        <CardContent className="p-5 flex items-center justify-between">
+      <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200">
+        <PremiumCardContent className="p-5 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
             <h3 className="text-2xl font-display font-bold text-brand-navy">
@@ -90,8 +90,8 @@ export default function RecruiterShortlist() {
           <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
             <Icon className="w-5 h-5" />
           </div>
-        </CardContent>
-      </Card>
+        </PremiumCardContent>
+      </PremiumCard>
     </motion.div>
   )
 
@@ -175,7 +175,7 @@ export default function RecruiterShortlist() {
 
         {/* SHORTLIST TABLE */}
         <motion.div variants={slideUp}>
-          <Card className="shadow-sm overflow-hidden">
+          <PremiumCard className="shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
@@ -291,7 +291,7 @@ export default function RecruiterShortlist() {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </PremiumCard>
         </motion.div>
       </motion.div>
 

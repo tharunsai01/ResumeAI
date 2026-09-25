@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { Card, CardContent } from "../ui/Card"
+import { PremiumCard, PremiumCardContent } from "../ui/PremiumCard"
 
 interface AdminStatCardProps {
   title: string
@@ -17,8 +17,8 @@ export function AdminStatCard({ title, value, icon: Icon, delay = 0, color = { b
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.1 }}
     >
-      <Card className="hover:-translate-y-0.5 transition-all duration-200">
-        <CardContent className="p-5 flex items-start justify-between">
+      <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200">
+        <PremiumCardContent className="p-5 flex items-start justify-between">
           <div>
             <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
             <h3 className="text-2xl font-display font-bold text-brand-navy">
@@ -33,8 +33,8 @@ export function AdminStatCard({ title, value, icon: Icon, delay = 0, color = { b
           <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
             <Icon className="w-5 h-5" />
           </div>
-        </CardContent>
-      </Card>
+        </PremiumCardContent>
+      </PremiumCard>
     </motion.div>
   )
 }

@@ -4,7 +4,7 @@ import { Search, Filter, SlidersHorizontal, Briefcase, Calendar, CheckCircle2, C
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Button } from "../../components/ui/Button"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Badge } from "../../components/ui/Badge"
 import { MatchScore } from "../../components/shared/MatchScore"
 import { useJobActions } from "../../hooks/useJobActions"
@@ -129,8 +129,8 @@ export default function CandidateApplications() {
         {/* Summary Cards */}
         <motion.div variants={slideUp} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {summaryStats.map((stat, i) => (
-            <Card key={i} className="group hover:border-brand-indigo/30 transition-colors">
-              <CardContent className="p-5 flex items-center gap-4">
+            <PremiumCard key={i} className="group hover:border-brand-indigo/30 transition-colors">
+              <PremiumCardContent className="p-5 flex items-center gap-4">
                 <div className={`p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform`}>
                   <stat.icon className={`w-6 h-6 ${stat.color}`} />
                 </div>
@@ -138,8 +138,8 @@ export default function CandidateApplications() {
                   <p className="text-sm text-brand-navy/60 font-medium">{stat.label}</p>
                   <p className="text-2xl font-display font-semibold text-brand-navy">{stat.value}</p>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           ))}
         </motion.div>
 
@@ -167,8 +167,8 @@ export default function CandidateApplications() {
 
             {/* Sidebar Filters */}
             <motion.div variants={slideUp} className={cn("w-full lg:w-64 shrink-0 space-y-6 lg:block", isMobileFiltersOpen ? "block" : "hidden")}>
-              <Card>
-                <CardContent className="p-5 space-y-6">
+              <PremiumCard>
+                <PremiumCardContent className="p-5 space-y-6">
                   <div className="flex items-center justify-between">
                     <h2 className="font-display font-semibold text-brand-navy flex items-center gap-2">
                       <Filter className="w-4 h-4" /> Filters
@@ -207,12 +207,12 @@ export default function CandidateApplications() {
                       <option value="Last 3 months">Last 3 months</option>
                     </select>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
 
               {/* Status Overview visual */}
-              <Card>
-                <CardContent className="p-5">
+              <PremiumCard>
+                <PremiumCardContent className="p-5">
                   <h3 className="text-xs font-semibold text-brand-navy uppercase tracking-wider mb-4">Pipeline Overview</h3>
                   <div className="space-y-3">
                     {[
@@ -234,8 +234,8 @@ export default function CandidateApplications() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* Application List */}
@@ -322,8 +322,8 @@ export default function CandidateApplications() {
                   {/* Mobile Card View */}
                   <div className="md:hidden space-y-3">
                     {filteredApplications.map((app) => (
-                      <Card key={app.applicationId} className="overflow-hidden">
-                        <CardContent className="p-4">
+                      <PremiumCard key={app.applicationId} className="overflow-hidden">
+                        <PremiumCardContent className="p-4">
                           <div className="flex justify-between items-start mb-3">
                             <div>
                               <p className="font-semibold text-brand-navy text-sm">{app.title}</p>
@@ -344,8 +344,8 @@ export default function CandidateApplications() {
                           >
                             View Details
                           </Button>
-                        </CardContent>
-                      </Card>
+                        </PremiumCardContent>
+                      </PremiumCard>
                     ))}
                   </div>
 

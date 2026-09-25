@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import type { AdminUser } from "../../../data/mockAdminUsers"
 import { Ban, CheckCircle, AlertTriangle } from "lucide-react"
 
@@ -11,11 +11,11 @@ interface AccountStatusCardProps {
 
 export function AccountStatusCard({ user, isCurrentUser, onSuspend, onReactivate }: AccountStatusCardProps) {
   return (
-    <Card className="h-full border-brand-indigo/10 bg-gradient-to-br from-white to-brand-light/50">
-      <CardHeader className="pb-2 mb-4">
-        <CardTitle className="text-lg font-display font-semibold text-brand-navy">Account Status</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <PremiumCard className="h-full border-brand-indigo/10 bg-gradient-to-br from-white to-brand-light/50">
+      <PremiumCardHeader className="pb-2 mb-4">
+        <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Account Status</PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent>
         <div className="flex items-start gap-4">
           <div className="mt-1">
             {user.status === "Active" && <div className="w-3 h-3 rounded-full bg-semantic-success animate-pulse" />}
@@ -56,7 +56,7 @@ export function AccountStatusCard({ user, isCurrentUser, onSuspend, onReactivate
             )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

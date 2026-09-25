@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, BrainCircuit, ChevronRight, BookOpen, Target, Activity, Filter, Code2, Database, Layout, Server, Cloud, Wrench } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Input } from "../../components/ui/Input"
 import { Badge } from "../../components/ui/Badge"
 import { Modal } from "../../components/ui/Modal"
@@ -129,9 +129,12 @@ export default function CandidateSkills() {
 
         {/* 2. Overall Skill Score (Hero) */}
         <motion.div variants={slideUp}>
-          <Card className="bg-gradient-to-br from-brand-navy to-brand-indigo text-white overflow-hidden relative border-none shadow-lg">
+          <PremiumCard 
+            className="text-white overflow-hidden relative border-none shadow-lg"
+            innerClassName="bg-gradient-to-br from-brand-navy to-brand-indigo"
+          >
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20" />
-            <CardContent className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 relative z-10">
+            <PremiumCardContent className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 relative z-10">
               <div className="shrink-0 bg-white rounded-full p-2 shadow-xl text-brand-navy">
                 <MatchScore score={data.overallScore} size="lg" />
               </div>
@@ -142,14 +145,17 @@ export default function CandidateSkills() {
                   Your technical profile is strong for software engineering roles, with opportunities to improve cloud, DevOps, and advanced backend skills.
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* 14. AI Career Insight */}
         <motion.div variants={slideUp}>
-          <Card className="border-brand-indigo/30 bg-brand-indigo/5">
-            <CardContent className="p-6 flex gap-4">
+          <PremiumCard 
+            className="border-brand-indigo/30"
+            innerClassName="bg-brand-indigo/5"
+          >
+            <PremiumCardContent className="p-6 flex gap-4">
               <div className="shrink-0 mt-1">
                 <div className="w-10 h-10 rounded-full bg-brand-indigo/20 flex items-center justify-center">
                   <BrainCircuit className="w-5 h-5 text-brand-indigo" />
@@ -164,8 +170,8 @@ export default function CandidateSkills() {
                   Your strongest opportunities currently appear to be Software Engineer, Full Stack Developer, and Backend Developer roles. Your Java, Python, React, and database skills provide a strong foundation. Improving AWS, Docker, Kubernetes, and system design could expand your opportunities into cloud-native and DevOps-oriented roles.
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* 3. Skill Category Overview */}
@@ -175,8 +181,8 @@ export default function CandidateSkills() {
             {data.categories.map((cat, i) => {
               const Icon = getCategoryIcon(cat.category)
               return (
-                <Card key={i} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-5">
+                <PremiumCard key={i} className="hover:shadow-md transition-shadow">
+                  <PremiumCardContent className="p-5">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                         <div className="p-2 bg-brand-light rounded-lg">
@@ -196,8 +202,8 @@ export default function CandidateSkills() {
                       />
                     </div>
                     <p className="text-xs text-brand-navy/60">{cat.description}</p>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               )
             })}
           </div>
@@ -206,8 +212,8 @@ export default function CandidateSkills() {
         {/* 4. Skills Detected From Resume */}
         <motion.div variants={slideUp} className="space-y-4">
           <h2 className="text-xl font-display font-semibold text-brand-navy">Skills Detected From Your Resume</h2>
-          <Card>
-            <CardContent className="p-6 divide-y divide-brand-gray/30">
+          <PremiumCard>
+            <PremiumCardContent className="p-6 divide-y divide-brand-gray/30">
               {Object.entries(groupedDetectedSkills).map(([category, skills]) => (
                 <div key={category} className={cn("py-4 first:pt-0 last:pb-0")}>
                   <h3 className="text-sm font-semibold text-brand-navy/60 uppercase tracking-wider mb-3">{category}</h3>
@@ -224,8 +230,8 @@ export default function CandidateSkills() {
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -240,8 +246,8 @@ export default function CandidateSkills() {
                 <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-brand-indigo"></span>Expert</span>
               </div>
             </div>
-            <Card className="h-[420px] overflow-hidden">
-              <CardContent className="p-6 h-full flex flex-col">
+            <PremiumCard className="h-[420px] overflow-hidden">
+              <PremiumCardContent className="p-6 h-full flex flex-col">
                 <p className="text-xs text-brand-navy/50 mb-4 italic">* AI-estimated proficiency based on resume context</p>
                 <div className="flex-1 space-y-4 overflow-y-auto pr-2 hide-scrollbar">
                   {data.detectedSkills.sort((a,b) => b.currentScore - a.currentScore).slice(0, 10).map((skill, idx) => (
@@ -266,15 +272,15 @@ export default function CandidateSkills() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
 
           {/* 7. Top Strengths */}
           <motion.div variants={slideUp} className="space-y-4">
             <h2 className="text-xl font-display font-semibold text-brand-navy">Your Top Strengths</h2>
-            <Card className="h-[420px] overflow-hidden">
-              <CardContent className="p-0 flex flex-col h-full">
+            <PremiumCard className="h-[420px] overflow-hidden">
+              <PremiumCardContent className="p-0 flex flex-col h-full">
                 <div className="divide-y divide-brand-gray/30 overflow-y-auto hide-scrollbar">
                   {data.detectedSkills.sort((a,b) => b.currentScore - a.currentScore).slice(0, 5).map((skill, idx) => (
                     <div key={skill.id} className="p-5 flex gap-4 hover:bg-brand-light/30 transition-colors">
@@ -291,8 +297,8 @@ export default function CandidateSkills() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
         </div>
 
@@ -304,12 +310,12 @@ export default function CandidateSkills() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {data.gaps.slice(0,4).map((gap) => (
-              <Card key={gap.id} className="relative overflow-hidden group cursor-pointer hover:border-brand-indigo/30 transition-colors" onClick={() => setSelectedSkill(gap)}>
+              <PremiumCard key={gap.id} className="relative overflow-hidden group cursor-pointer hover:border-brand-indigo/30 transition-colors" onClick={() => setSelectedSkill(gap)}>
                 <div className={cn("absolute top-0 left-0 w-1 h-full", 
                   gap.priority === "High" ? "bg-semantic-error" : 
                   gap.priority === "Medium" ? "bg-semantic-warning" : "bg-brand-blue"
                 )} />
-                <CardContent className="p-5 pl-6">
+                <PremiumCardContent className="p-5 pl-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-semibold text-brand-navy">{gap.name}</h3>
                     <Badge variant={gap.priority === "High" ? "warning" : "secondary"} className="text-[10px] uppercase">
@@ -335,8 +341,8 @@ export default function CandidateSkills() {
                     <div className="bg-brand-indigo h-full transition-all duration-1000" style={{ width: `${gap.targetScore - gap.currentScore}%` }} />
                   </div>
                   <p className="text-xs text-brand-navy/60 mt-4 line-clamp-2">{gap.description}</p>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             ))}
           </div>
         </motion.div>
@@ -346,18 +352,18 @@ export default function CandidateSkills() {
           <h2 className="text-xl font-display font-semibold text-brand-navy">What Should You Learn Next?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.recommendations.slice(0, 3).map((rec, i) => (
-              <Card key={rec.id} className="flex flex-col">
-                <CardHeader className="pb-2">
+              <PremiumCard key={rec.id} className="flex flex-col">
+                <PremiumCardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-brand-indigo text-white flex items-center justify-center text-xs font-bold shadow-sm">
                         {i + 1}
                       </div>
-                      <CardTitle className="text-lg">{rec.name}</CardTitle>
+                      <PremiumCardTitle className="text-lg">{rec.name}</PremiumCardTitle>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col justify-between">
+                </PremiumCardHeader>
+                <PremiumCardContent className="flex-1 flex flex-col justify-between">
                   <div className="mb-4">
                     <p className="text-sm text-brand-navy/70 italic mb-4 bg-brand-light/50 p-3 rounded-lg">"{rec.description}"</p>
                     <div className="space-y-2">
@@ -376,8 +382,8 @@ export default function CandidateSkills() {
                   <button onClick={() => setSelectedSkill(rec)} className="text-sm font-medium text-brand-indigo flex items-center hover:underline mt-auto group">
                     View learning steps <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </button>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             ))}
           </div>
         </motion.div>
@@ -387,8 +393,8 @@ export default function CandidateSkills() {
           <h2 className="text-xl font-display font-semibold text-brand-navy">Recommended Career Paths</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.careerPaths.slice(0,3).map((path, i) => (
-              <Card key={i} className="hover:border-brand-indigo/30 transition-colors shadow-sm">
-                <CardContent className="p-5">
+              <PremiumCard key={i} className="hover:border-brand-indigo/30 transition-colors shadow-sm">
+                <PremiumCardContent className="p-5">
                   <div className="flex justify-between items-start mb-5">
                     <h3 className="font-semibold text-brand-navy text-lg leading-tight">{path.title}</h3>
                     <Badge variant={path.readinessScore >= 80 ? "success" : "secondary"}>
@@ -409,8 +415,8 @@ export default function CandidateSkills() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             ))}
           </div>
         </motion.div>
@@ -419,8 +425,8 @@ export default function CandidateSkills() {
           {/* 12. Job Market Connection */}
           <motion.div variants={slideUp} className="space-y-4">
             <h2 className="text-xl font-display font-semibold text-brand-navy">Skills That Employers Want</h2>
-            <Card>
-              <CardContent className="p-0 divide-y divide-brand-gray/30">
+            <PremiumCard>
+              <PremiumCardContent className="p-0 divide-y divide-brand-gray/30">
                 {data.demand.slice(0, 6).map((skill) => (
                   <div key={skill.id} className="p-4 flex items-center justify-between hover:bg-brand-light/30 transition-colors group">
                     <div className="flex items-center gap-3">
@@ -435,16 +441,19 @@ export default function CandidateSkills() {
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
 
           {/* 13. Impact on Job Matching & 15. Skill Trend */}
           <motion.div variants={slideUp} className="space-y-6">
             <div className="space-y-4">
               <h2 className="text-xl font-display font-semibold text-brand-navy">Improve Your Job Matches</h2>
-              <Card className="bg-brand-light/50 border-dashed border-brand-gray">
-                <CardContent className="p-5 space-y-4">
+              <PremiumCard 
+                className="border-dashed border-brand-gray"
+                innerClassName="bg-brand-light/50"
+              >
+                <PremiumCardContent className="p-5 space-y-4">
                   <div className="flex justify-between items-center pb-3 border-b border-brand-gray/50">
                     <span className="text-sm font-medium text-brand-navy/70">Current Profile</span>
                     <Badge variant="outline" className="border-brand-indigo text-brand-indigo bg-white">85% avg match</Badge>
@@ -456,14 +465,14 @@ export default function CandidateSkills() {
                     </div>
                   ))}
                   <p className="text-[10px] text-brand-navy/40 text-right italic mt-2">* Estimated potential improvement</p>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </div>
 
             <div className="space-y-4">
               <h2 className="text-xl font-display font-semibold text-brand-navy">Skill Development</h2>
-              <Card>
-                <CardContent className="p-6">
+              <PremiumCard>
+                <PremiumCardContent className="p-6">
                   {/* Lightweight CSS Chart */}
                   <div className="h-32 flex items-end justify-between gap-2 relative">
                     {/* Grid lines */}
@@ -488,8 +497,8 @@ export default function CandidateSkills() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </div>
           </motion.div>
         </div>
@@ -507,8 +516,8 @@ export default function CandidateSkills() {
             </select>
           </div>
           {currentComparison && (
-            <Card>
-              <CardContent className="p-8">
+            <PremiumCard>
+              <PremiumCardContent className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-8">
                     <div>
@@ -558,16 +567,16 @@ export default function CandidateSkills() {
                     </ul>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           )}
         </motion.div>
 
         {/* 17. Skill Search & 18. Filters */}
         <motion.div variants={slideUp} className="space-y-4">
           <h2 className="text-xl font-display font-semibold text-brand-navy">All Skills Directory</h2>
-          <Card className="overflow-hidden">
-            <CardHeader className="pb-4 border-b border-brand-gray/30 bg-brand-light/30">
+          <PremiumCard className="overflow-hidden">
+            <PremiumCardHeader className="pb-4 border-b border-brand-gray/30 bg-brand-light/30">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-navy/40" />
@@ -610,8 +619,8 @@ export default function CandidateSkills() {
                   </select>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+            </PremiumCardHeader>
+            <PremiumCardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left whitespace-nowrap">
                   <thead className="text-[10px] text-brand-navy/50 uppercase tracking-wider bg-brand-light/50 border-b border-brand-gray/50">
@@ -656,8 +665,8 @@ export default function CandidateSkills() {
                   </tbody>
                 </table>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
       </motion.div>

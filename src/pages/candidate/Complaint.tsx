@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from "../../components/ui/PremiumCard"
 import { Input } from "../../components/ui/Input"
 import { Button } from "../../components/ui/Button"
 import { Badge } from "../../components/ui/Badge"
@@ -179,11 +179,11 @@ export default function ComplaintPage() {
                 onSubmit={handleSubmit}
                 className="space-y-6"
               >
-                <Card>
-                  <CardHeader>
-                    <CardTitle>What would you like to report?</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                <PremiumCard>
+                  <PremiumCardHeader>
+                    <PremiumCardTitle>What would you like to report?</PremiumCardTitle>
+                  </PremiumCardHeader>
+                  <PremiumCardContent>
                     <select
                       value={selectedType}
                       onChange={(e) => setSelectedType(e.target.value as ComplaintType)}
@@ -218,8 +218,8 @@ export default function ComplaintPage() {
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
 
                 {/* DYNAMIC FIELDS */}
                 <AnimatePresence>
@@ -228,12 +228,12 @@ export default function ComplaintPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                     >
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>Additional Details</CardTitle>
-                          <CardDescription>Please provide specific information regarding the issue.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
+                      <PremiumCard>
+                        <PremiumCardHeader>
+                          <PremiumCardTitle>Additional Details</PremiumCardTitle>
+                          <PremiumCardDescription>Please provide specific information regarding the issue.</PremiumCardDescription>
+                        </PremiumCardHeader>
+                        <PremiumCardContent className="space-y-4">
                           
                           {selectedType === "Suspicious Job Posting" && (
                             <>
@@ -320,17 +320,17 @@ export default function ComplaintPage() {
                           {(selectedType === "Incorrect Job Information" || selectedType === "Harassment or Inappropriate Communication" || selectedType === "Other") && (
                             <p className="text-sm text-brand-navy/60 italic">Please provide all necessary details in the description below.</p>
                           )}
-                        </CardContent>
-                      </Card>
+                        </PremiumCardContent>
+                      </PremiumCard>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>General Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <PremiumCard>
+                  <PremiumCardHeader>
+                    <PremiumCardTitle>General Information</PremiumCardTitle>
+                  </PremiumCardHeader>
+                  <PremiumCardContent className="space-y-4">
                     <div>
                       <label className="block text-xs font-semibold text-brand-navy/60 mb-1.5 uppercase">Subject <span className="text-semantic-error">*</span></label>
                       <Input 
@@ -383,8 +383,8 @@ export default function ComplaintPage() {
                         {isSubmitting ? "Submitting..." : "Submit Report"}
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               </motion.form>
             )}
           </AnimatePresence>
@@ -393,12 +393,12 @@ export default function ComplaintPage() {
         {/* SIDEBAR - HISTORY */}
         <div className="lg:w-80 shrink-0">
           <motion.div variants={staggerContainer} initial="initial" animate="animate">
-            <Card className="sticky top-24">
-              <CardHeader className="bg-brand-gray/5 border-b border-brand-gray/30 rounded-t-xl">
-                <CardTitle className="text-lg">My Reports</CardTitle>
-                <CardDescription>Your recent support requests</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
+            <PremiumCard className="sticky top-24">
+              <PremiumCardHeader className="bg-brand-gray/5 border-b border-brand-gray/30 rounded-t-xl">
+                <PremiumCardTitle className="text-lg">My Reports</PremiumCardTitle>
+                <PremiumCardDescription>Your recent support requests</PremiumCardDescription>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-0">
                 {reports.length === 0 ? (
                   <div className="p-8 text-center text-brand-navy/50">
                     <FileText className="w-8 h-8 mx-auto mb-2 text-brand-navy/20" />
@@ -433,8 +433,8 @@ export default function ComplaintPage() {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
         </div>
       </div>

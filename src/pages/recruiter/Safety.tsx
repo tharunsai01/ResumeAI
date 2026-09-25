@@ -1,7 +1,7 @@
 import { motion } from "framer-motion"
 import { Shield, ShieldAlert, CheckCircle2, Lock, FileText, Brain, Users, AlertTriangle } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
@@ -110,7 +110,7 @@ export default function RecruiterSafety() {
         <div className="space-y-6">
           {SECTIONS.map((section, idx) => (
             <motion.div key={idx} variants={slideUp}>
-              <Card className="border-brand-gray/30 shadow-sm overflow-hidden">
+              <PremiumCard className="border-brand-gray/30 shadow-sm overflow-hidden">
                 <div className="bg-brand-light/30 px-6 py-5 border-b border-brand-gray/20 flex items-start gap-4">
                   <SpotlightCard className="glass-card p-3 shrink-0">
                     <section.icon className="w-6 h-6 text-brand-indigo" />
@@ -119,7 +119,7 @@ export default function RecruiterSafety() {
                     <h2 className="text-xl font-bold text-brand-navy">{section.title}</h2>
                   </div>
                 </div>
-                <CardContent className="p-6 md:p-8">
+                <PremiumCardContent className="p-6 md:p-8">
                   <p className="text-brand-navy/80 font-medium mb-4">{section.description}</p>
                   
                   {section.bullets.length > 0 && (
@@ -138,8 +138,8 @@ export default function RecruiterSafety() {
                       {section.note}
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import { skillTaxonomyOverview } from "../../../data/mockAdminDashboard"
 import { Tags, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -7,14 +7,14 @@ export function SkillTaxonomyOverview() {
   const navigate = useNavigate()
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-display font-semibold text-brand-navy flex items-center gap-2">
+    <PremiumCard className="flex flex-col">
+      <PremiumCardHeader className="pb-2">
+        <PremiumCardTitle className="text-xl font-display font-semibold text-brand-navy flex items-center gap-2">
           <Tags className="w-5 h-5 text-brand-indigo" />
           Skill Taxonomy
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col justify-between mt-4">
+        </PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent className="flex-1 flex flex-col justify-between mt-4">
         
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="bg-brand-light rounded-lg p-3 text-center border border-brand-gray/30">
@@ -48,7 +48,7 @@ export function SkillTaxonomyOverview() {
         >
           Manage Skills <ArrowRight className="w-4 h-4" />
         </button>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

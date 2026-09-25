@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, ChevronDown, Users, Brain, BarChart, Shield, Calendar, User, Briefcase, Target, CheckCircle2 } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import SpotlightCard from "../../components/ui/SpotlightCard"
@@ -164,7 +164,7 @@ export default function RecruiterHelp() {
           ) : (
             filteredCategories.map((category) => (
               <motion.div key={category.id} variants={slideUp}>
-                <Card className="overflow-hidden border-brand-gray/30 shadow-sm">
+                <PremiumCard className="overflow-hidden border-brand-gray/30 shadow-sm">
                   <div className="bg-brand-light/30 px-6 py-5 border-b border-brand-gray/20 flex items-start gap-4">
                     <SpotlightCard className="glass-card p-3 shrink-0">
                       <category.icon className="w-6 h-6 text-brand-indigo" />
@@ -175,7 +175,7 @@ export default function RecruiterHelp() {
                     </div>
                   </div>
                   
-                  <CardContent className="p-0">
+                  <PremiumCardContent className="p-0">
                     {category.workflow && (
                       <div className="px-6 py-5 bg-brand-indigo/5 border-b border-brand-indigo/10">
                         <h4 className="text-xs font-bold text-brand-indigo uppercase tracking-wider mb-2">Workflow</h4>
@@ -231,8 +231,8 @@ export default function RecruiterHelp() {
                         )
                       })}
                     </div>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               </motion.div>
             ))
           )}

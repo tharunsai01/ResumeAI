@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Input } from "../../components/ui/Input"
 import { Badge } from "../../components/ui/Badge"
 import { Modal } from "../../components/ui/Modal"
@@ -138,9 +138,9 @@ export default function CandidateProfilePage() {
             
             {/* HERO */}
             <motion.div variants={slideUp}>
-              <Card className="overflow-hidden">
+              <PremiumCard className="overflow-hidden">
                 <div className="h-32 bg-gradient-to-r from-brand-indigo to-brand-blue relative" />
-                <CardContent className="px-8 pb-8 pt-0 relative">
+                <PremiumCardContent className="px-8 pb-8 pt-0 relative">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end -mt-12 sm:-mt-16 mb-4">
                     <div className="relative group cursor-pointer rounded-full overflow-hidden border-4 border-white shadow-lg w-24 h-24 sm:w-32 sm:h-32 bg-brand-light flex items-center justify-center">
                       {profile.avatar ? (
@@ -191,17 +191,17 @@ export default function CandidateProfilePage() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* SUMMARY */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Professional Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle>Professional Summary</PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   {isEditing ? (
                     <div>
                       <textarea 
@@ -217,20 +217,20 @@ export default function CandidateProfilePage() {
                   ) : (
                     <p className="text-brand-navy/80 text-sm leading-relaxed">{profile.summary}</p>
                   )}
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* SKILLS SUMMARY */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Skills</CardTitle>
+              <PremiumCard>
+                <PremiumCardHeader className="flex flex-row items-center justify-between">
+                  <PremiumCardTitle>Skills</PremiumCardTitle>
                   <button onClick={() => setIsSkillModalOpen(true)} className="text-sm font-medium text-brand-indigo flex items-center hover:underline">
                     <Plus className="w-4 h-4 mr-1" /> Add Skill
                   </button>
-                </CardHeader>
-                <CardContent>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <div className="flex flex-wrap gap-2">
                     {profile.skills.map(skill => (
                       <div key={skill.id} className="flex items-center gap-2 px-3 py-1.5 bg-brand-light rounded-lg border border-brand-gray/50">
@@ -239,20 +239,20 @@ export default function CandidateProfilePage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* EXPERIENCE */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Experience</CardTitle>
+              <PremiumCard>
+                <PremiumCardHeader className="flex flex-row items-center justify-between">
+                  <PremiumCardTitle>Experience</PremiumCardTitle>
                   <button onClick={() => setIsExpModalOpen(true)} className="text-sm font-medium text-brand-indigo flex items-center hover:underline">
                     <Plus className="w-4 h-4 mr-1" /> Add Experience
                   </button>
-                </CardHeader>
-                <CardContent>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <div className="space-y-6">
                     {profile.experience.map(exp => (
                       <div key={exp.id} className="relative pl-6 border-l border-brand-gray/80">
@@ -278,20 +278,20 @@ export default function CandidateProfilePage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* EDUCATION */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Education</CardTitle>
+              <PremiumCard>
+                <PremiumCardHeader className="flex flex-row items-center justify-between">
+                  <PremiumCardTitle>Education</PremiumCardTitle>
                   <button onClick={() => setIsEduModalOpen(true)} className="text-sm font-medium text-brand-indigo flex items-center hover:underline">
                     <Plus className="w-4 h-4 mr-1" /> Add Education
                   </button>
-                </CardHeader>
-                <CardContent>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <div className="space-y-4">
                     {profile.education.map(edu => (
                       <div key={edu.id} className="flex justify-between items-start bg-brand-light p-4 rounded-xl border border-brand-gray/50">
@@ -306,8 +306,8 @@ export default function CandidateProfilePage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
           </div>
@@ -317,11 +317,11 @@ export default function CandidateProfilePage() {
             
             {/* PROFILE COMPLETION */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Profile Completion</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle>Profile Completion</PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <div className="flex items-center gap-4 mb-6">
                     <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -344,34 +344,34 @@ export default function CandidateProfilePage() {
                       </li>
                     ))}
                   </ul>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* AI PROFILE INSIGHT */}
             <motion.div variants={slideUp}>
-              <Card className="border-semantic-warning/30 bg-semantic-warning/5">
-                <CardHeader className="pb-3 border-b border-semantic-warning/10">
+              <PremiumCard className="border-semantic-warning/30 bg-semantic-warning/5">
+                <PremiumCardHeader className="pb-3 border-b border-semantic-warning/10">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-semantic-warning-dark">
+                    <PremiumCardTitle className="flex items-center gap-2 text-semantic-warning-dark">
                       <Sparkles className="w-5 h-5" /> AI Profile Insight
-                    </CardTitle>
+                    </PremiumCardTitle>
                     <span className="text-[10px] font-semibold uppercase tracking-wider bg-white px-2 py-1 rounded border border-semantic-warning/20 text-semantic-warning-dark">AI-Generated</span>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-4 text-brand-navy/80 text-sm leading-relaxed">
+                </PremiumCardHeader>
+                <PremiumCardContent className="pt-4 text-brand-navy/80 text-sm leading-relaxed">
                   Your profile is well positioned for <strong className="font-semibold text-brand-navy">Software Engineer</strong> and <strong className="font-semibold text-brand-navy">Full Stack Developer</strong> roles. Adding more cloud experience and completing your career preferences could improve the relevance of your recommended jobs.
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* CAREER PREFERENCES */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Career Preferences</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle>Career Preferences</PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-4">
                   <div>
                     <span className="block text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-1">Preferred Roles</span>
                     <p className="text-sm font-medium text-brand-navy">{profile.careerPreferences.preferredJobTitles.join(", ") || "Not set"}</p>
@@ -392,17 +392,17 @@ export default function CandidateProfilePage() {
                       <p className="text-sm font-medium text-brand-navy">{profile.careerPreferences.expectedSalary || "Not set"}</p>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* CAREER INTERESTS */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Career Interests</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle>Career Interests</PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent>
                   <div className="flex flex-wrap gap-2">
                     {profile.careerInterests.map((interest, idx) => (
                       <Badge key={idx} variant="secondary" className="bg-brand-indigo/10 text-brand-indigo hover:bg-brand-indigo/20">
@@ -415,17 +415,17 @@ export default function CandidateProfilePage() {
                       </button>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
             {/* VISIBILITY */}
             <motion.div variants={slideUp}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Profile Visibility</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <PremiumCard>
+                <PremiumCardHeader>
+                  <PremiumCardTitle>Profile Visibility</PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-semibold text-brand-navy">Open to Opportunities</h4>
@@ -458,8 +458,8 @@ export default function CandidateProfilePage() {
                       <option>Private</option>
                     </select>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
 
           </div>

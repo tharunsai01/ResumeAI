@@ -1,6 +1,6 @@
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import { platformActivityData } from "../../../data/mockAdminDashboard"
 import { useState } from "react"
 
@@ -8,10 +8,10 @@ export function PlatformActivityChart() {
   const [timeRange, setTimeRange] = useState("30 Days")
 
   return (
-    <Card className="col-span-1 lg:col-span-2">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+    <PremiumCard className="col-span-1 lg:col-span-2">
+      <PremiumCardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
-          <CardTitle className="text-xl font-display font-semibold text-brand-navy">Platform Activity</CardTitle>
+          <PremiumCardTitle className="text-xl font-display font-semibold text-brand-navy">Platform Activity</PremiumCardTitle>
           <p className="text-sm text-brand-navy/60">User and platform activity over the last {timeRange.toLowerCase()}</p>
         </div>
         <div className="flex bg-brand-light p-1 rounded-lg">
@@ -29,8 +29,8 @@ export function PlatformActivityChart() {
             </button>
           ))}
         </div>
-      </CardHeader>
-      <CardContent>
+      </PremiumCardHeader>
+      <PremiumCardContent>
         <div className="h-[300px] w-full mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={platformActivityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -58,7 +58,7 @@ export function PlatformActivityChart() {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

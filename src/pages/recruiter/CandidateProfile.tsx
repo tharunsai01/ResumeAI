@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { ChevronLeft, MapPin, Mail, Briefcase, Download, Eye, Calendar, Sparkles, AlertCircle, CheckCircle2, FileText } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { initialRecruiterCandidates } from "../../data/recruiterMockData"
@@ -82,9 +82,9 @@ export default function RecruiterCandidateProfile() {
 
         {/* HEADER PROFILE CARD */}
         <motion.div variants={slideUp}>
-          <Card className="overflow-hidden border-none shadow-md">
+          <PremiumCard className="overflow-hidden border-none shadow-md">
             <div className="h-24 w-full bg-gradient-to-r from-brand-indigo via-brand-blue to-brand-navy/80" />
-            <CardContent className="px-6 pb-6 pt-0 relative sm:flex justify-between items-end gap-6">
+            <PremiumCardContent className="px-6 pb-6 pt-0 relative sm:flex justify-between items-end gap-6">
               <div className="flex flex-col sm:flex-row sm:items-end gap-5 -mt-10 mb-4 sm:mb-0 relative z-10">
                 <div className="w-24 h-24 rounded-2xl bg-white p-1.5 shadow-lg shrink-0">
                   <div className="w-full h-full bg-gradient-to-br from-brand-indigo/10 to-brand-blue/10 rounded-xl flex items-center justify-center border border-brand-gray/30">
@@ -122,8 +122,8 @@ export default function RecruiterCandidateProfile() {
                   <Calendar className="w-4 h-4 mr-2" /> Schedule Interview
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -131,25 +131,25 @@ export default function RecruiterCandidateProfile() {
           <motion.div variants={slideUp} className="lg:col-span-2 space-y-6">
             
             {/* OVERVIEW */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Professional Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Professional Summary</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6">
                 <p className="text-brand-navy/80 leading-relaxed text-sm">
                   Results-driven {candidate.title} with {candidate.experience} of experience specializing in {candidate.skills.slice(0,2).map(s => s.name).join(" and ")}. 
                   Proven track record in delivering high-quality software solutions and collaborating effectively with cross-functional teams.
                   Passionate about continuous learning and adopting new technologies to solve complex problems.
                 </p>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
             {/* EXPERIENCE */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Experience</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Experience</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6">
                 {candidate.experience === "Fresher" ? (
                   <div className="text-sm text-brand-navy/60 italic">No professional experience listed.</div>
                 ) : (
@@ -170,15 +170,15 @@ export default function RecruiterCandidateProfile() {
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
             {/* PROJECTS */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Projects</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Projects</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6 space-y-4">
                 {candidate.projects.map((proj, idx) => (
                   <div key={idx} className="bg-brand-light/50 p-4 rounded-xl border border-brand-gray/30">
                     <h4 className="font-semibold text-brand-navy text-sm mb-1">{proj.title}</h4>
@@ -192,15 +192,15 @@ export default function RecruiterCandidateProfile() {
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
             {/* EDUCATION */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Education</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Education</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6 space-y-4">
                 {candidate.education.map((edu, idx) => (
                   <div key={idx} className="flex justify-between items-start">
                     <div>
@@ -210,8 +210,8 @@ export default function RecruiterCandidateProfile() {
                     <div className="text-xs font-medium text-brand-navy/50">{edu.year}</div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
           </motion.div>
 
@@ -219,14 +219,14 @@ export default function RecruiterCandidateProfile() {
           <motion.div variants={slideUp} className="space-y-6">
             
             {/* AI MATCH PREVIEW */}
-            <Card className="border-brand-indigo/20 shadow-[0_4px_20px_-10px_rgba(79,70,229,0.1)] relative overflow-hidden">
+            <PremiumCard className="border-brand-indigo/20 shadow-[0_4px_20px_-10px_rgba(79,70,229,0.1)] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-indigo/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-indigo/[0.02] pb-4">
-                <CardTitle className="flex items-center gap-2 text-brand-indigo">
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-indigo/[0.02] pb-4">
+                <PremiumCardTitle className="flex items-center gap-2 text-brand-indigo">
                   <Sparkles className="w-5 h-5" /> AI Match Preview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-5">
+                </PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <div className="text-sm font-semibold text-brand-navy">Overall Match</div>
@@ -264,20 +264,20 @@ export default function RecruiterCandidateProfile() {
                     <span>Slightly less experience than ideally preferred.</span>
                   </div>
                 </div>
-              </CardContent>
+              </PremiumCardContent>
               <div className="p-4 bg-brand-indigo/5 border-t border-brand-gray/20">
                 <Button onClick={() => navigate("/recruiter/screening")} className="w-full bg-white text-brand-indigo border-brand-indigo/20 hover:bg-brand-indigo hover:text-white transition-colors">
                   View Full AI Screening
                 </Button>
               </div>
-            </Card>
+            </PremiumCard>
 
             {/* SKILLS */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Skills & Expertise</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Skills & Expertise</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5">
                 <div className="flex flex-col gap-3">
                   {candidate.skills.map(skill => (
                     <div key={skill.name} className="flex items-center justify-between">
@@ -293,15 +293,15 @@ export default function RecruiterCandidateProfile() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
             {/* RESUME */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Resume</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Resume</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5">
                 <div className="bg-brand-light rounded-xl border border-brand-gray/30 p-4 flex flex-col items-center justify-center text-center gap-3">
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
                     <FileText className="w-6 h-6 text-brand-indigo" />
@@ -319,15 +319,15 @@ export default function RecruiterCandidateProfile() {
                     </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
             {/* APPLICATION HISTORY */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Application History</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Application History</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5">
                 <div className="space-y-4">
                   {candidate.applicationHistory.map((hist, idx) => (
                     <div key={idx} className="flex gap-3">
@@ -348,8 +348,8 @@ export default function RecruiterCandidateProfile() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
           </motion.div>
         </div>

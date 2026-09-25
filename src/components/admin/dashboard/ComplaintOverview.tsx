@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import { complaintOverview } from "../../../data/mockAdminDashboard"
 import { AlertOctagon, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -7,14 +7,14 @@ export function ComplaintOverview() {
   const navigate = useNavigate()
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-display font-semibold text-brand-navy flex items-center gap-2">
+    <PremiumCard className="flex flex-col">
+      <PremiumCardHeader className="pb-2">
+        <PremiumCardTitle className="text-xl font-display font-semibold text-brand-navy flex items-center gap-2">
           <AlertOctagon className="w-5 h-5 text-brand-indigo" />
           Complaint Overview
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col justify-between">
+        </PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent className="flex-1 flex flex-col justify-between">
         <div className="space-y-4 mt-4">
           <div className="flex justify-between items-center p-3 rounded-lg bg-semantic-warning/5 border border-semantic-warning/10">
             <span className="text-sm font-medium text-brand-navy/80">Open</span>
@@ -40,7 +40,7 @@ export function ComplaintOverview() {
         >
           View Complaints <ArrowRight className="w-4 h-4" />
         </button>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

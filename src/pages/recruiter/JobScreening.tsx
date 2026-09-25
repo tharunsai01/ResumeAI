@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { ChevronLeft, Brain, Search, CheckCircle2, Zap, Loader2 } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { screeningJobs, initialScreeningCandidates, AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
@@ -154,9 +154,9 @@ export default function RecruiterJobScreening() {
 
         {/* OVERVIEW & PIPELINE CARD */}
         <motion.div variants={slideUp}>
-          <Card className="overflow-hidden border-brand-indigo/10 shadow-sm relative">
+          <PremiumCard className="overflow-hidden border-brand-indigo/10 shadow-sm relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-indigo/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
-            <CardContent className="p-6">
+            <PremiumCardContent className="p-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 
                 {/* PIPELINE */}
@@ -206,8 +206,8 @@ export default function RecruiterJobScreening() {
                 </div>
 
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* INFO BANNER */}
@@ -275,7 +275,7 @@ export default function RecruiterJobScreening() {
 
         {/* CANDIDATE RANKING TABLE */}
         <motion.div variants={slideUp}>
-          <Card className="shadow-sm">
+          <PremiumCard className="shadow-sm">
             <div className="p-4 border-b border-brand-gray/20 flex justify-between items-center bg-brand-light/30">
               <h3 className="font-display font-semibold text-brand-navy">AI Candidate Ranking</h3>
             </div>
@@ -372,7 +372,7 @@ export default function RecruiterJobScreening() {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </PremiumCard>
         </motion.div>
       </motion.div>
 

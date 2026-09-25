@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import { systemHealth } from "../../../data/mockAdminDashboard"
 import { Activity, ArrowRight, CheckCircle2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -7,14 +7,14 @@ export function SystemHealthOverview() {
   const navigate = useNavigate()
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-display font-semibold text-brand-navy flex items-center gap-2">
+    <PremiumCard className="flex flex-col">
+      <PremiumCardHeader className="pb-2">
+        <PremiumCardTitle className="text-xl font-display font-semibold text-brand-navy flex items-center gap-2">
           <Activity className="w-5 h-5 text-semantic-success" />
           System Health
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col justify-between mt-4">
+        </PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent className="flex-1 flex flex-col justify-between mt-4">
         
         <div className="flex items-center justify-between p-4 bg-brand-light rounded-xl border border-brand-gray/30 mb-4">
           <span className="font-semibold text-brand-navy">System Uptime</span>
@@ -41,7 +41,7 @@ export function SystemHealthOverview() {
         >
           View System Health <ArrowRight className="w-4 h-4" />
         </button>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

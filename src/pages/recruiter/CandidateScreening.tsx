@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { ChevronLeft, CheckCircle2, AlertCircle, FileText, User, Calendar, Brain, X } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { initialScreeningCandidates, jobRequirements, AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
@@ -75,9 +75,9 @@ export default function RecruiterCandidateScreening() {
 
         {/* CANDIDATE HEADER */}
         <motion.div variants={slideUp}>
-          <Card className="border-none shadow-md overflow-hidden">
+          <PremiumCard className="border-none shadow-md overflow-hidden">
             <div className="h-2 bg-gradient-to-r from-brand-indigo via-brand-blue to-transparent" />
-            <CardContent className="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <PremiumCardContent className="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div className="flex items-center gap-5">
                 <div className="w-20 h-20 rounded-2xl bg-brand-indigo/10 flex items-center justify-center border border-brand-indigo/20 shrink-0">
                   <span className="text-3xl font-display font-bold text-brand-indigo">
@@ -119,8 +119,8 @@ export default function RecruiterCandidateScreening() {
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -129,13 +129,13 @@ export default function RecruiterCandidateScreening() {
           <motion.div variants={slideUp} className="lg:col-span-2 space-y-6">
             
             {/* AI MATCH BREAKDOWN */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30">
-                <CardTitle className="flex items-center gap-2 text-brand-indigo">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30">
+                <PremiumCardTitle className="flex items-center gap-2 text-brand-indigo">
                   <Brain className="w-5 h-5" /> AI Match Breakdown
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
+                </PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                   {[
                     { label: "Skills Match", score: candidate.skillMatch },
@@ -162,34 +162,34 @@ export default function RecruiterCandidateScreening() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
             {/* WHY MATCHES & GAPS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="border-semantic-success/20 bg-semantic-success/5 shadow-none">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-semantic-success text-base flex items-center gap-2">
+              <PremiumCard className="border-semantic-success/20 bg-semantic-success/5 shadow-none">
+                <PremiumCardHeader className="pb-2">
+                  <PremiumCardTitle className="text-semantic-success text-base flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5" /> Why this candidate matches
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm text-brand-navy/80">
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-2 text-sm text-brand-navy/80">
                   {candidate.matchedStrengths.map((str, i) => (
                     <div key={i} className="flex items-start gap-2">
                       <CheckCircle2 className="w-4 h-4 text-semantic-success shrink-0 mt-0.5" />
                       <span>{str}</span>
                     </div>
                   ))}
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
 
-              <Card className="border-semantic-warning/20 bg-semantic-warning/5 shadow-none">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-semantic-warning text-base flex items-center gap-2">
+              <PremiumCard className="border-semantic-warning/20 bg-semantic-warning/5 shadow-none">
+                <PremiumCardHeader className="pb-2">
+                  <PremiumCardTitle className="text-semantic-warning text-base flex items-center gap-2">
                     <AlertCircle className="w-5 h-5" /> Potential Gaps
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm text-brand-navy/80">
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-2 text-sm text-brand-navy/80">
                   {candidate.potentialGaps.length > 0 ? candidate.potentialGaps.map((gap, i) => (
                     <div key={i} className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-semantic-warning shrink-0 mt-1.5" />
@@ -198,16 +198,16 @@ export default function RecruiterCandidateScreening() {
                   )) : (
                     <div className="text-brand-navy/50 italic">No significant gaps identified.</div>
                   )}
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </div>
 
             {/* REQUIRED SKILLS COMPARISON */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30">
-                <CardTitle>Required Skills vs Candidate Skills</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30">
+                <PremiumCardTitle>Required Skills vs Candidate Skills</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
                     <h4 className="text-sm font-semibold text-brand-navy mb-4 border-b border-brand-gray/20 pb-2">Required by Job</h4>
@@ -245,8 +245,8 @@ export default function RecruiterCandidateScreening() {
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
           </motion.div>
 
@@ -254,14 +254,14 @@ export default function RecruiterCandidateScreening() {
           <motion.div variants={slideUp} className="space-y-6">
             
             {/* AI RECOMMENDATION */}
-            <Card className={cn("border-2 shadow-sm", recommendation.border)}>
-              <CardHeader className={cn("border-b pb-4", recommendation.border, recommendation.bg)}>
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-brand-navy/50 mb-1">AI Recommendation</CardTitle>
+            <PremiumCard className={cn("border-2 shadow-sm", recommendation.border)}>
+              <PremiumCardHeader className={cn("border-b pb-4", recommendation.border, recommendation.bg)}>
+                <PremiumCardTitle className="text-sm font-bold uppercase tracking-wider text-brand-navy/50 mb-1">AI Recommendation</PremiumCardTitle>
                 <div className={cn("text-xl font-display font-bold flex items-center gap-2", recommendation.color)}>
                   {recommendation.title}
                 </div>
-              </CardHeader>
-              <CardContent className="p-5">
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5">
                 <p className="text-sm text-brand-navy/80 leading-relaxed mb-4">
                   {recommendation.desc}
                 </p>
@@ -269,15 +269,15 @@ export default function RecruiterCandidateScreening() {
                   <Brain className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>AI recommendations are intended to support your review. Final hiring decisions remain with the recruiter.</span>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
             {/* RESUME ANALYSIS PREVIEW */}
-            <Card>
-              <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
-                <CardTitle>Resume Analysis</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5 space-y-4">
+            <PremiumCard>
+              <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
+                <PremiumCardTitle>Resume Analysis</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5 space-y-4">
                 <div className="bg-brand-light/50 border border-brand-gray/30 p-3 rounded-xl flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white rounded-lg shadow-sm">
@@ -308,8 +308,8 @@ export default function RecruiterCandidateScreening() {
                 <Button variant="outline" className="w-full bg-white text-brand-indigo border-brand-indigo/20 hover:bg-brand-indigo/5 mt-2" onClick={() => navigate(`/recruiter/candidates/${candidate.id}`)}>
                   View Full Resume
                 </Button>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
 
             {/* ACTION */}
             <Button onClick={() => navigate("/recruiter/interviews")} className="w-full bg-brand-light text-brand-navy border border-brand-gray/40 hover:bg-brand-gray/20 shadow-sm">

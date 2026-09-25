@@ -1,7 +1,7 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, AlertCircle, X } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../../components/ui/PremiumCard"
 import { Button } from "../../../components/ui/Button"
 import { slideUp } from "../../../lib/animations"
 import { cn } from "../../../lib/utils"
@@ -93,11 +93,11 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
       <motion.div variants={slideUp} className="lg:col-span-2 space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <PremiumCard>
+          <PremiumCardHeader>
+            <PremiumCardTitle>Basic Information</PremiumCardTitle>
+          </PremiumCardHeader>
+          <PremiumCardContent className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-brand-navy mb-1">Job Title *</label>
               <input
@@ -226,14 +226,14 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
                 className="w-full bg-white border border-brand-gray/50 rounded-xl px-4 py-2.5 outline-none focus:border-brand-indigo/50 transition-all text-brand-navy disabled:bg-brand-gray/10 disabled:text-brand-navy/40"
               />
             </div>
-          </CardContent>
-        </Card>
+          </PremiumCardContent>
+        </PremiumCard>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Job Description & Responsibilities</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <PremiumCard>
+          <PremiumCardHeader>
+            <PremiumCardTitle>Job Description & Responsibilities</PremiumCardTitle>
+          </PremiumCardHeader>
+          <PremiumCardContent>
             <div>
               <textarea
                 value={formData.description}
@@ -246,14 +246,14 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
               />
               {errors.description && <p className="text-xs text-semantic-error mt-1">{errors.description}</p>}
             </div>
-          </CardContent>
-        </Card>
+          </PremiumCardContent>
+        </PremiumCard>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Skills & Requirements</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <PremiumCard>
+          <PremiumCardHeader>
+            <PremiumCardTitle>Skills & Requirements</PremiumCardTitle>
+          </PremiumCardHeader>
+          <PremiumCardContent className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-brand-navy mb-2">Required Skills *</label>
               <div className="flex flex-wrap gap-2 mb-3">
@@ -315,22 +315,22 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
                 <Button type="button" variant="outline" onClick={() => { addSkill("preferred", newPreferredSkill); setNewPreferredSkill(""); }}>Add</Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </PremiumCardContent>
+        </PremiumCard>
       </motion.div>
 
       <motion.div variants={slideUp} className="space-y-6">
-        <Card className="sticky top-24 border-brand-indigo/20 shadow-[0_4px_20px_-10px_rgba(79,70,229,0.1)]">
+        <PremiumCard className="sticky top-24 border-brand-indigo/20 shadow-[0_4px_20px_-10px_rgba(79,70,229,0.1)]">
           <div className="h-1 w-full bg-gradient-to-r from-brand-indigo to-brand-blue rounded-t-xl" />
-          <CardHeader className="bg-brand-indigo/[0.02] pb-4">
-            <CardTitle className="flex items-center gap-2 text-brand-indigo text-lg">
+          <PremiumCardHeader className="bg-brand-indigo/[0.02] pb-4">
+            <PremiumCardTitle className="flex items-center gap-2 text-brand-indigo text-lg">
               <Sparkles className="w-5 h-5" /> AI Matching Preview
-            </CardTitle>
+            </PremiumCardTitle>
             <p className="text-xs text-brand-navy/60 leading-relaxed mt-2">
               These requirements will be used by HireSmart AI to compare candidate profiles against this job.
             </p>
-          </CardHeader>
-          <CardContent className="p-5 space-y-5 border-t border-brand-gray/20">
+          </PremiumCardHeader>
+          <PremiumCardContent className="p-5 space-y-5 border-t border-brand-gray/20">
             <div>
               <div className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-2">Required Core Skills</div>
               <div className="flex flex-wrap gap-1.5">
@@ -359,7 +359,7 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
                 </p>
               </div>
             </div>
-          </CardContent>
+          </PremiumCardContent>
           <div className="p-4 bg-brand-light/30 border-t border-brand-gray/30 flex flex-col gap-3">
             <Button onClick={handlePublish} disabled={isSubmitting} className="w-full bg-gradient-to-r from-brand-indigo to-brand-blue">
               {isSubmitting ? "Publishing..." : "Publish Job"}
@@ -373,7 +373,7 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
               </Button>
             </div>
           </div>
-        </Card>
+        </PremiumCard>
       </motion.div>
     </div>
   )

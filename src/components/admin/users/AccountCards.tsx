@@ -1,14 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
 import type { AdminUser } from "../../../data/mockAdminUsers"
 import { UserRoleBadge, UserStatusBadge, UserVerificationBadge } from "./UserBadges"
 
 export function AccountInformation({ user }: { user: AdminUser }) {
   return (
-    <Card>
-      <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
-        <CardTitle className="text-lg font-display font-semibold text-brand-navy">Account Information</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <PremiumCard>
+      <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+        <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Account Information</PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <div className="text-brand-navy/50 text-xs uppercase tracking-wider font-semibold mb-1">User ID</div>
@@ -27,8 +27,8 @@ export function AccountInformation({ user }: { user: AdminUser }) {
             <div className="font-medium text-brand-navy">{user.joinedAt}</div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }
 
@@ -42,11 +42,11 @@ export function RoleAccessCard({ user }: { user: AdminUser }) {
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
-        <CardTitle className="text-lg font-display font-semibold text-brand-navy">Role & Access</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <PremiumCard>
+      <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+        <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Role & Access</PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent>
         <div className="space-y-4">
           <div className="flex justify-between items-center pb-3 border-b border-brand-gray/10">
             <div>
@@ -72,7 +72,7 @@ export function RoleAccessCard({ user }: { user: AdminUser }) {
             <UserVerificationBadge verification={user.verification} />
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }

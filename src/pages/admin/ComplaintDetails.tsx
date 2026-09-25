@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { AdminEmptyState } from "../../components/admin/AdminEmptyState"
 import { useAdminComplaints } from "../../contexts/AdminComplaintsContext"
 import { ArrowLeft, MessageSquareX, ExternalLink, Activity, ArrowRight, ShieldAlert, CheckCircle2 } from "lucide-react"
@@ -169,20 +169,20 @@ export default function AdminComplaintDetails() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
-              <CardTitle className="text-lg font-display font-semibold text-brand-navy">Complaint Description</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <PremiumCard>
+            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+              <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Complaint Description</PremiumCardTitle>
+            </PremiumCardHeader>
+            <PremiumCardContent>
               <p className="text-brand-navy/80 whitespace-pre-wrap">{complaint.description}</p>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
-          <Card>
-            <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
-              <CardTitle className="text-lg font-display font-semibold text-brand-navy">Resolution</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <PremiumCard>
+            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+              <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Resolution</PremiumCardTitle>
+            </PremiumCardHeader>
+            <PremiumCardContent>
               {complaint.status === "Resolved" || complaint.status === "Closed" ? (
                 <div className="bg-semantic-success/5 border border-semantic-success/20 rounded-lg p-4">
                   <div className="flex items-center gap-2 text-semantic-success font-semibold mb-2">
@@ -219,16 +219,16 @@ export default function AdminComplaintDetails() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
-              <CardTitle className="text-lg font-display font-semibold text-brand-navy">Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <PremiumCard>
+            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+              <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Information</PremiumCardTitle>
+            </PremiumCardHeader>
+            <PremiumCardContent className="space-y-4">
               <div>
                 <span className="text-xs text-brand-navy/50 font-semibold uppercase block mb-1">Category</span>
                 <span className="text-sm font-medium text-brand-navy">{complaint.category}</span>
@@ -241,14 +241,14 @@ export default function AdminComplaintDetails() {
                 <span className="text-xs text-brand-navy/50 font-semibold uppercase block mb-1">Last Updated</span>
                 <span className="text-sm font-medium text-brand-navy">{complaint.updatedAt}</span>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
-          <Card>
-            <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
-              <CardTitle className="text-lg font-display font-semibold text-brand-navy">Submitted By</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <PremiumCard>
+            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+              <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Submitted By</PremiumCardTitle>
+            </PremiumCardHeader>
+            <PremiumCardContent className="space-y-4">
               <div>
                 <span className="text-xs text-brand-navy/50 font-semibold uppercase block mb-1">Name</span>
                 <span className="text-sm font-medium text-brand-navy">{complaint.submittedBy.name}</span>
@@ -271,15 +271,15 @@ export default function AdminComplaintDetails() {
               >
                 View User <ExternalLink className="w-4 h-4" />
               </button>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
-          <Card>
-            <CardHeader className="pb-2 border-b border-brand-gray/20 mb-4 flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-display font-semibold text-brand-navy">Complaint Activity</CardTitle>
+          <PremiumCard>
+            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4 flex flex-row items-center justify-between">
+              <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Complaint Activity</PremiumCardTitle>
               <Activity className="w-4 h-4 text-brand-navy/40" />
-            </CardHeader>
-            <CardContent>
+            </PremiumCardHeader>
+            <PremiumCardContent>
               <div className="space-y-4">
                 {complaint.activity.map((act, i) => (
                   <div key={i} className="flex gap-4 relative">
@@ -296,8 +296,8 @@ export default function AdminComplaintDetails() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
           <div className="bg-brand-light/50 border border-brand-gray/20 rounded-xl p-4">
             <h3 className="font-semibold text-brand-navy mb-2 flex items-center gap-2">

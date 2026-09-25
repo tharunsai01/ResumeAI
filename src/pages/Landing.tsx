@@ -1,8 +1,9 @@
 import React, { useState } from "react"
 import { motion } from "framer-motion"
-import { 
-  ArrowRight, BrainCircuit, FileText, Briefcase, CheckCircle2, 
-  Search, BarChart, Shield, Target, Users, Zap, Lock, User
+import {
+  ArrowRight, BrainCircuit, FileText, Briefcase, CheckCircle2,
+  Search, BarChart, Shield, Target, Users, Zap, Lock, User,
+  Moon, Sun
 } from "lucide-react"
 import { Button } from "../components/ui/Button"
 import { MatchScore } from "../components/shared/MatchScore"
@@ -12,6 +13,9 @@ import { useAuth } from "../context/AuthContext"
 import { Navigate, Link } from "react-router-dom"
 import type { UserRole } from "../services/authService"
 import LightRays from "../components/ui/LightRays"
+import { PremiumCard, PremiumCardContent, PremiumCardTitle, PremiumCardDescription } from "../components/ui/PremiumCard"
+import { settingsService } from "../services/settingsService"
+import { useEffect } from "react"
 
 export default function Landing() {
   const { user } = useAuth()
@@ -20,6 +24,25 @@ export default function Landing() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<"login" | "register">("login")
   const [selectedRole, setSelectedRole] = useState<UserRole>("candidate")
+
+  const [theme, setTheme] = useState(settingsService.getSettings().appearance.theme)
+
+  useEffect(() => {
+    // Make sure theme matches settings service
+    setTheme(settingsService.getSettings().appearance.theme)
+  }, [])
+
+  const toggleTheme = () => {
+    const isDark = document.documentElement.classList.contains('dark')
+    const newTheme = isDark ? 'Light' : 'Dark'
+    settingsService.updateSettings({
+      appearance: {
+        ...settingsService.getSettings().appearance,
+        theme: newTheme
+      }
+    })
+    setTheme(newTheme)
+  }
 
   // If already logged in, redirect to dashboard
   if (user) {
@@ -52,19 +75,19 @@ export default function Landing() {
     <div className="min-h-screen bg-brand-light flex flex-col font-sans">
       
       {/* Navigation */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-md border-b border-brand-gray/30">
+      <header className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-brand-navy/80 backdrop-blur-md border-b border-brand-gray/30 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
               <div className="h-10 w-10 rounded-xl bg-brand-indigo flex items-center justify-center shadow-lg shadow-brand-indigo/20">
                 <span className="text-white font-display font-bold text-xl">H</span>
               </div>
-              <span className="text-2xl font-display font-semibold text-brand-navy">
+              <span className="text-2xl font-display font-semibold text-brand-navy dark:text-white">
                 HireSmart <span className="text-brand-indigo">AI</span>
               </span>
             </div>
             
-            <nav className="hidden lg:flex items-center space-x-8 text-sm font-semibold text-brand-navy/70">
+            <nav className="hidden lg:flex items-center space-x-8 text-sm font-semibold text-brand-navy/70 dark:text-white/70">
               <button onClick={() => scrollToSection('features')} className="hover:text-brand-indigo transition-colors">Features</button>
               <button onClick={() => scrollToSection('how-it-works')} className="hover:text-brand-indigo transition-colors">How It Works</button>
               <button onClick={() => scrollToSection('candidates')} className="hover:text-brand-indigo transition-colors">For Candidates</button>
@@ -75,7 +98,7 @@ export default function Landing() {
               <button onClick={handleSignIn} className="text-sm font-semibold text-brand-navy hover:text-brand-indigo transition-colors px-4 py-2 hidden sm:block">
                 Sign In
               </button>
-              <Button onClick={handleGetStarted} className="px-6 py-2.5 h-auto rounded-xl">Get Started</Button>
+              <Button onClick={handleGetStarted} className="px-6 py-2.5 h-auto">Get Started</Button>
             </div>
           </div>
         </div>
@@ -83,7 +106,7 @@ export default function Landing() {
 
       <main className="flex-1 pt-20">
         {/* A. Hero Section */}
-        <section className="relative pt-20 pb-24 lg:pt-32 lg:pb-32 overflow-hidden bg-white">
+        <section className="relative pt-20 pb-24 lg:pt-32 lg:pb-32 overflow-hidden bg-white dark:bg-brand-navy">
           <LightRays
             raysOrigin="top-center"
             raysColor="#8B5CF6"
@@ -116,18 +139,18 @@ export default function Landing() {
                   <SparkleIcon className="w-4 h-4 mr-2" />
                   AI-Powered Recruitment Platform
                 </div>
-                <h1 className="text-5xl md:text-6xl lg:text-7xl tracking-tight font-display font-extrabold text-brand-navy leading-[1.1]">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl tracking-tight font-display font-extrabold text-brand-navy dark:text-white leading-[1.1]">
                   Smarter Hiring.<br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-indigo to-brand-violet">Brighter Careers.</span>
                 </h1>
-                <p className="mt-6 text-lg md:text-xl text-brand-navy/70 leading-relaxed max-w-lg">
+                <p className="mt-6 text-lg md:text-xl text-brand-navy/70 dark:text-white/70 leading-relaxed max-w-lg">
                   AI-powered resume screening and intelligent job matching that connects the right talent with the right opportunity.
                 </p>
                 <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                  <Button onClick={handleGetStarted} size="lg" className="px-8 h-14 rounded-xl text-base group">
+                  <Button onClick={handleGetStarted} size="lg" className="px-8 h-14 text-base group">
                     Get Started <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
-                  <Button onClick={() => scrollToSection('features')} variant="secondary" size="lg" className="px-8 h-14 rounded-xl text-base bg-brand-light border-brand-gray/50 hover:bg-brand-gray/20">
+                  <Button onClick={() => scrollToSection('features')} variant="secondary" size="lg" className="px-8 h-14 text-base">
                     Explore Platform
                   </Button>
                 </div>
@@ -216,38 +239,42 @@ export default function Landing() {
 
             <div className="grid lg:grid-cols-2 gap-16">
               {/* Candidate Flow */}
-              <div className="bg-brand-light rounded-3xl p-8 lg:p-12 border border-brand-gray/50">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 bg-brand-blue/10 rounded-xl flex items-center justify-center">
-                    <User className="w-6 h-6 text-brand-blue" />
+              <PremiumCard>
+                <PremiumCardContent className="p-8 lg:p-12 h-full">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-12 h-12 bg-brand-blue/10 rounded-xl flex items-center justify-center">
+                      <User className="w-6 h-6 text-brand-blue" />
+                    </div>
+                    <h3 className="premium-card-text text-2xl font-display font-bold text-brand-navy dark:text-white transition-colors">Candidate Flow</h3>
                   </div>
-                  <h3 className="text-2xl font-display font-bold text-brand-navy">Candidate Flow</h3>
-                </div>
-                <div className="space-y-6">
-                  <WorkflowStep number="01" title="Upload Resume" desc="Drop your CV and let AI instantly parse your experience." />
-                  <WorkflowStep number="02" title="Skill Extraction" desc="AI identifies your core competencies and strengths." />
-                  <WorkflowStep number="03" title="Job Matching" desc="Get instantly matched with open roles requiring your skills." />
-                  <WorkflowStep number="04" title="Apply & Track" desc="Submit applications and monitor your progress in real-time." />
-                  <WorkflowStep number="05" title="Interview & Hire" desc="Connect with recruiters and land your perfect job." isLast />
-                </div>
-              </div>
+                  <div className="space-y-6">
+                    <WorkflowStep number="01" title="Upload Resume" desc="Drop your CV and let AI instantly parse your experience." />
+                    <WorkflowStep number="02" title="Skill Extraction" desc="AI identifies your core competencies and strengths." />
+                    <WorkflowStep number="03" title="Job Matching" desc="Get instantly matched with open roles requiring your skills." />
+                    <WorkflowStep number="04" title="Apply & Track" desc="Submit applications and monitor your progress in real-time." />
+                    <WorkflowStep number="05" title="Interview & Hire" desc="Connect with recruiters and land your perfect job." isLast />
+                  </div>
+                </PremiumCardContent>
+              </PremiumCard>
 
               {/* Recruiter Flow */}
-              <div className="bg-brand-indigo/5 rounded-3xl p-8 lg:p-12 border border-brand-indigo/10">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 bg-brand-indigo/10 rounded-xl flex items-center justify-center">
-                    <Briefcase className="w-6 h-6 text-brand-indigo" />
+              <PremiumCard>
+                <PremiumCardContent className="p-8 lg:p-12 h-full">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-12 h-12 bg-brand-indigo/10 rounded-xl flex items-center justify-center">
+                      <Briefcase className="w-6 h-6 text-brand-indigo" />
+                    </div>
+                    <h3 className="premium-card-text text-2xl font-display font-bold text-brand-navy dark:text-white transition-colors">Recruiter Flow</h3>
                   </div>
-                  <h3 className="text-2xl font-display font-bold text-brand-navy">Recruiter Flow</h3>
-                </div>
-                <div className="space-y-6">
-                  <WorkflowStep number="01" title="Create Job" desc="Post an opportunity and let AI determine the required skills." />
-                  <WorkflowStep number="02" title="Receive Applications" desc="Candidates apply directly through the HireSmart platform." />
-                  <WorkflowStep number="03" title="AI Screening" desc="AI evaluates and ranks every candidate against your job description." />
-                  <WorkflowStep number="04" title="Shortlist Candidates" desc="Review the top matches and move them through your pipeline." />
-                  <WorkflowStep number="05" title="Interview & Hire" desc="Schedule meetings and make data-driven hiring decisions." isLast />
-                </div>
-              </div>
+                  <div className="space-y-6">
+                    <WorkflowStep number="01" title="Create Job" desc="Post an opportunity and let AI determine the required skills." />
+                    <WorkflowStep number="02" title="Receive Applications" desc="Candidates apply directly through the HireSmart platform." />
+                    <WorkflowStep number="03" title="AI Screening" desc="AI evaluates and ranks every candidate against your job description." />
+                    <WorkflowStep number="04" title="Shortlist Candidates" desc="Review the top matches and move them through your pipeline." />
+                    <WorkflowStep number="05" title="Interview & Hire" desc="Schedule meetings and make data-driven hiring decisions." isLast />
+                  </div>
+                </PremiumCardContent>
+              </PremiumCard>
             </div>
           </div>
         </section>
@@ -277,38 +304,40 @@ export default function Landing() {
                     <span className="text-white/80">Track all your applications in one centralized, beautiful dashboard.</span>
                   </li>
                 </ul>
-                <Button onClick={() => { setSelectedRole("candidate"); setIsRoleSelectorOpen(false); setIsAuthModalOpen(true); setAuthMode("register"); }} variant="default" className="bg-brand-blue hover:bg-brand-blue/90 text-white">
+                <Button onClick={() => { setSelectedRole("candidate"); setIsRoleSelectorOpen(false); setIsAuthModalOpen(true); setAuthMode("register"); }} variant="default" className="bg-brand-blue hover:bg-brand-blue/90 text-white py-3 px-6">
                   Explore Candidate Experience
                 </Button>
               </div>
               <div className="mt-12 lg:mt-0 relative">
-                <div className="glass-card /10 backdrop-blur-xl -white/20 p-6">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="h-12 w-12 bg-brand-blue rounded-full flex items-center justify-center font-bold text-xl">
-                      JD
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg">John Doe</h4>
-                      <p className="text-white/60 text-sm">Senior Frontend Engineer</p>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="bg-white/5 rounded-xl p-4">
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-white/80">React Expertise</span>
-                        <span className="font-bold text-brand-blue">98%</span>
+                <PremiumCard>
+                  <PremiumCardContent className="p-6">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="h-12 w-12 bg-brand-blue rounded-full flex items-center justify-center font-bold text-xl text-white">
+                        JD
                       </div>
-                      <div className="h-2 bg-white/10 rounded-full"><div className="h-full w-[98%] bg-brand-blue rounded-full"></div></div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-4">
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-white/80">System Architecture</span>
-                        <span className="font-bold text-brand-blue">85%</span>
+                      <div>
+                        <h4 className="premium-card-text font-bold text-lg text-slate-800 dark:text-white transition-colors">John Doe</h4>
+                        <p className="premium-card-text text-slate-500 dark:text-white/60 text-sm transition-colors">Senior Frontend Engineer</p>
                       </div>
-                      <div className="h-2 bg-white/10 rounded-full"><div className="h-full w-[85%] bg-brand-blue rounded-full"></div></div>
                     </div>
-                  </div>
-                </div>
+                    <div className="space-y-4">
+                      <div className="bg-slate-100 dark:bg-white/5 rounded-xl p-4">
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="premium-card-text text-slate-700 dark:text-white/80 transition-colors">React Expertise</span>
+                          <span className="font-bold text-brand-blue">98%</span>
+                        </div>
+                        <div className="h-2 bg-slate-200 dark:bg-white/10 rounded-full"><div className="h-full w-[98%] bg-brand-blue rounded-full"></div></div>
+                      </div>
+                      <div className="bg-slate-100 dark:bg-white/5 rounded-xl p-4">
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="premium-card-text text-slate-700 dark:text-white/80 transition-colors">System Architecture</span>
+                          <span className="font-bold text-brand-blue">85%</span>
+                        </div>
+                        <div className="h-2 bg-slate-200 dark:bg-white/10 rounded-full"><div className="h-full w-[85%] bg-brand-blue rounded-full"></div></div>
+                      </div>
+                    </div>
+                  </PremiumCardContent>
+                </PremiumCard>
               </div>
             </div>
           </div>
@@ -319,28 +348,30 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center flex flex-col-reverse lg:flex-row">
               <div className="mt-12 lg:mt-0 relative w-full">
-                <div className="glass-card p-6">
-                  <div className="flex justify-between items-center mb-6 border-b border-brand-gray/30 pb-4">
-                    <h4 className="font-bold text-brand-navy">AI Screening Results</h4>
-                    <span className="text-xs font-bold text-brand-indigo bg-brand-indigo/10 px-3 py-1 rounded-full">Frontend Dev</span>
-                  </div>
-                  <div className="space-y-3">
-                    {[94, 88, 76].map((score, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-brand-light transition-colors border border-transparent hover:border-brand-gray/30">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 bg-brand-navy/5 rounded-full flex items-center justify-center font-bold text-sm text-brand-navy">
-                            C{i+1}
+                <PremiumCard>
+                  <PremiumCardContent className="p-6">
+                    <div className="flex justify-between items-center mb-6 border-b border-brand-gray/30 pb-4">
+                      <h4 className="premium-card-text font-bold text-slate-800 dark:text-white transition-colors">AI Screening Results</h4>
+                      <span className="text-xs font-bold text-brand-indigo bg-brand-indigo/10 px-3 py-1 rounded-full">Frontend Dev</span>
+                    </div>
+                    <div className="space-y-3">
+                      {[94, 88, 76].map((score, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-brand-light/10 transition-colors border border-transparent hover:border-brand-gray/30">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 bg-slate-100 dark:bg-brand-navy/50 rounded-full flex items-center justify-center font-bold text-sm text-brand-navy dark:text-white">
+                              C{i+1}
+                            </div>
+                            <div>
+                              <p className="premium-card-text text-sm font-bold text-slate-800 dark:text-white transition-colors">Candidate {i+1}</p>
+                              <p className="premium-card-text text-xs text-slate-500 dark:text-brand-navy/50 transition-colors">Applied 2h ago</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-sm font-bold text-brand-navy">Candidate {i+1}</p>
-                            <p className="text-xs text-brand-navy/50">Applied 2h ago</p>
-                          </div>
+                          <MatchScore score={score} size="sm" />
                         </div>
-                        <MatchScore score={score} size="sm" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                      ))}
+                    </div>
+                  </PremiumCardContent>
+                </PremiumCard>
               </div>
               <div>
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-6 text-brand-navy">Scale Your Hiring with Precision</h2>
@@ -362,7 +393,7 @@ export default function Landing() {
                     <span className="text-brand-navy/70">Manage your entire hiring pipeline, from shortlisting to final interviews.</span>
                   </li>
                 </ul>
-                <Button onClick={() => { setSelectedRole("recruiter"); setIsRoleSelectorOpen(false); setIsAuthModalOpen(true); setAuthMode("register"); }} className="bg-brand-indigo hover:bg-brand-indigo/90 text-white">
+                <Button onClick={() => { setSelectedRole("recruiter"); setIsRoleSelectorOpen(false); setIsAuthModalOpen(true); setAuthMode("register"); }} className="py-3 px-6">
                   Explore Recruiter Experience
                 </Button>
               </div>
@@ -465,8 +496,8 @@ export default function Landing() {
             <h2 className="text-4xl md:text-5xl font-display font-extrabold text-brand-navy mb-6">Find Better Matches.<br />Hire Smarter.</h2>
             <p className="text-xl text-brand-navy/60 mb-10">Join thousands of candidates and forward-thinking recruiters transforming the future of work.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button onClick={handleGetStarted} size="lg" className="px-10 h-14 rounded-xl text-lg">Get Started</Button>
-              <Button onClick={handleSignIn} variant="secondary" size="lg" className="px-10 h-14 rounded-xl text-lg bg-brand-light border-brand-gray/50 hover:bg-brand-gray/20">Sign In</Button>
+              <Button onClick={handleGetStarted} size="lg" className="btn-gradient-fill px-10 h-14 text-lg">Get Started</Button>
+              <Button onClick={handleSignIn} variant="secondary" size="lg" className="btn-gradient-fill-secondary px-10 h-14 text-lg">Sign In</Button>
             </div>
           </div>
         </section>
@@ -558,13 +589,17 @@ function SparkleIcon(props: React.SVGProps<SVGSVGElement>) {
 
 function FeatureCard({ icon: Icon, title, desc }: { icon: any, title: string, desc: string }) {
   return (
-    <div className="glass-card p-6 shadow-sm hover: transition-shadow">
-      <div className="w-12 h-12 bg-brand-indigo/10 rounded-xl flex items-center justify-center mb-6">
-        <Icon className="w-6 h-6 text-brand-indigo" />
-      </div>
-      <h3 className="text-lg font-bold text-brand-navy mb-2">{title}</h3>
-      <p className="text-brand-navy/60 text-sm leading-relaxed">{desc}</p>
-    </div>
+    <PremiumCard className="w-full">
+      <PremiumCardContent className="p-6 h-full flex flex-col justify-between">
+        <div>
+          <div className="w-12 h-12 bg-brand-indigo/10 rounded-xl flex items-center justify-center mb-6">
+            <Icon className="w-6 h-6 text-brand-indigo" />
+          </div>
+          <PremiumCardTitle className="text-lg mb-2">{title}</PremiumCardTitle>
+          <PremiumCardDescription className="leading-relaxed">{desc}</PremiumCardDescription>
+        </div>
+      </PremiumCardContent>
+    </PremiumCard>
   )
 }
 

@@ -110,29 +110,39 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
               </p>
             </div>
 
-            {/* Role Tabs for Login */}
-            {mode === "login" && (
-              <div className="flex p-1 bg-brand-light rounded-xl mb-6">
-                <button
-                  onClick={() => setRole("candidate")}
-                  className={cn(
-                    "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
-                    role === "candidate" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
-                  )}
-                >
-                  Candidate
-                </button>
-                <button
-                  onClick={() => setRole("recruiter")}
-                  className={cn(
-                    "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
-                    role === "recruiter" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
-                  )}
-                >
-                  Recruiter
-                </button>
-              </div>
-            )}
+            {/* Role Tabs */}
+            <div className="flex p-1 bg-brand-light rounded-xl mb-6">
+              <button
+                type="button"
+                onClick={() => setRole("candidate")}
+                className={cn(
+                  "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                  role === "candidate" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
+                )}
+              >
+                Candidate
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("recruiter")}
+                className={cn(
+                  "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                  role === "recruiter" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
+                )}
+              >
+                Recruiter
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("admin")}
+                className={cn(
+                  "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                  role === "admin" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
+                )}
+              >
+                Admin
+              </button>
+            </div>
 
             {error && (
               <div className="mb-6 p-3 bg-semantic-error/10 border border-semantic-error/20 rounded-xl flex items-start gap-3">

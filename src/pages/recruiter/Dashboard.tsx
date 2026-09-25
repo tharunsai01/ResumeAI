@@ -4,15 +4,15 @@ import { motion } from "framer-motion"
 import { Briefcase, Users, Search, CheckCircle2, Calendar, Award, ChevronRight, Sparkles, ArrowRight, Play } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 
 const StatCard = ({ title, data, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
-    <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default h-full border-brand-gray/40">
-      <CardContent className="p-5 flex flex-col h-full justify-between">
+    <PremiumCard className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default h-full border-brand-gray/40">
+      <PremiumCardContent className="p-5 flex flex-col h-full justify-between">
         <div className="flex items-start justify-between mb-4">
           <div className={cn("p-2.5 rounded-xl border", color.bg, color.text, color.border)}>
             <Icon className="w-5 h-5" />
@@ -31,8 +31,8 @@ const StatCard = ({ title, data, icon: Icon, color, delay, loading }: any) => (
             </p>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   </motion.div>
 )
 
@@ -124,11 +124,11 @@ export default function RecruiterDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 3. CANDIDATE PIPELINE */}
           <motion.div variants={slideUp} className="lg:col-span-2 flex flex-col">
-            <Card className="flex-1 border-brand-gray/40 overflow-hidden flex flex-col">
-              <CardHeader className="bg-brand-light/30 border-b border-brand-gray/30 pb-4">
-                <CardTitle className="text-lg">Candidate Pipeline</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 flex-1 flex flex-col justify-center">
+            <PremiumCard className="flex-1 border-brand-gray/40 overflow-hidden flex flex-col">
+              <PremiumCardHeader className="bg-brand-light/30 border-b border-brand-gray/30 pb-4">
+                <PremiumCardTitle className="text-lg">Candidate Pipeline</PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-6 flex-1 flex flex-col justify-center">
                 <div className="flex flex-col sm:flex-row items-center justify-between w-full relative">
                   {/* Connectors (Desktop only) */}
                   <div className="hidden sm:block absolute top-6 left-0 right-0 h-0.5 bg-brand-gray/30 z-0" />
@@ -159,20 +159,20 @@ export default function RecruiterDashboard() {
                     </React.Fragment>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
 
           {/* 4. AI SCREENING OVERVIEW */}
           <motion.div variants={slideUp} className="flex flex-col">
-            <Card className="h-full border-brand-indigo/20 shadow-[0_4px_20px_-10px_rgba(79,70,229,0.1)] flex flex-col">
+            <PremiumCard className="h-full border-brand-indigo/20 shadow-[0_4px_20px_-10px_rgba(79,70,229,0.1)] flex flex-col">
               <div className="h-1 w-full bg-gradient-to-r from-brand-indigo to-brand-blue" />
-              <CardHeader className="pb-3 bg-brand-indigo/[0.02]">
-                <CardTitle className="text-lg flex items-center gap-2">
+              <PremiumCardHeader className="pb-3 bg-brand-indigo/[0.02]">
+                <PremiumCardTitle className="text-lg flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-brand-indigo" /> AI Screening Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-5 flex-1 flex flex-col">
+                </PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-end mb-6">
                   <span className="text-sm font-medium text-brand-navy/60">Average Match</span>
                   <span className="text-3xl font-display font-bold text-brand-indigo">{loading ? "-" : `${screeningStats.averageMatch}%`}</span>
@@ -224,22 +224,22 @@ export default function RecruiterDashboard() {
                 >
                   <Play className="w-4 h-4 mr-2" /> Run AI Screening
                 </Button>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* 6. RECENT JOBS */}
           <motion.div variants={slideUp}>
-            <Card className="h-full border-brand-gray/40">
-              <CardHeader className="flex flex-row items-center justify-between pb-4 bg-brand-light/30 border-b border-brand-gray/30">
-                <CardTitle className="text-lg">Recent Jobs</CardTitle>
+            <PremiumCard className="h-full border-brand-gray/40">
+              <PremiumCardHeader className="flex flex-row items-center justify-between pb-4 bg-brand-light/30 border-b border-brand-gray/30">
+                <PremiumCardTitle className="text-lg">Recent Jobs</PremiumCardTitle>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/recruiter/jobs")} className="text-brand-indigo text-xs h-8">
                   View All <ChevronRight className="w-3 h-3 ml-1" />
                 </Button>
-              </CardHeader>
-              <CardContent className="p-0">
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold">
@@ -291,22 +291,22 @@ export default function RecruiterDashboard() {
                     </tbody>
                   </table>
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
 
           {/* 7. TOP AI MATCHES */}
           <motion.div variants={slideUp}>
-            <Card className="h-full border-brand-gray/40">
-              <CardHeader className="flex flex-row items-center justify-between pb-4 bg-brand-light/30 border-b border-brand-gray/30">
-                <CardTitle className="text-lg flex items-center gap-2">
+            <PremiumCard className="h-full border-brand-gray/40">
+              <PremiumCardHeader className="flex flex-row items-center justify-between pb-4 bg-brand-light/30 border-b border-brand-gray/30">
+                <PremiumCardTitle className="text-lg flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-semantic-warning" /> Top AI Matches
-                </CardTitle>
+                </PremiumCardTitle>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/recruiter/screening")} className="text-brand-indigo text-xs h-8">
                   View All <ChevronRight className="w-3 h-3 ml-1" />
                 </Button>
-              </CardHeader>
-              <CardContent className="p-2 space-y-1">
+              </PremiumCardHeader>
+              <PremiumCardContent className="p-2 space-y-1">
                 {loading ? (
                   [1, 2, 3].map(i => (
                     <div key={i} className="flex items-center p-3 gap-3 animate-pulse">
@@ -345,21 +345,21 @@ export default function RecruiterDashboard() {
                     </div>
                   ))
                 )}
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
         </div>
 
         {/* 8. RECENT APPLICATIONS */}
         <motion.div variants={slideUp}>
-          <Card className="border-brand-gray/40">
-            <CardHeader className="flex flex-row items-center justify-between pb-4 bg-brand-light/30 border-b border-brand-gray/30">
-              <CardTitle className="text-lg">Recent Applications</CardTitle>
+          <PremiumCard className="border-brand-gray/40">
+            <PremiumCardHeader className="flex flex-row items-center justify-between pb-4 bg-brand-light/30 border-b border-brand-gray/30">
+              <PremiumCardTitle className="text-lg">Recent Applications</PremiumCardTitle>
               <Button variant="ghost" size="sm" onClick={() => navigate("/recruiter/candidates")} className="text-brand-indigo text-xs h-8">
                 View All <ChevronRight className="w-3 h-3 ml-1" />
               </Button>
-            </CardHeader>
-            <CardContent className="p-0">
+            </PremiumCardHeader>
+            <PremiumCardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
                   <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold">
@@ -420,8 +420,8 @@ export default function RecruiterDashboard() {
                   </tbody>
                 </table>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* 9. QUICK ACTIONS */}

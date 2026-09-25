@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
 import { AdminStatCard } from "../../components/admin/AdminStatCard"
-import { Card } from "../../components/ui/Card"
+import { PremiumCard } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { Search, Filter, Download, FileText, ShieldAlert, BrainCircuit, Users, X, Eye, Activity } from "lucide-react"
 import { useAdminAuditLogs } from "../../contexts/AdminAuditLogsContext"
@@ -245,7 +245,7 @@ export default function AdminAuditLogs() {
 
         {/* TABLE */}
         <motion.div variants={slideUp}>
-          <Card>
+          <PremiumCard>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
@@ -352,7 +352,7 @@ export default function AdminAuditLogs() {
                 </div>
               </div>
             )}
-          </Card>
+          </PremiumCard>
         </motion.div>
       </motion.div>
 

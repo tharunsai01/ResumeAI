@@ -2,7 +2,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Modal } from "../../components/ui/Modal"
@@ -195,12 +195,12 @@ export default function AdminSettings() {
                 {/* PROFILE */}
                 {activeTab === "profile" && (
                   <>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Administrator Profile</CardTitle>
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Administrator Profile</PremiumCardTitle>
                         <p className="text-sm text-brand-navy/60">Manage your administrator account information.</p>
-                      </CardHeader>
-                      <CardContent className="space-y-6 pt-4">
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="space-y-6 pt-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-brand-gray/10">
                           <div className="flex items-center gap-4">
                             <div className="w-16 h-16 rounded-full bg-brand-indigo/10 flex items-center justify-center text-2xl font-bold text-brand-indigo uppercase">
@@ -250,14 +250,14 @@ export default function AdminSettings() {
                             Save Changes
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Account Information</CardTitle>
-                      </CardHeader>
-                      <CardContent>
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Account Information</PremiumCardTitle>
+                      </PremiumCardHeader>
+                      <PremiumCardContent>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-4">
                           <div>
                             <div className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-1">Admin ID</div>
@@ -288,16 +288,16 @@ export default function AdminSettings() {
                             <div className="text-sm font-medium text-brand-navy">{profile.lastActive}</div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
                   </>
                 )}
 
                 {/* SECURITY */}
                 {activeTab === "security" && (
                   <>
-                    <Card className="bg-brand-indigo/5 border-brand-indigo/20 shadow-none">
-                      <CardContent className="p-4 flex items-start gap-3">
+                    <PremiumCard className="bg-brand-indigo/5 border-brand-indigo/20 shadow-none">
+                      <PremiumCardContent className="p-4 flex items-start gap-3">
                         <ShieldAlert className="w-5 h-5 text-brand-indigo mt-0.5 shrink-0" />
                         <div>
                           <h4 className="text-sm font-bold text-brand-navy mb-0.5">Administrator Account Security</h4>
@@ -305,14 +305,14 @@ export default function AdminSettings() {
                             Administrator accounts have elevated platform access. Keep your credentials secure and enable additional sign-in protection when available.
                           </p>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Account Security</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Account Security</PremiumCardTitle>
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="space-y-6">
                         <div className="flex items-center justify-between py-4 border-b border-brand-gray/10">
                           <div>
                             <div className="text-sm font-semibold text-brand-navy flex items-center gap-2">
@@ -338,19 +338,19 @@ export default function AdminSettings() {
                           </div>
                           <Button variant="outline" onClick={() => setTwoFactorModalOpen(true)} className="bg-white">Manage 2FA</Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
                   </>
                 )}
 
                 {/* SESSIONS */}
                 {activeTab === "sessions" && (
                   <>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Session Preferences</CardTitle>
-                      </CardHeader>
-                      <CardContent>
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Session Preferences</PremiumCardTitle>
+                      </PremiumCardHeader>
+                      <PremiumCardContent>
                         <div className="flex items-center justify-between max-w-lg">
                           <div>
                             <label className="text-sm font-semibold text-brand-navy block">Session Timeout</label>
@@ -371,14 +371,14 @@ export default function AdminSettings() {
                             Save Changes
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
 
-                    <Card>
-                      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-brand-gray/10">
-                        <CardTitle>Active Sessions</CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
+                    <PremiumCard>
+                      <PremiumCardHeader className="flex flex-row items-center justify-between pb-2 border-b border-brand-gray/10">
+                        <PremiumCardTitle>Active Sessions</PremiumCardTitle>
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="pt-4">
                         <div className="space-y-4">
                           {settings.sessions.activeList.map(session => (
                             <div key={session.id} className="flex items-start justify-between p-4 rounded-xl border border-brand-gray/10 bg-brand-light/30">
@@ -410,16 +410,16 @@ export default function AdminSettings() {
                             </div>
                           ))}
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
 
-                    <Card className="border-semantic-error/30 bg-semantic-error/5">
-                      <CardHeader>
-                        <CardTitle className="text-semantic-error flex items-center gap-2">
+                    <PremiumCard className="border-semantic-error/30 bg-semantic-error/5">
+                      <PremiumCardHeader>
+                        <PremiumCardTitle className="text-semantic-error flex items-center gap-2">
                           Danger Zone
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
+                        </PremiumCardTitle>
+                      </PremiumCardHeader>
+                      <PremiumCardContent>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                           <div>
                             <div className="text-sm font-semibold text-brand-navy">Sign Out All Other Sessions</div>
@@ -429,20 +429,20 @@ export default function AdminSettings() {
                             <LogOut className="w-4 h-4 mr-2" /> Sign Out Other Sessions
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
                   </>
                 )}
 
                 {/* NOTIFICATIONS */}
                 {activeTab === "notifications" && (
                   <div className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Administrator Notifications</CardTitle>
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Administrator Notifications</PremiumCardTitle>
                         <p className="text-sm text-brand-navy/60">Choose which platform events should generate administrator notifications.</p>
-                      </CardHeader>
-                      <CardContent className="space-y-1">
+                      </PremiumCardHeader>
+                      <PremiumCardContent className="space-y-1">
                         <SettingsToggle 
                           label="Complaint Alerts" 
                           checked={notifications.alerts.complaint}
@@ -478,14 +478,14 @@ export default function AdminSettings() {
                           checked={notifications.alerts.auditActivity}
                           onChange={(v: boolean) => setNotifications({...notifications, alerts: {...notifications.alerts, auditActivity: v}})}
                         />
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Notification Channels</CardTitle>
-                      </CardHeader>
-                      <CardContent>
+                    <PremiumCard>
+                      <PremiumCardHeader>
+                        <PremiumCardTitle>Notification Channels</PremiumCardTitle>
+                      </PremiumCardHeader>
+                      <PremiumCardContent>
                         <div className="flex gap-8">
                           <label className="flex items-center gap-2 text-sm text-brand-navy font-medium">
                             <input type="checkbox" checked={notifications.channels.inApp} onChange={e => setNotifications({...notifications, channels: {...notifications.channels, inApp: e.target.checked}})} className="rounded text-brand-indigo focus:ring-brand-indigo w-4 h-4" />
@@ -499,18 +499,18 @@ export default function AdminSettings() {
                         <div className="flex justify-end pt-6 mt-4 border-t border-brand-gray/10">
                           <Button onClick={handleSaveNotifications} className="bg-brand-indigo hover:bg-brand-blue">Save Changes</Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </PremiumCardContent>
+                    </PremiumCard>
                   </div>
                 )}
 
                 {/* APPEARANCE */}
                 {activeTab === "appearance" && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Admin Appearance</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-8">
+                  <PremiumCard>
+                    <PremiumCardHeader>
+                      <PremiumCardTitle>Admin Appearance</PremiumCardTitle>
+                    </PremiumCardHeader>
+                    <PremiumCardContent className="space-y-8">
                       <div>
                         <label className="text-sm font-medium text-brand-navy mb-3 block">Theme</label>
                         <div className="flex gap-4">
@@ -570,17 +570,17 @@ export default function AdminSettings() {
                       <div className="flex justify-end pt-2">
                         <Button onClick={handleSaveAppearance} className="bg-brand-indigo hover:bg-brand-blue">Save Changes</Button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 )}
 
                 {/* PRIVACY */}
                 {activeTab === "privacy" && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Admin Privacy</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
+                  <PremiumCard>
+                    <PremiumCardHeader>
+                      <PremiumCardTitle>Admin Privacy</PremiumCardTitle>
+                    </PremiumCardHeader>
+                    <PremiumCardContent className="space-y-6">
                       <div className="max-w-md space-y-6">
                         <div className="space-y-1.5">
                           <label className="text-sm font-medium text-brand-navy">Profile Visibility</label>
@@ -615,20 +615,20 @@ export default function AdminSettings() {
                       <div className="flex justify-end pt-2">
                         <Button onClick={handleSavePrivacy} className="bg-brand-indigo hover:bg-brand-blue">Save Changes</Button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 )}
 
                 {/* MY ACTIVITY */}
                 {activeTab === "activity" && (
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between border-b border-brand-gray/10 pb-4 mb-4">
-                      <CardTitle>My Activity</CardTitle>
+                  <PremiumCard>
+                    <PremiumCardHeader className="flex flex-row items-center justify-between border-b border-brand-gray/10 pb-4 mb-4">
+                      <PremiumCardTitle>My Activity</PremiumCardTitle>
                       <Button variant="outline" className="bg-white text-xs h-8" onClick={() => window.location.href = '/admin/audit-logs'}>
                         View Full Audit Activity <ArrowRight className="w-3.5 h-3.5 ml-1" />
                       </Button>
-                    </CardHeader>
-                    <CardContent>
+                    </PremiumCardHeader>
+                    <PremiumCardContent>
                       <div className="space-y-6">
                         <div className="relative border-l-2 border-brand-gray/20 ml-3 pl-6 space-y-6">
                           {settings.recentActivity.map(act => (
@@ -640,8 +640,8 @@ export default function AdminSettings() {
                           ))}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 )}
 
               </motion.div>

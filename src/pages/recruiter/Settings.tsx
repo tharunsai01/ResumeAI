@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { User, Building2, Sliders, Brain, Bell, Shield, Palette, ChevronRight, HelpCircle, Sun, Moon, Monitor } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Modal } from "../../components/ui/Modal"
@@ -169,7 +169,7 @@ export default function RecruiterSettings() {
                     "flex items-center justify-between w-full px-4 py-3 rounded-xl text-left transition-colors",
                     activeTab === tab.id 
                       ? "bg-brand-indigo/10 text-brand-indigo font-semibold dark:bg-brand-indigo/20 dark:text-brand-indigo" 
-                      : "text-brand-navy/70 hover:bg-brand-gray/30 hover:text-brand-navy font-medium dark:text-brand-navy/60 dark:hover:bg-white/5 dark:hover:text-white"
+                      : "text-brand-navy/70 hover:bg-brand-gray/30 hover:text-brand-navy font-medium dark:text-white/70 dark:hover:bg-white/5 dark:hover:text-white dark:hover:bg-white/10"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -196,11 +196,11 @@ export default function RecruiterSettings() {
               
               {/* PROFILE TAB */}
               {activeTab === "profile" && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Recruiter Profile</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
+                <PremiumCard>
+                  <PremiumCardHeader>
+                    <PremiumCardTitle>Recruiter Profile</PremiumCardTitle>
+                  </PremiumCardHeader>
+                  <PremiumCardContent className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">Full Name</label>
@@ -230,18 +230,18 @@ export default function RecruiterSettings() {
                     <div className="mt-6 flex justify-end">
                       <Button onClick={handleSaveProfile} className="btn-interactive btn-primary">Save Changes</Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               )}
 
               {/* COMPANY TAB */}
               {activeTab === "company" && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Company Details</CardTitle>
-                    <CardDescription>Update your company's information.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
+                <PremiumCard>
+                  <PremiumCardHeader>
+                    <PremiumCardTitle>Company Details</PremiumCardTitle>
+                    <PremiumCardDescription>Update your company's information.</PremiumCardDescription>
+                  </PremiumCardHeader>
+                  <PremiumCardContent className="space-y-6">
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">Company Name</label>
                       <Input type="text" value={company.name} onChange={e => setCompany({...company, name: e.target.value})} className="bg-transparent" />
@@ -279,18 +279,18 @@ export default function RecruiterSettings() {
                     <div className="mt-8 flex justify-end">
                       <Button onClick={handleSaveCompany} className="btn-interactive btn-primary">Save Changes</Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               )}
 
               {/* PREFERENCES TAB */}
               {activeTab === "prefs" && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Recruitment Preferences</CardTitle>
-                    <CardDescription>Set default filters and preferences for your jobs.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
+                <PremiumCard>
+                  <PremiumCardHeader>
+                    <PremiumCardTitle>Recruitment Preferences</PremiumCardTitle>
+                    <PremiumCardDescription>Set default filters and preferences for your jobs.</PremiumCardDescription>
+                  </PremiumCardHeader>
+                  <PremiumCardContent className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">Default Job Type</label>
@@ -322,18 +322,18 @@ export default function RecruiterSettings() {
                     <div className="mt-8 flex justify-end">
                       <Button onClick={handleSavePrefs} className="btn-interactive btn-primary">Save Preferences</Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               )}
 
               {/* AI SCREENING TAB */}
               {activeTab === "ai" && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>AI Screening Configuration</CardTitle>
-                    <CardDescription>Determine the AI qualification threshold.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
+                <PremiumCard>
+                  <PremiumCardHeader>
+                    <PremiumCardTitle>AI Screening Configuration</PremiumCardTitle>
+                    <PremiumCardDescription>Determine the AI qualification threshold.</PremiumCardDescription>
+                  </PremiumCardHeader>
+                  <PremiumCardContent className="space-y-6">
                     <div className="bg-brand-blue/5 border border-brand-blue/10 rounded-xl p-5 flex items-start gap-3 mb-4">
                       <HelpCircle className="w-5 h-5 text-brand-blue shrink-0 mt-0.5" />
                       <div>
@@ -368,18 +368,18 @@ export default function RecruiterSettings() {
                     <div className="mt-8 pt-6 flex justify-end border-t border-brand-gray/20">
                       <Button onClick={handleSaveAI} className="btn-interactive btn-primary">Save AI Settings</Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               )}
 
               {/* NOTIFICATIONS TAB */}
               {activeTab === "notifications" && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Notification Preferences</CardTitle>
-                    <CardDescription>Choose which notifications you want to receive.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-0 divide-y divide-brand-gray/30">
+                <PremiumCard>
+                  <PremiumCardHeader>
+                    <PremiumCardTitle>Notification Preferences</PremiumCardTitle>
+                    <PremiumCardDescription>Choose which notifications you want to receive.</PremiumCardDescription>
+                  </PremiumCardHeader>
+                  <PremiumCardContent className="space-y-0 divide-y divide-brand-gray/30">
                     {[
                       { key: "applications", label: "New Applications", desc: "Get notified when candidates apply to your jobs." },
                       { key: "screening", label: "AI Screening Completed", desc: "Get notified when AI finishes analyzing a candidate pool." },
@@ -403,19 +403,19 @@ export default function RecruiterSettings() {
                         </button>
                       </div>
                     ))}
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               )}
 
               {/* SECURITY TAB */}
               {activeTab === "security" && (
                 <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Active Sessions</CardTitle>
-                      <CardDescription>Manage your active logins across devices.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                  <PremiumCard>
+                    <PremiumCardHeader>
+                      <PremiumCardTitle>Active Sessions</PremiumCardTitle>
+                      <PremiumCardDescription>Manage your active logins across devices.</PremiumCardDescription>
+                    </PremiumCardHeader>
+                    <PremiumCardContent className="space-y-4">
                       <div className="flex items-start justify-between p-4 border border-brand-gray/50 rounded-xl bg-brand-indigo/5">
                         <div>
                           <h4 className="font-semibold text-brand-navy">Chrome on Windows</h4>
@@ -426,15 +426,15 @@ export default function RecruiterSettings() {
                       <button onClick={() => showToast("Signed out of all other sessions ✓")} className="btn-interactive btn-secondary w-full py-3 font-semibold rounded-xl transition-colors">
                         Sign Out All Other Sessions
                       </button>
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Authentication</CardTitle>
-                      <CardDescription>Update your credentials or 2FA.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                  <PremiumCard>
+                    <PremiumCardHeader>
+                      <PremiumCardTitle>Authentication</PremiumCardTitle>
+                      <PremiumCardDescription>Update your credentials or 2FA.</PremiumCardDescription>
+                    </PremiumCardHeader>
+                    <PremiumCardContent className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium text-brand-navy">Password</h4>
@@ -454,19 +454,19 @@ export default function RecruiterSettings() {
                           Enable 2FA
                         </button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 </div>
               )}
 
               {/* APPEARANCE TAB */}
               {activeTab === "appearance" && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Appearance</CardTitle>
-                    <CardDescription>Customize the interface of HireSmart AI.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-8">
+                <PremiumCard>
+                  <PremiumCardHeader>
+                    <PremiumCardTitle>Appearance</PremiumCardTitle>
+                    <PremiumCardDescription>Customize the interface of HireSmart AI.</PremiumCardDescription>
+                  </PremiumCardHeader>
+                  <PremiumCardContent className="space-y-8">
                     <div>
                       <h4 className="font-semibold text-brand-navy mb-4">Theme</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -489,8 +489,8 @@ export default function RecruiterSettings() {
                         ))}
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               )}
 
             </motion.div>

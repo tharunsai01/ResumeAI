@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { 
   Activity, RefreshCw, Server, Database, ShieldAlert, Cpu, 
@@ -114,11 +114,11 @@ export default function AdminSystemHealth() {
 
         {/* TOP SUMMARY */}
         <motion.div variants={slideUp} className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="md:col-span-2 bg-gradient-to-br from-brand-navy to-brand-indigo text-white border-none shadow-md relative overflow-hidden">
+          <PremiumCard className="md:col-span-2 bg-gradient-to-br from-brand-navy to-brand-indigo text-white border-none shadow-md relative overflow-hidden">
             <div className="absolute top-0 right-0 p-6 opacity-10">
               <Activity className="w-32 h-32" />
             </div>
-            <CardContent className="p-6 relative z-10 flex items-center justify-between">
+            <PremiumCardContent className="p-6 relative z-10 flex items-center justify-between">
               <div>
                 <p className="text-white/70 font-medium uppercase tracking-wider text-xs mb-1">Overall System Health</p>
                 <div className="flex items-end gap-3">
@@ -132,11 +132,11 @@ export default function AdminSystemHealth() {
                 <p className="text-white/70 font-medium text-sm mb-1">Services Operational</p>
                 <p className="text-2xl font-bold text-white">{servicesOperational} / {healthData.services.length}</p>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
           
-          <Card className="flex flex-col justify-center bg-brand-light/30 border-brand-gray/20">
-            <CardContent className="p-5 flex items-center justify-between">
+          <PremiumCard className="flex flex-col justify-center bg-brand-light/30 border-brand-gray/20">
+            <PremiumCardContent className="p-5 flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-1">Degraded</p>
                 <h3 className="text-2xl font-display font-bold text-brand-navy">{servicesDegraded}</h3>
@@ -144,11 +144,11 @@ export default function AdminSystemHealth() {
               <div className="p-3 bg-semantic-warning/10 rounded-xl">
                 <AlertTriangle className="w-5 h-5 text-semantic-warning" />
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
-          <Card className="flex flex-col justify-center bg-brand-light/30 border-brand-gray/20">
-            <CardContent className="p-5 flex items-center justify-between">
+          <PremiumCard className="flex flex-col justify-center bg-brand-light/30 border-brand-gray/20">
+            <PremiumCardContent className="p-5 flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-1">Unavailable</p>
                 <h3 className="text-2xl font-display font-bold text-brand-navy">{servicesUnavailable}</h3>
@@ -156,8 +156,8 @@ export default function AdminSystemHealth() {
               <div className="p-3 bg-semantic-error/10 rounded-xl">
                 <XCircle className="w-5 h-5 text-semantic-error" />
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* SERVICE GRID */}
@@ -165,7 +165,7 @@ export default function AdminSystemHealth() {
           <h3 className="text-lg font-display font-semibold text-brand-navy mb-4">Core Services</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {healthData.services.map((service) => (
-              <Card 
+              <PremiumCard 
                 key={service.id} 
                 className={cn(
                   "cursor-pointer hover:border-brand-indigo/30 hover:shadow-md transition-all duration-200 group relative overflow-hidden",
@@ -179,7 +179,7 @@ export default function AdminSystemHealth() {
                   service.status === 'Operational' ? "bg-emerald-500" : 
                   service.status === 'Degraded' ? "bg-semantic-warning" : "bg-semantic-error"
                 )} />
-                <CardContent className="p-5 pl-6">
+                <PremiumCardContent className="p-5 pl-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="p-2 bg-brand-light rounded-lg group-hover:bg-brand-indigo/5 transition-colors">
                       {getServiceIcon(service.id)}
@@ -197,8 +197,8 @@ export default function AdminSystemHealth() {
                     </span>
                     <span className="text-brand-navy/50">{service.responseTime}</span>
                   </div>
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             ))}
           </div>
         </motion.div>
@@ -208,21 +208,21 @@ export default function AdminSystemHealth() {
           
           {/* HISTORY */}
           <motion.div variants={slideUp} className="lg:col-span-2">
-            <Card className="h-full">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-brand-gray/10">
+            <PremiumCard className="h-full">
+              <PremiumCardHeader className="flex flex-row items-center justify-between pb-2 border-b border-brand-gray/10">
                 <div>
-                  <CardTitle className="text-[16px] flex items-center gap-2">
+                  <PremiumCardTitle className="text-[16px] flex items-center gap-2">
                     <Activity className="w-4 h-4 text-brand-indigo" />
                     Health History
-                  </CardTitle>
+                  </PremiumCardTitle>
                   <p className="text-xs text-brand-navy/50 mt-1">System Health — Last 24 Hours</p>
                 </div>
                 <div className="flex gap-2">
                   <span className="text-[10px] font-semibold uppercase px-2 py-1 bg-brand-indigo/10 text-brand-indigo rounded">24 Hours</span>
                   <span className="text-[10px] font-semibold uppercase px-2 py-1 text-brand-navy/40 hover:bg-brand-light rounded cursor-pointer transition-colors">7 Days</span>
                 </div>
-              </CardHeader>
-              <CardContent className="pt-6">
+              </PremiumCardHeader>
+              <PremiumCardContent className="pt-6">
                 <div className="h-[200px] w-full flex items-end justify-between gap-2">
                   {healthData.history.map((point, idx) => (
                     <div key={idx} className="flex flex-col items-center flex-1 gap-2">
@@ -239,20 +239,20 @@ export default function AdminSystemHealth() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
 
           {/* EVENTS */}
           <motion.div variants={slideUp}>
-            <Card className="h-full flex flex-col">
-              <CardHeader className="pb-2 border-b border-brand-gray/10">
-                <CardTitle className="text-[16px] flex items-center gap-2">
+            <PremiumCard className="h-full flex flex-col">
+              <PremiumCardHeader className="pb-2 border-b border-brand-gray/10">
+                <PremiumCardTitle className="text-[16px] flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 text-brand-navy" />
                   Recent System Events
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 flex-1">
+                </PremiumCardTitle>
+              </PremiumCardHeader>
+              <PremiumCardContent className="pt-4 flex-1">
                 <div className="space-y-4">
                   {healthData.events.map((event, idx) => (
                     <div key={idx} className="flex gap-3">
@@ -274,21 +274,21 @@ export default function AdminSystemHealth() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </PremiumCardContent>
+            </PremiumCard>
           </motion.div>
         </div>
 
         {/* SYSTEM RESOURCES WIDGET */}
         <motion.div variants={slideUp}>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-[16px] flex items-center gap-2">
+          <PremiumCard>
+            <PremiumCardHeader className="pb-2">
+              <PremiumCardTitle className="text-[16px] flex items-center gap-2">
                 <Cpu className="w-4 h-4 text-brand-navy/60" />
                 Infrastructure & Resources
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </PremiumCardTitle>
+            </PremiumCardHeader>
+            <PremiumCardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
                   <div className="flex justify-between items-end mb-2">
@@ -327,14 +327,14 @@ export default function AdminSystemHealth() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* BOTTOM LINKS */}
         <motion.div variants={slideUp} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="bg-brand-light/30 border-brand-gray/20">
-            <CardContent className="p-4 flex flex-col justify-between h-full space-y-4">
+          <PremiumCard className="bg-brand-light/30 border-brand-gray/20">
+            <PremiumCardContent className="p-4 flex flex-col justify-between h-full space-y-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <ShieldCheck className="w-4 h-4 text-brand-indigo" />
@@ -351,11 +351,11 @@ export default function AdminSystemHealth() {
               >
                 Open AI Evaluation <ArrowRight className="w-3.5 h-3.5 ml-2" />
               </Button>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
           
-          <Card className="bg-brand-light/30 border-brand-gray/20">
-            <CardContent className="p-4 flex flex-col justify-between h-full space-y-4">
+          <PremiumCard className="bg-brand-light/30 border-brand-gray/20">
+            <PremiumCardContent className="p-4 flex flex-col justify-between h-full space-y-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <FileText className="w-4 h-4 text-brand-navy/60" />
@@ -372,8 +372,8 @@ export default function AdminSystemHealth() {
               >
                 View Audit Logs <ArrowRight className="w-3.5 h-3.5 ml-2" />
               </Button>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
       </motion.div>

@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion } from "framer-motion"
 import { Sparkles, Target, Brain, Globe, User, Briefcase, CheckCircle2 } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
@@ -27,8 +27,8 @@ export default function RecruiterAbout() {
 
         {/* OUR GOAL */}
         <motion.div variants={slideUp}>
-          <Card className="border-brand-gray/30 shadow-sm overflow-hidden bg-brand-navy text-white">
-            <CardContent className="p-8 md:p-12 text-center space-y-6 relative overflow-hidden">
+          <PremiumCard className="border-brand-gray/30 shadow-sm overflow-hidden bg-brand-navy text-white">
+            <PremiumCardContent className="p-8 md:p-12 text-center space-y-6 relative overflow-hidden">
               <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-brand-indigo/20 rounded-full blur-3xl"></div>
               <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-brand-blue/20 rounded-full blur-3xl"></div>
               
@@ -42,8 +42,8 @@ export default function RecruiterAbout() {
                   HireSmart AI aims to assist this process by analyzing resumes, extracting relevant skills, matching candidate profiles with job requirements, and presenting recruiters with structured candidate insights.
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* HOW IT WORKS WORKFLOW */}
@@ -53,8 +53,8 @@ export default function RecruiterAbout() {
             <div className="w-16 h-1 bg-brand-indigo mx-auto mt-4 rounded-full"></div>
           </div>
           
-          <Card className="border-brand-gray/30 shadow-sm">
-            <CardContent className="p-8">
+          <PremiumCard className="border-brand-gray/30 shadow-sm">
+            <PremiumCardContent className="p-8">
               <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 text-sm font-bold text-brand-navy text-center">
                 {["Job Creation", "Candidate Applications", "Resume Analysis", "Skill Extraction", "Requirement Matching", "AI Match Score", "Candidate Ranking", "Recruiter Review", "Shortlisting", "Interview", "Hiring Decision"].map((step, idx, arr) => (
                   <React.Fragment key={idx}>
@@ -67,20 +67,20 @@ export default function RecruiterAbout() {
                   </React.Fragment>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* FOR RECRUITERS & CANDIDATES */}
         <motion.div variants={slideUp} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="border-brand-gray/30 shadow-sm hover:border-brand-indigo/30 transition-colors">
+          <PremiumCard className="border-brand-gray/30 shadow-sm hover:border-brand-indigo/30 transition-colors">
             <div className="bg-brand-indigo/5 px-8 py-6 border-b border-brand-indigo/10 flex items-center gap-4">
               <SpotlightCard className="glass-card p-3 text-brand-indigo shrink-0">
                 <Briefcase className="w-6 h-6" />
               </SpotlightCard>
               <h3 className="text-xl font-bold text-brand-navy">For Recruiters</h3>
             </div>
-            <CardContent className="p-8">
+            <PremiumCardContent className="p-8">
               <p className="text-sm text-brand-navy/60 mb-6 font-medium">HireSmart AI provides tools to:</p>
               <ul className="space-y-3">
                 {["Create jobs", "Manage applications", "Review candidates", "Analyze resumes", "View AI-assisted match scores", "Shortlist candidates", "Manage interviews", "Track hiring progress", "View recruitment analytics"].map((item, i) => (
@@ -90,17 +90,17 @@ export default function RecruiterAbout() {
                   </li>
                 ))}
               </ul>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
-          <Card className="border-brand-gray/30 shadow-sm hover:border-brand-blue/30 transition-colors">
+          <PremiumCard className="border-brand-gray/30 shadow-sm hover:border-brand-blue/30 transition-colors">
             <div className="bg-brand-blue/5 px-8 py-6 border-b border-brand-blue/10 flex items-center gap-4">
               <SpotlightCard className="glass-card p-3 text-brand-blue shrink-0">
                 <User className="w-6 h-6" />
               </SpotlightCard>
               <h3 className="text-xl font-bold text-brand-navy">For Candidates</h3>
             </div>
-            <CardContent className="p-8">
+            <PremiumCardContent className="p-8">
               <p className="text-sm text-brand-navy/60 mb-6 font-medium">Candidates can:</p>
               <ul className="space-y-3">
                 {["Create a professional profile", "Upload resumes", "Discover relevant jobs", "View recommended opportunities", "Track applications", "Analyze skills", "Manage their career information"].map((item, i) => (
@@ -110,14 +110,14 @@ export default function RecruiterAbout() {
                   </li>
                 ))}
               </ul>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* AI-ASSISTED RECRUITMENT */}
         <motion.div variants={slideUp}>
-          <Card className="border-brand-indigo/30 shadow-md overflow-hidden bg-brand-light/30">
-            <CardContent className="p-8 flex flex-col md:flex-row items-center gap-8">
+          <PremiumCard className="border-brand-indigo/30 shadow-md overflow-hidden bg-brand-light/30">
+            <PremiumCardContent className="p-8 flex flex-col md:flex-row items-center gap-8">
               <div className="w-24 h-24 rounded-full bg-brand-indigo/10 flex items-center justify-center shrink-0">
                 <Brain className="w-10 h-10 text-brand-indigo" />
               </div>
@@ -132,8 +132,8 @@ export default function RecruiterAbout() {
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
 

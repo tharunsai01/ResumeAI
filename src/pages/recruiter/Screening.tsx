@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { Search, Brain, CheckCircle2, ChevronRight, FileText, Briefcase, Filter } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { screeningJobs } from "../../data/screeningMockData"
@@ -23,8 +23,8 @@ export default function RecruiterScreening() {
 
   const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
     <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 transition-all duration-200">
-        <CardContent className="p-5 flex items-center justify-between">
+      <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200">
+        <PremiumCardContent className="p-5 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
             <h3 className="text-2xl font-display font-bold text-brand-navy">
@@ -34,8 +34,8 @@ export default function RecruiterScreening() {
           <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
             <Icon className="w-5 h-5" />
           </div>
-        </CardContent>
-      </Card>
+        </PremiumCardContent>
+      </PremiumCard>
     </motion.div>
   )
 
@@ -69,21 +69,21 @@ export default function RecruiterScreening() {
           <div className="space-y-4">
             {loading ? (
               [1, 2, 3].map(i => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="p-6">
+                <PremiumCard key={i} className="animate-pulse">
+                  <PremiumCardContent className="p-6">
                     <div className="h-5 w-48 bg-brand-gray/20 rounded mb-2" />
                     <div className="h-4 w-32 bg-brand-gray/20 rounded mb-4" />
                     <div className="flex gap-4">
                       <div className="h-4 w-24 bg-brand-gray/20 rounded" />
                       <div className="h-4 w-24 bg-brand-gray/20 rounded" />
                     </div>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               ))
             ) : (
               screeningJobs.map(job => (
-                <Card key={job.id} className="group hover:border-brand-indigo/30 hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/recruiter/screening/${job.id}`)}>
-                  <CardContent className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <PremiumCard key={job.id} className="group hover:border-brand-indigo/30 hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/recruiter/screening/${job.id}`)}>
+                  <PremiumCardContent className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-3 mb-1">
                         <h3 className="text-lg font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors">{job.title}</h3>
@@ -117,8 +117,8 @@ export default function RecruiterScreening() {
                     <Button variant="ghost" className="shrink-0 group-hover:bg-brand-indigo group-hover:text-white transition-colors self-start sm:self-center">
                       View Screening <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
-                  </CardContent>
-                </Card>
+                  </PremiumCardContent>
+                </PremiumCard>
               ))
             )}
           </div>
