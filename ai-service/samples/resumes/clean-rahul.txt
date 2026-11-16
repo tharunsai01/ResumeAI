@@ -1,0 +1,27 @@
+Rahul Kumar
+rahul@example.com | +91 98765 43210 | Bangalore, India
+
+SUMMARY
+Software developer with 2 years of experience building backend services and full-stack web applications.
+
+SKILLS
+Java, Python, C++, JavaScript, TypeScript, React, Node.js, Express, Spring Boot, REST API, MongoDB, SQL, AWS, Docker, Linux, Git
+
+EXPERIENCE
+Software Developer - ABC Technologies (2024 - Present)
+- Developed backend services using Java and Spring Boot
+- Designed and documented REST APIs consumed by a React frontend
+- Worked with MongoDB for storing application data
+
+Software Intern - XYZ Solutions (2023 - 2024)
+- Assisted in full-stack feature development
+- Wrote unit tests achieving 80% code coverage
+
+EDUCATION
+B.Tech in Computer Science - ABC University (2021 - 2025)
+
+PROJECTS
+AI Resume Screening System - Python, FastAPI, React, MongoDB
+AI-powered recruitment platform for resume analysis and job matching.
+E-Commerce Microservices - Java, Spring Boot, Docker, AWS
+Scalable e-commerce backend built with microservices architecture.

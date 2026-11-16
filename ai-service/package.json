@@ -1,0 +1,17 @@
+{
+    "name": "hiresmart-ai-service",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "src/index.js",
+    "scripts": {
+        "test:phase1": "node scripts/test-phase1.js"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "dependencies": {
+        "mammoth": "^1.13.0",
+        "pdfjs-dist": "^4.10.38"
+    }
+}
