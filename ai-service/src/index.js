@@ -6,6 +6,9 @@ import { extractResume } from "./extraction/extractResume.js";
 export { ResumeParseError, MAX_FILE_BYTES } from "./parsing/parseResume.js";
 export { extractResume, buildAnalysis, ExtractionError } from "./extraction/extractResume.js";
 export { normalizeSkill } from "./taxonomy/normalizeSkill.js";
+export { scoreMatch, screenCandidates, resolveWeights } from "./matching/scoreMatch.js";
+export { MatchError } from "./matching/jobSchema.js";
+export { AI_SCREENING_THRESHOLD, DEFAULT_WEIGHTS } from "./matching/matchConfig.js";
 
 /**
  * Phase 1 pipeline: file -> parsed text -> cleaned -> security-scanned.
@@ -31,6 +34,8 @@ export async function processResumeFile(buffer, filename, options = {}) {
 
 /**
  * Phase 2 pipeline: resume file -> safe text -> LLM facts -> skills + scores.
+ * Run this once per resume and keep the result; score it against any number of jobs
+ * with scoreMatch({ analysis, text }, job).
  * options: { allowTxt, client, now } (client/now are for tests).
  */
 export async function analyzeResumeFile(buffer, filename, options = {}) {
@@ -44,6 +49,7 @@ export async function analyzeResumeFile(buffer, filename, options = {}) {
       wordCount: processed.wordCount,
     },
     security: processed.security,
+    text: processed.text,
     analysis,
     meta,
   };

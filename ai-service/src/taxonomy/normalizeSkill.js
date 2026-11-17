@@ -23,8 +23,10 @@ export function cleanSkillName(raw) {
 }
 
 const INDEX = new Map();
+const LABELS = new Map();
 for (const [name, category, aliases] of SKILLS) {
   const entry = { name, category };
+  LABELS.set(name, [name, ...aliases]);
   for (const label of [name, ...aliases]) {
     const key = skillKey(label);
     const existing = INDEX.get(key);
@@ -46,4 +48,9 @@ export function normalizeSkill(raw) {
   const entry = INDEX.get(skillKey(cleaned));
   if (entry) return { name: entry.name, category: entry.category, known: true };
   return { name: cleaned, category: null, known: false };
+}
+
+/** Every label (canonical name + aliases) a skill can be written as. */
+export function aliasesFor(canonicalName) {
+  return LABELS.get(canonicalName) ?? [canonicalName];
 }

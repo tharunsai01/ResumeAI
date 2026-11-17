@@ -1,0 +1,34 @@
+[
+    {
+      "id": "job_101",
+      "title": "Software Engineer",
+      "requiredSkills": ["React", "Node.js", "MongoDB", "TypeScript"],
+      "preferredSkills": ["AWS", "Docker", "GraphQL"],
+      "experience": "2–4 years",
+      "education": "B.Tech/B.E. in Computer Science or equivalent"
+    },
+    {
+      "id": "job_102",
+      "title": "AI Engineer",
+      "requiredSkills": ["Python", "Machine Learning", "Deep Learning", "PyTorch"],
+      "preferredSkills": ["TensorFlow", "LLMs", "Docker", "AWS"],
+      "experience": "2–5 years",
+      "education": "B.Tech/M.Tech in Computer Science, AI or a related field"
+    },
+    {
+      "id": "job_103",
+      "title": "Frontend Developer",
+      "requiredSkills": ["React", "TypeScript", "JavaScript", "HTML", "CSS"],
+      "preferredSkills": ["Tailwind CSS", "Redux", "Next.js"],
+      "experience": "0–2 years",
+      "education": "Bachelor's degree in Computer Science or a related field"
+    },
+    {
+      "id": "job_104",
+      "title": "Java Developer Intern",
+      "requiredSkills": ["Java", "SQL", "Git"],
+      "preferredSkills": ["Spring Boot", "REST API"],
+      "experience": "Fresher",
+      "education": "Pursuing or completed B.Tech/B.E. in Computer Science or equivalent"
+    }
+  ]
