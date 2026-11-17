@@ -2,6 +2,7 @@ import { normalizeJob } from "./jobSchema.js";
 import { AI_SCREENING_THRESHOLD, POTENTIAL_MATCH_MIN, DEFAULT_WEIGHTS, MATCH } from "./matchConfig.js";
 import { experienceScore, parseExperienceRange, educationScore, requiredEducationLevel } from "./parsers.js";
 import { roleSimilarity, keywordMatch } from "./similarity.js";
+import { SEMANTIC } from "../semantic/semanticConfig.js";
 
 // Scoring reads only skills, years, degree text and role titles.
 // It never reads name, email, location, company or institution.
@@ -112,7 +113,8 @@ function explain({ job, years, range, reqEntries, prefEntries, education, unveri
  * Scores one resume against one job.
  * resume:  { analysis, text? }  (analysis comes from analyzeResumeFile; text improves keywordMatch)
  * rawJob:  { id, title, requiredSkills, preferredSkills, experience, education }
- * options: { weights, threshold }
+ * options: { weights, threshold, semantic }
+ *   semantic: { cosine, score } from the embedding model (see semanticScore.js); optional
  */
 export function scoreMatch(resume, rawJob, options = {}) {
   const { analysis, text = "" } = resume;
@@ -128,11 +130,21 @@ export function scoreMatch(resume, rawJob, options = {}) {
   const range = parseExperienceRange(job.experience);
   const degrees = analysis.education.map((e) => e.degree).filter(Boolean);
 
+  // Role similarity = rule-based score, blended with the embedding score when we have one.
+  const ruleBased = roleSimilarity(analysis, job, MATCH.matchedMinScore);
+  const semantic = options.semantic ?? null;
+  const blend = options.semanticBlend ?? SEMANTIC.blend;
+  let roleScore = ruleBased;
+  if (semantic) {
+    roleScore =
+      ruleBased === null ? semantic.score : Math.round(blend * semantic.score + (1 - blend) * ruleBased);
+  }
+
   const components = {
     skills: skillScore(reqEntries, prefEntries),
     experience: experienceScore(years, range),
     education: educationScore(job.education, degrees),
-    roleSimilarity: roleSimilarity(analysis, job, MATCH.matchedMinScore),
+    roleSimilarity: roleScore,
   };
 
   // Components the job gives no information about are skipped and the other weights are rescaled.
@@ -173,6 +185,7 @@ export function scoreMatch(resume, rawJob, options = {}) {
     educationMatch: components.education,
     roleSimilarity: components.roleSimilarity,
     keywordMatch: keywordMatch(text, analysis.skills, [...job.required, ...job.preferred]),
+    semanticCosine: semantic ? semantic.cosine : null,
     screeningStatus,
     meetsThreshold: overallMatch >= threshold,
     experience: yearsLabel(years),

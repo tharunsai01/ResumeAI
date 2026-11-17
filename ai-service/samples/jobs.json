@@ -1,34 +1,58 @@
 [
-    {
-      "id": "job_101",
-      "title": "Software Engineer",
-      "requiredSkills": ["React", "Node.js", "MongoDB", "TypeScript"],
-      "preferredSkills": ["AWS", "Docker", "GraphQL"],
-      "experience": "2–4 years",
-      "education": "B.Tech/B.E. in Computer Science or equivalent"
-    },
-    {
-      "id": "job_102",
-      "title": "AI Engineer",
-      "requiredSkills": ["Python", "Machine Learning", "Deep Learning", "PyTorch"],
-      "preferredSkills": ["TensorFlow", "LLMs", "Docker", "AWS"],
-      "experience": "2–5 years",
-      "education": "B.Tech/M.Tech in Computer Science, AI or a related field"
-    },
-    {
-      "id": "job_103",
-      "title": "Frontend Developer",
-      "requiredSkills": ["React", "TypeScript", "JavaScript", "HTML", "CSS"],
-      "preferredSkills": ["Tailwind CSS", "Redux", "Next.js"],
-      "experience": "0–2 years",
-      "education": "Bachelor's degree in Computer Science or a related field"
-    },
-    {
-      "id": "job_104",
-      "title": "Java Developer Intern",
-      "requiredSkills": ["Java", "SQL", "Git"],
-      "preferredSkills": ["Spring Boot", "REST API"],
-      "experience": "Fresher",
-      "education": "Pursuing or completed B.Tech/B.E. in Computer Science or equivalent"
-    }
-  ]
+  {
+    "id": "job_101",
+    "title": "Software Engineer",
+    "requiredSkills": ["React", "Node.js", "MongoDB", "TypeScript"],
+    "preferredSkills": ["AWS", "Docker", "GraphQL"],
+    "experience": "2–4 years",
+    "education": "B.Tech/B.E. in Computer Science or equivalent",
+    "description": "Build and maintain full-stack web applications using React and Node.js with MongoDB. Work in a small product team on customer-facing features, REST APIs and cloud deployments.",
+    "responsibilities": [
+      "Build scalable and responsive web applications.",
+      "Design and implement RESTful APIs.",
+      "Collaborate with cross-functional teams to define, design, and ship new features."
+    ]
+  },
+  {
+    "id": "job_102",
+    "title": "AI Engineer",
+    "requiredSkills": ["Python", "Machine Learning", "Deep Learning", "PyTorch"],
+    "preferredSkills": ["TensorFlow", "LLMs", "Docker", "AWS"],
+    "experience": "2–5 years",
+    "education": "B.Tech/M.Tech in Computer Science, AI or a related field",
+    "description": "Design, train and deploy machine learning and deep learning models. Work on NLP and LLM-based features, evaluate model quality and ship models to production.",
+    "responsibilities": [
+      "Train and evaluate machine learning models.",
+      "Build data and inference pipelines in Python.",
+      "Deploy models and monitor their performance."
+    ]
+  },
+  {
+    "id": "job_103",
+    "title": "Frontend Developer",
+    "requiredSkills": ["React", "TypeScript", "JavaScript", "HTML", "CSS"],
+    "preferredSkills": ["Tailwind CSS", "Redux", "Next.js"],
+    "experience": "0–2 years",
+    "education": "Bachelor's degree in Computer Science or a related field",
+    "description": "Create fast, accessible user interfaces for a web application using React and TypeScript. Work closely with designers to turn mockups into responsive components.",
+    "responsibilities": [
+      "Build reusable React components.",
+      "Turn design mockups into responsive pages.",
+      "Improve performance and accessibility of the web app."
+    ]
+  },
+  {
+    "id": "job_104",
+    "title": "Java Developer Intern",
+    "requiredSkills": ["Java", "SQL", "Git"],
+    "preferredSkills": ["Spring Boot", "REST API"],
+    "experience": "Fresher",
+    "education": "Pursuing or completed B.Tech/B.E. in Computer Science or equivalent",
+    "description": "Internship for students learning backend development in Java. Work with a mentor on Spring Boot services, SQL databases and REST APIs.",
+    "responsibilities": [
+      "Write and test small features in Java and Spring Boot.",
+      "Query and update data in SQL databases.",
+      "Use Git and code reviews to collaborate with the team."
+    ]
+  }
+]

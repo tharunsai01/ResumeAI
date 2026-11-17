@@ -19,6 +19,11 @@ const skillList = z
   .nullish()
   .transform((v) => v ?? []);
 
+const textList = z
+  .array(z.string())
+  .nullish()
+  .transform((v) => (v ?? []).map((item) => item.trim()).filter(Boolean).slice(0, 15));
+
 const JobSchema = z.object({
   id: z
     .union([z.string(), z.number()])
@@ -29,6 +34,8 @@ const JobSchema = z.object({
   preferredSkills: skillList,
   experience: text, // e.g. "2–4 years", "Fresher"
   education: text, // e.g. "B.Tech/B.E. in Computer Science or equivalent"
+  description: text, // optional, used for semantic matching
+  responsibilities: textList, // optional, used for semantic matching
 });
 
 /** Validates a job and maps its skills to the taxonomy. Same shape as the frontend's jobRequirements. */
@@ -60,5 +67,7 @@ export function normalizeJob(rawJob) {
     preferred,
     experience: job.experience,
     education: job.education,
+    description: job.description,
+    responsibilities: job.responsibilities,
   };
 }

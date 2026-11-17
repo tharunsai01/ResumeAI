@@ -9,6 +9,13 @@ export { normalizeSkill } from "./taxonomy/normalizeSkill.js";
 export { scoreMatch, screenCandidates, resolveWeights } from "./matching/scoreMatch.js";
 export { MatchError } from "./matching/jobSchema.js";
 export { AI_SCREENING_THRESHOLD, DEFAULT_WEIGHTS } from "./matching/matchConfig.js";
+export {
+  semanticSimilarity,
+  semanticSimilarities,
+  scoreMatchSemantic,
+  screenCandidatesSemantic,
+  cosine,
+} from "./semantic/semanticScore.js";
 
 /**
  * Phase 1 pipeline: file -> parsed text -> cleaned -> security-scanned.
