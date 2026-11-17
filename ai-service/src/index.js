@@ -1,12 +1,15 @@
 import { parseResume } from "./parsing/parseResume.js";
 import { cleanText } from "./parsing/cleanText.js";
 import { scanForInjection } from "./security/injectionScan.js";
+import { extractResume } from "./extraction/extractResume.js";
 
 export { ResumeParseError, MAX_FILE_BYTES } from "./parsing/parseResume.js";
+export { extractResume, buildAnalysis, ExtractionError } from "./extraction/extractResume.js";
+export { normalizeSkill } from "./taxonomy/normalizeSkill.js";
 
 /**
  * Phase 1 pipeline: file -> parsed text -> cleaned -> security-scanned.
- * `text` is the sanitised text that is safe to hand to the LLM in Phase 2.
+ * `text` is the sanitised text that is safe to hand to the LLM.
  */
 export async function processResumeFile(buffer, filename, options = {}) {
   const parsed = await parseResume(buffer, filename, options);
@@ -23,5 +26,25 @@ export async function processResumeFile(buffer, filename, options = {}) {
       findings: scan.findings,
       invisibleCount,
     },
+  };
+}
+
+/**
+ * Phase 2 pipeline: resume file -> safe text -> LLM facts -> skills + scores.
+ * options: { allowTxt, client, now } (client/now are for tests).
+ */
+export async function analyzeResumeFile(buffer, filename, options = {}) {
+  const processed = await processResumeFile(buffer, filename, options);
+  const { analysis, meta } = await extractResume(processed.text, options);
+
+  return {
+    file: {
+      type: processed.fileType,
+      pageCount: processed.pageCount,
+      wordCount: processed.wordCount,
+    },
+    security: processed.security,
+    analysis,
+    meta,
   };
 }

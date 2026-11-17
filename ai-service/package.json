@@ -5,13 +5,18 @@
     "type": "module",
     "main": "src/index.js",
     "scripts": {
-        "test:phase1": "node scripts/test-phase1.js"
+        "test:phase1": "node scripts/test-phase1.js",
+        "test:phase2": "node scripts/test-phase2.js",
+        "test:phase2:offline": "node scripts/test-phase2-offline.js"
     },
     "engines": {
         "node": ">=18"
     },
     "dependencies": {
+        "dotenv": "^18.0.10",
+        "groq-sdk": "^1.6.0",
         "mammoth": "^1.13.0",
-        "pdfjs-dist": "^4.10.38"
+        "pdfjs-dist": "^4.10.38",
+        "zod": "^4.6.7"
     }
 }
