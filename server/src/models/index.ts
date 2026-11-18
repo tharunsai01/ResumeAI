@@ -9,3 +9,4 @@ export { Shortlist } from './Shortlist';
 export { Interview } from './Interview';
 export { Notification } from './Notification';
 export { Complaint } from './Complaint';
+export { RefreshToken } from './RefreshToken';
