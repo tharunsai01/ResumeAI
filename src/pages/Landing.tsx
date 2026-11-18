@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+﻿import React, { useState } from "react"
 import { motion } from "framer-motion"
 import {
   ArrowRight, BrainCircuit, FileText, Briefcase, CheckCircle2,
@@ -107,9 +107,7 @@ export default function Landing() {
               >
                 {theme === "Dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
-              <button onClick={handleSignIn} className="text-sm font-semibold text-brand-navy dark:text-white/80 hover:text-brand-indigo transition-colors px-4 py-2 hidden sm:block">
-                Sign In
-              </button>
+              <Button onClick={handleSignIn} variant="secondary" className="btn-gradient-fill-secondary hidden sm:block">Sign In</Button>
               <Button onClick={handleGetStarted} className="px-6 py-2.5 h-auto">Get Started</Button>
             </div>
           </div>
@@ -477,27 +475,33 @@ export default function Landing() {
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-12">Built on Trust and Responsibility</h2>
             
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white/5 p-8 rounded-2xl border border-white/10 text-left">
-                <Lock className="w-8 h-8 text-brand-blue mb-4" />
-                <h3 className="text-xl font-bold mb-3">Secure & Private</h3>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  Candidate data is strictly private. Resumes and personal information are handled securely and only shared with explicitly applied jobs.
-                </p>
-              </div>
-              <div className="bg-white/5 p-8 rounded-2xl border border-white/10 text-left">
-                <BrainCircuit className="w-8 h-8 text-brand-blue mb-4" />
-                <h3 className="text-xl font-bold mb-3">Responsible AI</h3>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  Our AI models are designed for transparent matching. We provide the "why" behind every match score to prevent hidden algorithmic bias.
-                </p>
-              </div>
-              <div className="bg-white/5 p-8 rounded-2xl border border-white/10 text-left">
-                <Users className="w-8 h-8 text-brand-blue mb-4" />
-                <h3 className="text-xl font-bold mb-3">Human Final Say</h3>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  AI performs the heavy lifting of screening and matching, but no automatic hiring decisions are made. Recruiters retain total control.
-                </p>
-              </div>
+              <PremiumCard>
+                <PremiumCardContent className="p-8 text-left">
+                  <Lock className="w-8 h-8 text-brand-blue mb-4" />
+                  <h3 className="premium-card-text text-xl font-bold mb-3 text-brand-navy dark:text-white">Secure &amp; Private</h3>
+                  <p className="premium-card-text text-sm leading-relaxed text-brand-navy/60 dark:text-white/60">
+                    Candidate data is strictly private. Resumes and personal information are handled securely and only shared with explicitly applied jobs.
+                  </p>
+                </PremiumCardContent>
+              </PremiumCard>
+              <PremiumCard>
+                <PremiumCardContent className="p-8 text-left">
+                  <BrainCircuit className="w-8 h-8 text-brand-blue mb-4" />
+                  <h3 className="premium-card-text text-xl font-bold mb-3 text-brand-navy dark:text-white">Responsible AI</h3>
+                  <p className="premium-card-text text-sm leading-relaxed text-brand-navy/60 dark:text-white/60">
+                    Our AI models are designed for transparent matching. We provide the "why" behind every match score to prevent hidden algorithmic bias.
+                  </p>
+                </PremiumCardContent>
+              </PremiumCard>
+              <PremiumCard>
+                <PremiumCardContent className="p-8 text-left">
+                  <Users className="w-8 h-8 text-brand-blue mb-4" />
+                  <h3 className="premium-card-text text-xl font-bold mb-3 text-brand-navy dark:text-white">Human Final Say</h3>
+                  <p className="premium-card-text text-sm leading-relaxed text-brand-navy/60 dark:text-white/60">
+                    AI performs the heavy lifting of screening and matching, but no automatic hiring decisions are made. Recruiters retain total control.
+                  </p>
+                </PremiumCardContent>
+              </PremiumCard>
             </div>
           </div>
         </section>
@@ -563,7 +567,7 @@ export default function Landing() {
           </div>
           
           <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-white/40">© {new Date().getFullYear()} HireSmart AI. All rights reserved.</p>
+            <p className="text-sm text-white/40">Â© {new Date().getFullYear()} HireSmart AI. All rights reserved.</p>
             <div className="flex gap-4">
               {/* Social icons could go here */}
             </div>
