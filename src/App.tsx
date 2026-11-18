@@ -153,6 +153,7 @@ function App() {
                 <Route element={<AdminComplaintsOutlet />}>
                   <Route path="/admin/complaints" element={<AdminComplaints />} />
                   <Route path="/admin/complaints/:complaintId" element={<AdminComplaintDetails />} />
+                  <Route path="/admin/complaint" element={<AdminComplaintForm />} />
                 </Route>
                 
                 <Route element={<AdminSkillsOutlet />}>
@@ -176,7 +177,6 @@ function App() {
                 </Route>
                 
                 <Route path="/admin/help" element={<AdminHelp />} />
-                <Route path="/admin/complaint" element={<AdminComplaintForm />} />
                 <Route path="/admin/safety" element={<AdminSafety />} />
                 <Route path="/admin/terms" element={<AdminTerms />} />
                 <Route path="/admin/privacy" element={<AdminPrivacy />} />

@@ -12,8 +12,22 @@ interface AdminSettingsContextType {
 
 const AdminSettingsContext = createContext<AdminSettingsContextType | undefined>(undefined)
 
+const ADMIN_SETTINGS_STORAGE_KEY = "hiresmart_admin_settings"
+
 export const AdminSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [settings, setSettings] = useState<AdminAccountState>(defaultMockAdminAccount)
+  const [settings, setSettings] = useState<AdminAccountState>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(ADMIN_SETTINGS_STORAGE_KEY)
+      if (stored) {
+        try {
+          return JSON.parse(stored)
+        } catch {
+          // Fallback to default
+        }
+      }
+    }
+    return defaultMockAdminAccount
+  })
 
   // On mount, apply the theme from appearance settings
   useEffect(() => {
@@ -34,6 +48,10 @@ export const AdminSettingsProvider: React.FC<{ children: React.ReactNode }> = ({
         ...prev,
         [section]: updatedValue
       }
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(ADMIN_SETTINGS_STORAGE_KEY, JSON.stringify(updated))
+      }
       
       // If appearance changed, apply theme
       if (section === 'appearance' && newValues.theme) {
@@ -45,13 +63,19 @@ export const AdminSettingsProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   const signoutOtherSessions = () => {
-    setSettings(prev => ({
-      ...prev,
-      sessions: {
-        ...prev.sessions,
-        activeList: prev.sessions.activeList.filter(s => s.isCurrent)
+    setSettings(prev => {
+      const updated = {
+        ...prev,
+        sessions: {
+          ...prev.sessions,
+          activeList: prev.sessions.activeList.filter(s => s.isCurrent)
+        }
       }
-    }))
+      if (typeof window !== "undefined") {
+        localStorage.setItem(ADMIN_SETTINGS_STORAGE_KEY, JSON.stringify(updated))
+      }
+      return updated
+    })
   }
 
   return (

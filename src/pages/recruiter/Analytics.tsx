@@ -73,8 +73,62 @@ export default function RecruiterAnalytics() {
   }, [])
 
   const handleExport = () => {
-    setToastMsg("Report export will be available after backend integration.")
-    setTimeout(() => setToastMsg(null), 3000)
+    try {
+      const csvRows: string[] = []
+
+      // Section 1: Report Title & Metadata
+      csvRows.push("HIRESMART AI - RECRUITMENT ANALYTICS REPORT")
+      csvRows.push(`Report Generated,${new Date().toLocaleString()}`)
+      csvRows.push(`Selected Date Range,${dateFilter}`)
+      csvRows.push("")
+
+      // Section 2: Executive Summary Metrics
+      csvRows.push("EXECUTIVE SUMMARY METRICS")
+      csvRows.push("Metric,Value,Benchmark / Rate")
+      csvRows.push(`Total Applications,${MOCK_STATS.totalApplications},100%`)
+      csvRows.push(`AI Screened,${MOCK_STATS.aiScreened},${Math.round((MOCK_STATS.aiScreened / MOCK_STATS.totalApplications) * 100)}%`)
+      csvRows.push(`AI Qualified,${MOCK_STATS.aiQualified},${Math.round((MOCK_STATS.aiQualified / MOCK_STATS.totalApplications) * 100)}%`)
+      csvRows.push(`Shortlisted,${MOCK_STATS.shortlisted},${Math.round((MOCK_STATS.shortlisted / MOCK_STATS.totalApplications) * 100)}%`)
+      csvRows.push(`Interviews Scheduled/Completed,${MOCK_STATS.interviews},${Math.round((MOCK_STATS.interviews / MOCK_STATS.totalApplications) * 100)}%`)
+      csvRows.push(`Hired,${MOCK_STATS.hired},${Math.round((MOCK_STATS.hired / MOCK_STATS.totalApplications) * 100)}%`)
+      csvRows.push(`Average Match Score,${MOCK_STATS.averageMatch}%,-`)
+      csvRows.push("")
+
+      // Section 3: AI Screening Insights
+      csvRows.push("AI SCREENING BREAKDOWN")
+      csvRows.push("Category,Candidates,Threshold")
+      csvRows.push("Strong Matches (90%+),32,>= 90%")
+      csvRows.push("Potential Matches (80-89%),110,80% - 89%")
+      csvRows.push("Below Threshold (<80%),44,< 80%")
+      csvRows.push("")
+
+      // Section 4: Job Performance Breakdown
+      csvRows.push("JOB PERFORMANCE BREAKDOWN")
+      csvRows.push("Job Title,Applications,AI Qualified,Shortlisted,Interviews,Hired")
+      for (const job of MOCK_JOBS) {
+        const titleSafe = `"${job.title.replace(/"/g, '""')}"`
+        csvRows.push(`${titleSafe},${job.apps},${job.qualified},${job.shortlisted},${job.interviews},${job.hired}`)
+      }
+
+      // Generate Blob and trigger download
+      const csvContent = csvRows.join("\r\n")
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      const safeDateName = dateFilter.toLowerCase().replace(/\s+/g, "-")
+      link.setAttribute("href", url)
+      link.setAttribute("download", `hiresmart-recruiter-analytics-${safeDateName}.csv`)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      setToastMsg(`Analytics report exported successfully (${dateFilter}) ✓`)
+      setTimeout(() => setToastMsg(null), 3500)
+    } catch {
+      setToastMsg("Failed to generate export file.")
+      setTimeout(() => setToastMsg(null), 3500)
+    }
   }
 
 

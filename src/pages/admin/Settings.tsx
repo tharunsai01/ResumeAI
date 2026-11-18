@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
@@ -61,9 +61,57 @@ export default function AdminSettings() {
   const [pwdForm, setPwdForm] = useState({ current: "", new: "", confirm: "" })
   const pwdValid = pwdForm.new.length >= 8 && pwdForm.new === pwdForm.confirm
 
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setProfile(settings.profile)
+  }, [settings.profile])
+
   const showToast = (msg: string) => {
     setToastMsg(msg)
     setTimeout(() => setToastMsg(null), 3000)
+  }
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith("image/")) {
+      showToast("Please select a valid image file (PNG, JPG, SVG, WebP).")
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Selected image must be smaller than 5MB.")
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string
+      if (dataUrl) {
+        setProfile(prev => ({ ...prev, avatar: dataUrl }))
+        updateSettings("profile", { avatar: dataUrl })
+        showToast("Administrator profile photo updated.")
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleRemovePhoto = () => {
+    if (!profile.avatar) {
+      showToast("Default avatar is already active.")
+      return
+    }
+    setProfile(prev => ({ ...prev, avatar: null }))
+    updateSettings("profile", { avatar: null })
+    showToast("Profile photo removed. Default avatar restored.")
+  }
+
+  const handleToggle2FA = () => {
+    const nextState = !settings.security.twoFactorEnabled
+    updateSettings("security", { twoFactorEnabled: nextState })
+    showToast(`Two-Factor Authentication ${nextState ? "enabled" : "disabled"} (Demo preference).`)
   }
 
   const handleSaveProfile = () => {
@@ -216,8 +264,27 @@ export default function AdminSettings() {
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="outline" className="h-8 text-xs bg-white text-brand-navy">Change Photo</Button>
-                            <Button variant="outline" className="h-8 text-xs bg-white text-semantic-error border-semantic-error/30 hover:bg-semantic-error/5">Remove</Button>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => photoInputRef.current?.click()}
+                              className="h-8 text-xs bg-white text-brand-navy hover:bg-brand-light"
+                            >
+                              Change Photo
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              onClick={handleRemovePhoto}
+                              className="h-8 text-xs bg-white text-semantic-error border-semantic-error/30 hover:bg-semantic-error/5"
+                            >
+                              Remove
+                            </Button>
+                            <input
+                              ref={photoInputRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handlePhotoUpload}
+                              className="hidden"
+                            />
                           </div>
                         </div>
 
@@ -695,15 +762,45 @@ export default function AdminSettings() {
         className="max-w-md"
       >
         <div className="py-2 space-y-6">
-          <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="w-8 h-8 text-emerald-600" />
-              <div>
-                <div className="font-bold text-emerald-900">2FA is Enabled</div>
-                <div className="text-xs text-emerald-700/80 mt-0.5">Your account is secure.</div>
+          {settings.security.twoFactorEnabled ? (
+            <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-8 h-8 text-emerald-600" />
+                <div>
+                  <div className="font-bold text-emerald-900">2FA is Enabled (Demo)</div>
+                  <div className="text-xs text-emerald-700/80 mt-0.5">Frontend security preference enabled.</div>
+                </div>
               </div>
+              <Button 
+                variant="outline" 
+                onClick={handleToggle2FA}
+                className="h-8 text-xs bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-50"
+              >
+                Disable
+              </Button>
             </div>
-            <Button variant="outline" className="h-8 text-xs bg-white text-emerald-800 border-emerald-200">Disable</Button>
+          ) : (
+            <div className="flex items-center justify-between p-4 bg-brand-gray/10 rounded-xl border border-brand-gray/20">
+              <div className="flex items-center gap-3">
+                <ShieldAlert className="w-8 h-8 text-brand-navy/60" />
+                <div>
+                  <div className="font-bold text-brand-navy">2FA is Disabled</div>
+                  <div className="text-xs text-brand-navy/60 mt-0.5">Enable extra verification preference.</div>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={handleToggle2FA}
+                className="h-8 text-xs bg-white text-brand-indigo border-brand-indigo/30 hover:bg-brand-indigo/5"
+              >
+                Enable
+              </Button>
+            </div>
+          )}
+
+          <div className="p-3.5 bg-brand-light rounded-lg border border-brand-gray/20 text-xs text-brand-navy/70 leading-relaxed">
+            <span className="font-semibold text-brand-navy block mb-0.5">Demo Environment Notice:</span>
+            This switch controls your local demonstration preference. Production-grade two-factor authentication requires backend OTP verification, SMS gateways, or authenticator app secrets.
           </div>
 
           <div>
@@ -713,7 +810,7 @@ export default function AdminSettings() {
                 <Smartphone className="w-5 h-5 text-brand-navy/60" />
                 <div>
                   <div className="text-sm font-medium text-brand-navy">Authenticator App</div>
-                  <div className="text-xs text-brand-navy/50 mt-0.5">Default method</div>
+                  <div className="text-xs text-brand-navy/50 mt-0.5">Default method (Simulated)</div>
                 </div>
               </div>
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
