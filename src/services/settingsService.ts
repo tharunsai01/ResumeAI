@@ -41,9 +41,18 @@ export const settingsService = {
   },
 
   clearAllLocalData(): void {
-    localStorage.removeItem(SETTINGS_STORAGE_KEY)
-    localStorage.removeItem("hiresmart_notifications")
-    localStorage.removeItem("hiresmart_candidate_profile")
-    // Note: there might be other local storage keys, we clear these for now
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(SETTINGS_STORAGE_KEY)
+      localStorage.removeItem("hiresmart_notifications")
+      localStorage.removeItem("hiresmart_notifications_candidate")
+      localStorage.removeItem("hiresmart_candidate_profile")
+      localStorage.removeItem("hiresmart_saved_jobs")
+      localStorage.removeItem("hiresmart_reports")
+      localStorage.removeItem("hiresmart_session")
+      if (typeof sessionStorage !== "undefined") {
+        sessionStorage.clear()
+      }
+      window.dispatchEvent(new Event('hiresmart_auth_changed'))
+    }
   }
 }

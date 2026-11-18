@@ -1,16 +1,16 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, CheckCircle2, Users, Check, X, ChevronRight, FileText } from "lucide-react"
+import { Search, CheckCircle2, Users, Check, X, ChevronRight, FileText, ArrowRight, RotateCcw } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Button } from "../../components/ui/Button"
 import { Modal } from "../../components/ui/Modal"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialPipelineCandidates } from "../../data/pipelineMockData"
 import type { PipelineCandidate, PipelineStage } from "../../data/pipelineMockData"
+import { pipelineService } from "../../services/pipelineService"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { cn } from "../../lib/utils"
-import SpotlightCard from "../../components/ui/SpotlightCard";
+import SpotlightCard from "../../components/ui/SpotlightCard"
 
 const COLUMNS: { id: PipelineStage; label: string; color: string; bg: string }[] = [
   { id: "Shortlisted", label: "Shortlisted", color: "text-brand-navy", bg: "bg-brand-gray/20 border-brand-gray/30" },
@@ -23,7 +23,7 @@ const COLUMNS: { id: PipelineStage; label: string; color: string; bg: string }[]
 
 export default function RecruiterHiringPipeline() {
   const navigate = useNavigate()
-  const [candidates, setCandidates] = React.useState<PipelineCandidate[]>(initialPipelineCandidates)
+  const [candidates, setCandidates] = React.useState<PipelineCandidate[]>(() => pipelineService.getCandidates())
   const [searchTerm, setSearchTerm] = React.useState("")
   
   const [hireModalOpen, setHireModalOpen] = React.useState(false)
@@ -31,8 +31,15 @@ export default function RecruiterHiringPipeline() {
   const [activeCandidate, setActiveCandidate] = React.useState<PipelineCandidate | null>(null)
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
-  
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      setCandidates(pipelineService.getCandidates())
+    }
+    window.addEventListener("hiresmart_pipeline_updated", handleUpdate)
+    return () => window.removeEventListener("hiresmart_pipeline_updated", handleUpdate)
+  }, [])
 
   React.useEffect(() => {
     const el = scrollContainerRef.current;
@@ -72,25 +79,52 @@ export default function RecruiterHiringPipeline() {
 
   const handleHire = () => {
     if (activeCandidate) {
-      setCandidates(candidates.map(c => c.id === activeCandidate.id ? { ...c, stage: "Hired" } : c))
+      const updated = pipelineService.updateCandidateStage(activeCandidate.id, "Hired")
+      if (updated) {
+        setCandidates(pipelineService.getCandidates())
+        showToast(`${activeCandidate.name} marked as hired.`)
+      }
       setHireModalOpen(false)
       setActiveCandidate(null)
-      showToast("Candidate marked as hired.")
     }
   }
 
   const handleReject = () => {
     if (activeCandidate) {
-      setCandidates(candidates.map(c => c.id === activeCandidate.id ? { ...c, stage: "Rejected" } : c))
+      const updated = pipelineService.updateCandidateStage(activeCandidate.id, "Rejected")
+      if (updated) {
+        setCandidates(pipelineService.getCandidates())
+        showToast(`${activeCandidate.name} marked as rejected.`)
+      }
       setRejectModalOpen(false)
       setActiveCandidate(null)
-      showToast("Candidate marked as rejected.")
+    }
+  }
+
+  const handleStageSelect = (cand: PipelineCandidate, newStage: PipelineStage) => {
+    if (cand.stage === newStage) return
+
+    if (newStage === "Hired") {
+      setActiveCandidate(cand)
+      setHireModalOpen(true)
+      return
+    }
+
+    if (newStage === "Rejected") {
+      setActiveCandidate(cand)
+      setRejectModalOpen(true)
+      return
+    }
+
+    const updated = pipelineService.updateCandidateStage(cand.id, newStage)
+    if (updated) {
+      setCandidates(pipelineService.getCandidates())
+      showToast(`${cand.name} moved to ${newStage}.`)
     }
   }
 
   const handleFurtherReview = (e: React.MouseEvent) => {
     e.stopPropagation()
-    // Mock action: just shows a toast and keeps in decision pending
     showToast("Flagged for further review.")
   }
 
@@ -126,7 +160,7 @@ export default function RecruiterHiringPipeline() {
             <h1 className="text-3xl font-display font-semibold text-brand-navy">Hiring Pipeline</h1>
             <p className="text-brand-navy/60 mt-1">Track candidates from shortlist through final hiring decisions.</p>
           </div>
-          <SpotlightCard className="glass-card flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all w-full sm:w-72 shrink-0">
+          <SpotlightCard className="glass-card flex items-center px-4 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all w-full sm:w-72 shrink-0">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"
@@ -163,7 +197,7 @@ export default function RecruiterHiringPipeline() {
                     {columnCandidates.map(cand => (
                       <SpotlightCard 
                         key={cand.id} 
-                        className="glass-card p-4 shadow-sm hover: hover: transition-all cursor-pointer group flex flex-col"
+                        className="glass-card p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col"
                         onClick={() => navigate(`/recruiter/candidates/${cand.id}`)}
                       >
                         <div className="flex items-start justify-between mb-2">
@@ -179,7 +213,7 @@ export default function RecruiterHiringPipeline() {
                           <CandidateMatchScore score={cand.overallMatch} size="sm" showLabel={false} />
                         </div>
                         
-                        <div className="mt-3 flex items-center justify-between">
+                        <div className="mt-2 flex items-center justify-between">
                           {cand.stage === "Interview Completed" || cand.stage === "Decision Pending" ? (
                             <Button 
                               variant="ghost" 
@@ -197,7 +231,72 @@ export default function RecruiterHiringPipeline() {
                           <ChevronRight className="w-4 h-4 text-brand-navy/20 group-hover:text-brand-indigo/60 transition-colors" />
                         </div>
 
-                        {/* Actions for Decision Pending */}
+                        {/* STAGE SPECIFIC ACTIONS */}
+                        
+                        {/* 1. Actions for Shortlisted */}
+                        {cand.stage === "Shortlisted" && (
+                          <div className="mt-3 pt-3 border-t border-brand-gray/20 flex items-center gap-2">
+                            <Button 
+                              size="sm" 
+                              className="flex-1 h-8 bg-brand-indigo hover:bg-brand-indigo/90 text-white text-xs"
+                              onClick={(e) => { e.stopPropagation(); handleStageSelect(cand, "Interview Scheduled"); }}
+                            >
+                              <ArrowRight className="w-3.5 h-3.5 mr-1" /> Schedule
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-semantic-error border-semantic-error/30 hover:bg-semantic-error/10 text-xs px-2.5"
+                              onClick={(e) => { e.stopPropagation(); setActiveCandidate(cand); setRejectModalOpen(true); }}
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* 2. Actions for Interview Scheduled */}
+                        {cand.stage === "Interview Scheduled" && (
+                          <div className="mt-3 pt-3 border-t border-brand-gray/20 flex items-center gap-2">
+                            <Button 
+                              size="sm" 
+                              className="flex-1 h-8 bg-brand-blue hover:bg-brand-blue/90 text-white text-xs"
+                              onClick={(e) => { e.stopPropagation(); handleStageSelect(cand, "Interview Completed"); }}
+                            >
+                              <Check className="w-3.5 h-3.5 mr-1" /> Complete
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-semantic-error border-semantic-error/30 hover:bg-semantic-error/10 text-xs px-2.5"
+                              onClick={(e) => { e.stopPropagation(); setActiveCandidate(cand); setRejectModalOpen(true); }}
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* 3. Actions for Interview Completed */}
+                        {cand.stage === "Interview Completed" && (
+                          <div className="mt-3 pt-3 border-t border-brand-gray/20 flex items-center gap-2">
+                            <Button 
+                              size="sm" 
+                              className="flex-1 h-8 bg-semantic-warning hover:bg-semantic-warning/90 text-white text-xs"
+                              onClick={(e) => { e.stopPropagation(); handleStageSelect(cand, "Decision Pending"); }}
+                            >
+                              <ArrowRight className="w-3.5 h-3.5 mr-1" /> Decision
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-semantic-error border-semantic-error/30 hover:bg-semantic-error/10 text-xs px-2.5"
+                              onClick={(e) => { e.stopPropagation(); setActiveCandidate(cand); setRejectModalOpen(true); }}
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* 4. Actions for Decision Pending */}
                         {cand.stage === "Decision Pending" && (
                           <div className="mt-3 pt-3 border-t border-brand-gray/20 flex flex-col gap-2">
                             <div className="flex items-center gap-2">
@@ -227,6 +326,50 @@ export default function RecruiterHiringPipeline() {
                             </Button>
                           </div>
                         )}
+
+                        {/* 5. Actions for Hired */}
+                        {cand.stage === "Hired" && (
+                          <div className="mt-3 pt-2 border-t border-brand-gray/20 flex items-center justify-between text-xs text-semantic-success font-semibold">
+                            <span className="flex items-center gap-1">
+                              <Check className="w-3.5 h-3.5" /> Offer Accepted / Hired
+                            </span>
+                          </div>
+                        )}
+
+                        {/* 6. Actions for Rejected */}
+                        {cand.stage === "Rejected" && (
+                          <div className="mt-3 pt-2 border-t border-brand-gray/20 flex items-center justify-between text-xs">
+                            <span className="text-semantic-error font-semibold flex items-center gap-1">
+                              <X className="w-3.5 h-3.5" /> Rejected
+                            </span>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-7 text-[10px] uppercase tracking-wider text-brand-indigo px-2 hover:bg-brand-indigo/10"
+                              onClick={(e) => { e.stopPropagation(); handleStageSelect(cand, "Shortlisted"); }}
+                            >
+                              <RotateCcw className="w-3 h-3 mr-1" /> Reconsider
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* UNIVERSAL STAGE SELECTOR ON EVERY CARD */}
+                        <div className="mt-2.5 pt-2 border-t border-brand-gray/20 flex items-center justify-between text-xs text-brand-navy/60">
+                          <span className="text-[10px] uppercase font-bold tracking-wider text-brand-navy/50">Stage</span>
+                          <select
+                            value={cand.stage}
+                            onChange={(e) => {
+                              e.stopPropagation()
+                              handleStageSelect(cand, e.target.value as PipelineStage)
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-xs bg-white border border-brand-gray/30 rounded px-2 py-0.5 text-brand-navy font-medium focus:outline-none focus:ring-1 focus:ring-brand-indigo cursor-pointer shadow-sm hover:border-brand-indigo/50 transition-colors"
+                          >
+                            {COLUMNS.map(col => (
+                              <option key={col.id} value={col.id}>{col.label}</option>
+                            ))}
+                          </select>
+                        </div>
                       </SpotlightCard>
                     ))}
                     
@@ -265,7 +408,7 @@ export default function RecruiterHiringPipeline() {
             </div>
           )}
           <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" onClick={() => setHireModalOpen(false)} className="border-brand-gray/40 text-brand-navy">Cancel</Button>
+            <Button variant="outline" onClick={() => { setHireModalOpen(false); setActiveCandidate(null); }} className="border-brand-gray/40 text-brand-navy">Cancel</Button>
             <Button onClick={handleHire} className="bg-semantic-success hover:bg-semantic-success/90 text-white">Confirm Hire</Button>
           </div>
       </Modal>
@@ -291,7 +434,7 @@ export default function RecruiterHiringPipeline() {
             </div>
           )}
           <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" onClick={() => setRejectModalOpen(false)} className="border-brand-gray/40 text-brand-navy">Cancel</Button>
+            <Button variant="outline" onClick={() => { setRejectModalOpen(false); setActiveCandidate(null); }} className="border-brand-gray/40 text-brand-navy">Cancel</Button>
             <Button onClick={handleReject} className="bg-semantic-error hover:bg-semantic-error/90 text-white">Reject Candidate</Button>
           </div>
       </Modal>

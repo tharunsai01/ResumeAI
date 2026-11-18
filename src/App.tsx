@@ -86,6 +86,14 @@ function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             
+            {/* Public Informational Routes */}
+            <Route path="/about" element={<RecruiterAbout />} />
+            <Route path="/terms" element={<RecruiterTerms />} />
+            <Route path="/privacy" element={<RecruiterPrivacy />} />
+            <Route path="/safety" element={<RecruiterSafety />} />
+            <Route path="/help" element={<RecruiterHelp />} />
+            <Route path="/complaint" element={<RecruiterComplaint />} />
+            
             {/* Candidate Routes */}
             <Route element={<ProtectedRoute allowedRole="candidate" />}>
               <Route path="/candidate/dashboard" element={<CandidateDashboard />} />

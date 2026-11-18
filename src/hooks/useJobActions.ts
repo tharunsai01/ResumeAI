@@ -42,34 +42,50 @@ export function useJobActions() {
 
   // Applied Jobs synced with applicationService
   const [appliedJobs, setAppliedJobs] = useState<AppliedJob[]>([])
+  const [isLoadingAppliedJobs, setIsLoadingAppliedJobs] = useState<boolean>(true)
 
   useEffect(() => {
+    let isMounted = true
     const loadApps = async () => {
-      const apps = applicationService.getApplicationsByCandidate("c_currentUser")
-      const allJobs = await jobService.getJobs()
-      const mapped: AppliedJob[] = apps.map(app => {
-        const job = allJobs.find(j => j.id === app.jobId)
-        if (!job) return null
-        return {
-          ...job,
-          applicationId: app.id,
-          appliedDate: app.appliedDate,
-          status: app.status,
-          matchScore: app.matchScore,
-          timeline: app.timeline,
-          notes: app.notes
+      setIsLoadingAppliedJobs(true)
+      try {
+        const apps = applicationService.getApplicationsByCandidate("c_currentUser")
+        const allJobs = await jobService.getJobs()
+        const mapped: AppliedJob[] = apps.map(app => {
+          const job = allJobs.find(j => j.id === app.jobId)
+          if (!job) return null
+          return {
+            ...job,
+            applicationId: app.id,
+            appliedDate: app.appliedDate,
+            status: app.status,
+            matchScore: app.matchScore,
+            timeline: app.timeline,
+            notes: app.notes
+          }
+        }).filter((a): a is AppliedJob => a !== null)
+        
+        mapped.sort((a, b) => new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime())
+        if (isMounted) {
+          setAppliedJobs(mapped)
+          setIsLoadingAppliedJobs(false)
         }
-      }).filter((a): a is AppliedJob => a !== null)
-      
-      mapped.sort((a, b) => new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime())
-      setAppliedJobs(mapped)
+      } catch (e) {
+        console.error("Failed to load applications in useJobActions", e)
+        if (isMounted) {
+          setIsLoadingAppliedJobs(false)
+        }
+      }
     }
 
     loadApps()
 
     const handleUpdate = () => loadApps()
     window.addEventListener("hiresmart_applications_updated", handleUpdate)
-    return () => window.removeEventListener("hiresmart_applications_updated", handleUpdate)
+    return () => {
+      isMounted = false
+      window.removeEventListener("hiresmart_applications_updated", handleUpdate)
+    }
   }, [])
 
   const applyToJob = (job: Job, matchScore: number) => {
@@ -93,8 +109,9 @@ export function useJobActions() {
         title: "Application Submitted",
         description: `You have successfully applied for ${job.title} at ${job.company}.`,
         type: "application",
-        link: `/candidate/applications/${newApp.id}`
-      })
+        link: `/candidate/applications/${newApp.id}`,
+        role: "candidate"
+      }, "candidate")
     }
 
     return true
@@ -118,8 +135,9 @@ export function useJobActions() {
           title: "Application Withdrawn",
           description: `You have withdrawn your application for ${app.title} at ${app.company}.`,
           type: "application",
-          link: `/candidate/applications/${applicationId}`
-        })
+          link: `/candidate/applications/${applicationId}`,
+          role: "candidate"
+        }, "candidate")
       }
     }
   }
@@ -131,6 +149,7 @@ export function useJobActions() {
     toggleSaveJob,
     isJobSaved,
     appliedJobs,
+    isLoadingAppliedJobs,
     applyToJob,
     hasApplied,
     updateApplicationNote,

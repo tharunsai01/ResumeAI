@@ -247,5 +247,59 @@ export const initialRecruiterCandidates: RecruiterCandidate[] = [
     applicationHistory: [
       { role: "Frontend Developer", date: "Sep 10, 2026", status: "Rejected" }
     ]
+  },
+  {
+    id: "cand_5",
+    name: "Priya Singh",
+    title: "AI Engineer",
+    location: "Mumbai",
+    email: "priya.s@example.com",
+    experience: "3 years",
+    skills: [
+      { name: "Python", proficiency: "Strong" },
+      { name: "Machine Learning", proficiency: "Strong" },
+      { name: "TensorFlow", proficiency: "Strong" }
+    ],
+    education: [
+      { degree: "B.Tech Computer Science", institution: "IIT Bombay", year: "2021" }
+    ],
+    projects: [
+      { title: "NLP Document Classifier", technologies: ["Python", "TensorFlow"], description: "Built scalable NLP models..." }
+    ],
+    matchScore: 93,
+    status: "Interview",
+    appliedRole: "AI Engineer",
+    appliedDate: "3 days ago",
+    screeningStatus: "Strong Match",
+    applicationHistory: [
+      { role: "AI Engineer", date: "Sep 15, 2026", status: "Interview" }
+    ]
+  },
+  {
+    id: "cand_7",
+    name: "Neha Gupta",
+    title: "Software Engineer",
+    location: "Delhi",
+    email: "neha.g@example.com",
+    experience: "4 years",
+    skills: [
+      { name: "Node.js", proficiency: "Strong" },
+      { name: "MongoDB", proficiency: "Strong" },
+      { name: "TypeScript", proficiency: "Strong" }
+    ],
+    education: [
+      { degree: "B.Tech Information Technology", institution: "Delhi Technological University", year: "2020" }
+    ],
+    projects: [
+      { title: "High-throughput API Gateway", technologies: ["Node.js", "TypeScript"], description: "Microservices gateway handling 50k req/sec..." }
+    ],
+    matchScore: 88,
+    status: "Shortlisted",
+    appliedRole: "Software Engineer",
+    appliedDate: "4 days ago",
+    screeningStatus: "Strong Match",
+    applicationHistory: [
+      { role: "Software Engineer", date: "Sep 14, 2026", status: "Shortlisted" }
+    ]
   }
 ]

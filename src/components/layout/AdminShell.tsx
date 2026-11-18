@@ -4,8 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { 
   LayoutDashboard, Users, AlertOctagon, Tags, ScrollText, 
   BrainCircuit, Activity, Settings, LogOut, Bell, Menu,
-  Search, Shield, FileText as FileTextIcon, Lock, Info, ChevronDown, ChevronUp, ChevronRight, Sun, Moon, HelpCircle, CheckCircle2, Check,
-  User, Calendar, Star, BarChart, AlertTriangle
+  Search, Shield, FileText as FileTextIcon, Lock, Info, ChevronRight, Sun, Moon, HelpCircle, CheckCircle2, Check
 } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { notificationService } from "../../services/notificationService"
@@ -13,9 +12,8 @@ import { authService } from "../../services/authService"
 import { settingsService } from "../../services/settingsService"
 import type { AppNotification } from "../../data/mockNotifications"
 import { PageTransition } from "./PageTransition"
-import SpotlightCard from "../ui/SpotlightCard";
 
-let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
+
 
 interface AdminShellProps {
   children: React.ReactNode
@@ -29,7 +27,7 @@ export function AdminShell({ children }: AdminShellProps) {
   
   // Notification State
   const [isNotifOpen, setIsNotifOpen] = React.useState(false)
-  const [notifications, setNotifications] = React.useState<AppNotification[]>(() => notificationService.getNotifications())
+  const [notifications, setNotifications] = React.useState<AppNotification[]>(() => notificationService.getNotifications("admin"))
   const unreadCount = notifications.filter(n => !n.read).length
 
   // Theme Toggle State
@@ -74,8 +72,9 @@ export function AdminShell({ children }: AdminShellProps) {
   }, [])
 
   React.useEffect(() => {
-    const handleUpdate = () => setNotifications(notificationService.getNotifications())
-    const handleStorage = () => setNotifications(notificationService.getNotifications())
+    setNotifications(notificationService.getNotifications("admin"))
+    const handleUpdate = () => setNotifications(notificationService.getNotifications("admin"))
+    const handleStorage = () => setNotifications(notificationService.getNotifications("admin"))
     
     window.addEventListener('hiresmart_notifications_updated', handleUpdate)
     window.addEventListener('storage', handleStorage)
@@ -123,21 +122,34 @@ export function AdminShell({ children }: AdminShellProps) {
 
   const handleLogout = () => {
     authService.logout()
-    navigate("/")
+    navigate("/", { replace: true })
   }
 
   const handleNotificationClick = (notif: AppNotification) => {
-    notificationService.markAsRead(notif.id)
-    setNotifications(notificationService.getNotifications())
+    notificationService.markAsRead(notif.id, "admin")
+    setNotifications(notificationService.getNotifications("admin"))
     setIsNotifOpen(false)
-    if (notif.link) {
+
+    const fallbackDashboard = "/admin"
+    if (!notif.link) {
+      navigate(fallbackDashboard)
+      return
+    }
+
+    const publicRoutes = ["/about", "/terms", "/privacy", "/safety", "/help", "/complaint"]
+    const isPublic = publicRoutes.some(p => notif.link === p || notif.link?.startsWith(`${p}/`))
+
+    if (notif.link.startsWith("/admin") || isPublic) {
       navigate(notif.link)
+    } else {
+      console.warn(`Prevented cross-role notification redirect: ${notif.link}`)
+      navigate(fallbackDashboard)
     }
   }
 
   const handleMarkAllAsRead = () => {
-    notificationService.markAllAsRead()
-    setNotifications(notificationService.getNotifications())
+    notificationService.markAllAsRead("admin")
+    setNotifications(notificationService.getNotifications("admin"))
   }
 
   const renderNavGroup = ({ title, links }: { title: string, links: typeof adminLinks }) => (

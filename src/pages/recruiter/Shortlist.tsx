@@ -7,7 +7,7 @@ import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard
 import { Button } from "../../components/ui/Button"
 import { Modal } from "../../components/ui/Modal"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialPipelineCandidates } from "../../data/pipelineMockData"
+import { pipelineService } from "../../services/pipelineService"
 import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import { cn } from "../../lib/utils"
@@ -16,7 +16,9 @@ import SpotlightCard from "../../components/ui/SpotlightCard";
 export default function RecruiterShortlist() {
   const navigate = useNavigate()
   const [loading, setLoading] = React.useState(true)
-  const [candidates, setCandidates] = React.useState(initialPipelineCandidates.filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage)))
+  const [candidates, setCandidates] = React.useState(() => 
+    pipelineService.getCandidates().filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage))
+  )
   
   // Modals
   const [scheduleModalOpen, setScheduleModalOpen] = React.useState(false)
@@ -34,7 +36,11 @@ export default function RecruiterShortlist() {
 
   React.useEffect(() => {
     setLoading(false)
-    
+    const handleUpdate = () => {
+      setCandidates(pipelineService.getCandidates().filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage)))
+    }
+    window.addEventListener("hiresmart_pipeline_updated", handleUpdate)
+    return () => window.removeEventListener("hiresmart_pipeline_updated", handleUpdate)
   }, [])
 
   const showToast = (msg: string) => {
@@ -43,13 +49,15 @@ export default function RecruiterShortlist() {
   }
 
   const handleSchedule = (data: any) => {
-    setCandidates(candidates.map(c => c.id === data.candidateId ? { ...c, stage: "Interview Scheduled" } : c))
+    pipelineService.updateCandidateStage(data.candidateId, "Interview Scheduled")
+    setCandidates(pipelineService.getCandidates().filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage)))
     showToast("Interview scheduled successfully.")
   }
 
   const handleRemove = () => {
     if (candidateToRemove) {
-      setCandidates(candidates.filter(c => c.id !== candidateToRemove.id))
+      pipelineService.removeCandidate(candidateToRemove.id)
+      setCandidates(pipelineService.getCandidates().filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage)))
       setCandidateToRemove(null)
       showToast("Candidate removed from shortlist.")
     }

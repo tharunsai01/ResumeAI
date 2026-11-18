@@ -1,16 +1,19 @@
 import { defaultMockProfile } from "../data/mockProfile"
 import type { CandidateProfile, Education, Experience, Project } from "../data/mockProfile"
+import type { SkillData } from "../data/mockSkills"
 
 const PROFILE_STORAGE_KEY = "hiresmart_candidate_profile"
 
 export const profileService = {
   getCandidateProfile(): CandidateProfile {
-    const stored = localStorage.getItem(PROFILE_STORAGE_KEY)
-    if (stored) {
-      try {
-        return JSON.parse(stored)
-      } catch (e) {
-        console.error("Failed to parse stored profile", e)
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(PROFILE_STORAGE_KEY)
+      if (stored) {
+        try {
+          return JSON.parse(stored)
+        } catch (e) {
+          console.error("Failed to parse stored profile", e)
+        }
       }
     }
     
@@ -22,7 +25,10 @@ export const profileService = {
   saveProfile(profile: CandidateProfile): void {
     const completion = this.calculateProfileCompletion(profile)
     const updatedProfile = { ...profile, profileCompletion: completion }
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(updatedProfile))
+    if (typeof window !== "undefined") {
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(updatedProfile))
+      window.dispatchEvent(new Event('hiresmart_profile_updated'))
+    }
   },
 
   updateCandidateProfile(updates: Partial<CandidateProfile>): CandidateProfile {
@@ -36,7 +42,7 @@ export const profileService = {
     let score = 0
     const totalWeights = {
       basicInfo: 20,
-      resume: 20, // We assume resume is uploaded if avatar or summary exists for now, or just give 20.
+      resume: 20, // Assumed uploaded
       skills: 20,
       education: 15,
       experience: 15,
@@ -50,7 +56,7 @@ export const profileService = {
       score += totalWeights.basicInfo / 2
     }
 
-    // Resume (20%) - Mocking this as always 20% for now since Phase 2 exists
+    // Resume (20%)
     score += totalWeights.resume
 
     // Skills (20%)
@@ -80,34 +86,101 @@ export const profileService = {
     return Math.min(100, score)
   },
 
-  // Helpers for nested updates
-  addEducation(edu: Education) {
+  // Skills helpers
+  addSkill(skill: Pick<SkillData, "id" | "name" | "level" | "category">): CandidateProfile {
     const profile = this.getCandidateProfile()
-    this.updateCandidateProfile({ education: [...profile.education, edu] })
-  },
-  
-  removeEducation(id: string) {
-    const profile = this.getCandidateProfile()
-    this.updateCandidateProfile({ education: profile.education.filter(e => e.id !== id) })
-  },
-
-  addExperience(exp: Experience) {
-    const profile = this.getCandidateProfile()
-    this.updateCandidateProfile({ experience: [...profile.experience, exp] })
-  },
-  
-  removeExperience(id: string) {
-    const profile = this.getCandidateProfile()
-    this.updateCandidateProfile({ experience: profile.experience.filter(e => e.id !== id) })
+    const exists = profile.skills.some(s => s.name.toLowerCase() === skill.name.trim().toLowerCase())
+    if (exists) {
+      throw new Error(`Skill "${skill.name}" already exists in your profile.`)
+    }
+    const newSkill = { ...skill, name: skill.name.trim() }
+    return this.updateCandidateProfile({ skills: [...profile.skills, newSkill] })
   },
 
-  addProject(proj: Project) {
+  updateSkill(skill: Pick<SkillData, "id" | "name" | "level" | "category">): CandidateProfile {
     const profile = this.getCandidateProfile()
-    this.updateCandidateProfile({ projects: [...profile.projects, proj] })
+    const duplicate = profile.skills.some(
+      s => s.id !== skill.id && s.name.toLowerCase() === skill.name.trim().toLowerCase()
+    )
+    if (duplicate) {
+      throw new Error(`Another skill named "${skill.name}" already exists.`)
+    }
+    const updatedSkills = profile.skills.map(s => s.id === skill.id ? { ...skill, name: skill.name.trim() } : s)
+    return this.updateCandidateProfile({ skills: updatedSkills })
+  },
+
+  removeSkill(id: string): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    return this.updateCandidateProfile({ skills: profile.skills.filter(s => s.id !== id) })
+  },
+
+  // Education helpers
+  addEducation(edu: Education): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    return this.updateCandidateProfile({ education: [...profile.education, edu] })
   },
   
-  removeProject(id: string) {
+  updateEducation(edu: Education): CandidateProfile {
     const profile = this.getCandidateProfile()
-    this.updateCandidateProfile({ projects: profile.projects.filter(p => p.id !== id) })
+    const updated = profile.education.map(e => e.id === edu.id ? edu : e)
+    return this.updateCandidateProfile({ education: updated })
+  },
+
+  removeEducation(id: string): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    return this.updateCandidateProfile({ education: profile.education.filter(e => e.id !== id) })
+  },
+
+  // Experience helpers
+  addExperience(exp: Experience): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    return this.updateCandidateProfile({ experience: [...profile.experience, exp] })
+  },
+
+  updateExperience(exp: Experience): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    const updated = profile.experience.map(e => e.id === exp.id ? exp : e)
+    return this.updateCandidateProfile({ experience: updated })
+  },
+  
+  removeExperience(id: string): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    return this.updateCandidateProfile({ experience: profile.experience.filter(e => e.id !== id) })
+  },
+
+  // Projects helpers
+  addProject(proj: Project): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    return this.updateCandidateProfile({ projects: [...profile.projects, proj] })
+  },
+  
+  updateProject(proj: Project): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    const updated = profile.projects.map(p => p.id === proj.id ? proj : p)
+    return this.updateCandidateProfile({ projects: updated })
+  },
+
+  removeProject(id: string): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    return this.updateCandidateProfile({ projects: profile.projects.filter(p => p.id !== id) })
+  },
+
+  // Career Interests helpers
+  addCareerInterest(interest: string): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    const clean = interest.trim()
+    if (!clean) return profile
+    const exists = profile.careerInterests.some(i => i.toLowerCase() === clean.toLowerCase())
+    if (exists) {
+      throw new Error(`"${clean}" is already in your career interests.`)
+    }
+    return this.updateCandidateProfile({ careerInterests: [...profile.careerInterests, clean] })
+  },
+
+  removeCareerInterest(interest: string): CandidateProfile {
+    const profile = this.getCandidateProfile()
+    return this.updateCandidateProfile({
+      careerInterests: profile.careerInterests.filter(i => i.toLowerCase() !== interest.toLowerCase())
+    })
   }
 }

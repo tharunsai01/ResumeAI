@@ -13,6 +13,27 @@ const SESSION_KEY = "hiresmart_session"
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+export async function hashPassword(password: string): Promise<string> {
+  if (typeof crypto !== "undefined" && crypto.subtle) {
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(password + "_hiresmart_salt_2026")
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("")
+    } catch {
+      // Fallback below if subtle crypto fails
+    }
+  }
+  let hash = 0
+  for (let i = 0; i < password.length; i++) {
+    const char = password.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return "hs_hash_" + Math.abs(hash).toString(16)
+}
+
 export const authService = {
   getUsers(): any[] {
     if (typeof window !== "undefined") {
@@ -30,11 +51,23 @@ export const authService = {
     return null
   },
 
-  async login(email: string, password: string):Promise<User> {
+  async login(email: string, password: string, requestedRole?: UserRole): Promise<User> {
     await delay(800) // Mock network delay
 
-    // Hardcode an admin login for testing the frontend admin portal
-    if (email === "admin@hiresmart.ai" || email === "admin") {
+    if (!email || !email.trim()) {
+      throw new Error("Email address is required.")
+    }
+    if (!password) {
+      throw new Error("Password is required.")
+    }
+
+    const cleanEmail = email.trim().toLowerCase()
+
+    // Dedicated administrator login check
+    if (cleanEmail === "admin@hiresmart.ai" || cleanEmail === "admin") {
+      if (requestedRole && requestedRole !== "admin") {
+        throw new Error("This account is an Administrator account. Please select the Admin tab to sign in.")
+      }
       const sessionUser: User = { 
         id: "mock_admin_123", 
         email: "admin@hiresmart.ai", 
@@ -46,11 +79,36 @@ export const authService = {
       return sessionUser
     }
 
+    // Role-check: If user selected "Admin" tab but is not using admin credentials
+    if (requestedRole === "admin") {
+      throw new Error("Access denied. This account does not have administrator privileges.")
+    }
+
     const users = this.getUsers()
-    const user = users.find(u => u.email === email && u.password === password)
-    if (!user) throw new Error("Invalid email or password.")
+    const user = users.find(u => u.email && u.email.toLowerCase() === cleanEmail)
+    if (!user) {
+      throw new Error("Invalid email or password.")
+    }
+
+    const inputHash = await hashPassword(password)
+    const isPasswordValid = user.password === inputHash || user.password === password
+    if (!isPasswordValid) {
+      throw new Error("Invalid email or password.")
+    }
+
+    // Verify account role matches requested tab
+    if (requestedRole && user.role !== requestedRole) {
+      const properRoleName = user.role.charAt(0).toUpperCase() + user.role.slice(1)
+      throw new Error(`This account is registered as a ${user.role}. Please select the ${properRoleName} tab to sign in.`)
+    }
     
-    const sessionUser: User = { id: user.id, email: user.email, name: user.name, role: user.role, company: user.company }
+    const sessionUser: User = { 
+      id: user.id, 
+      email: user.email, 
+      name: user.name, 
+      role: user.role, 
+      company: user.company 
+    }
     localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
     window.dispatchEvent(new Event('hiresmart_auth_changed'))
     return sessionUser
@@ -58,26 +116,40 @@ export const authService = {
 
   async register(data: { email: string; password?: string; name: string; role: UserRole; company?: string; isGoogle?: boolean }): Promise<User> {
     await delay(800)
+
+    if (data.role === "admin") {
+      throw new Error("Administrator accounts cannot be self-registered. Please contact system administration.")
+    }
+
+    const cleanEmail = data.email.trim().toLowerCase()
     const users = this.getUsers()
     
-    if (users.find(u => u.email === data.email)) {
+    if (users.find(u => u.email && u.email.toLowerCase() === cleanEmail)) {
       throw new Error("An account with this email already exists.")
     }
 
+    const passwordHash = data.password ? await hashPassword(data.password) : null
+
     const newUser = {
       id: Math.random().toString(36).substr(2, 9),
-      email: data.email,
-      password: data.password || null,
-      name: data.name,
+      email: data.email.trim(),
+      password: passwordHash,
+      name: data.name.trim(),
       role: data.role,
-      company: data.company,
+      company: data.company?.trim(),
       isGoogle: !!data.isGoogle
     }
 
     users.push(newUser)
     localStorage.setItem(USERS_KEY, JSON.stringify(users))
 
-    const sessionUser: User = { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role, company: newUser.company }
+    const sessionUser: User = { 
+      id: newUser.id, 
+      email: newUser.email, 
+      name: newUser.name, 
+      role: newUser.role, 
+      company: newUser.company 
+    }
     localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
     window.dispatchEvent(new Event('hiresmart_auth_changed'))
     return sessionUser
@@ -85,15 +157,14 @@ export const authService = {
 
   async googleAuth(role?: UserRole): Promise<User> {
     await delay(1200) // Mock popup delay
-    
-    // In a real app, this would open a Google OAuth popup, get the token, and send it to the backend.
-    // For this mock, we will generate a random Google user or log them into a mock account.
+
+    if (role === "admin") {
+      throw new Error("Administrator accounts cannot be registered via Google OAuth.")
+    }
     
     const mockEmail = `google.${Math.random().toString(36).substr(2, 5)}@gmail.com`
     const mockName = "Google User"
 
-    // If role is provided, it's a registration flow via Google. 
-    // If not, it's a login flow.
     if (role) {
       return this.register({
         email: mockEmail,
@@ -102,17 +173,20 @@ export const authService = {
         isGoogle: true
       })
     } else {
-      // For mock login purposes without a role specified (Login screen), 
-      // just pick the first user or throw an error.
       const users = this.getUsers()
       if (users.length > 0) {
-        const user = users[0] // Just log into the first available account for demo purposes
-        const sessionUser: User = { id: user.id, email: user.email, name: user.name, role: user.role, company: user.company }
+        const user = users[0]
+        const sessionUser: User = { 
+          id: user.id, 
+          email: user.email, 
+          name: user.name, 
+          role: user.role, 
+          company: user.company 
+        }
         localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
         window.dispatchEvent(new Event('hiresmart_auth_changed'))
         return sessionUser
       } else {
-        // If no users exist, create a mock candidate to demonstrate
         return this.register({
           email: mockEmail,
           name: mockName,
@@ -123,9 +197,113 @@ export const authService = {
     }
   },
 
-  logout() {
-    localStorage.removeItem(SESSION_KEY)
+  deleteAccount(userId: string): void {
+    if (typeof window !== "undefined") {
+      const users = this.getUsers()
+      const filtered = users.filter(u => u.id !== userId)
+      localStorage.setItem(USERS_KEY, JSON.stringify(filtered))
+      this.logout()
+    }
+  },
+
+  async updateEmail(userId: string, newEmail: string): Promise<User> {
+    await delay(300)
+    const cleanEmail = newEmail.trim().toLowerCase()
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(cleanEmail)) {
+      throw new Error("Please enter a valid email address.")
+    }
+
+    const users = this.getUsers()
+    const currentUser = this.getCurrentUser()
+    const existing = users.find(u => 
+      u.id !== userId && 
+      u.email && 
+      u.email.toLowerCase() === cleanEmail &&
+      (!currentUser?.email || u.email.toLowerCase() !== currentUser.email.toLowerCase())
+    )
+    if (existing) {
+      throw new Error("An account with this email address already exists.")
+    }
+
+    const updatedUsers = users.map(u => {
+      if (u.id === userId || (currentUser?.email && u.email && u.email.toLowerCase() === currentUser.email.toLowerCase())) {
+        return { ...u, email: newEmail.trim() }
+      }
+      return u
+    })
+    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
+
+    const updatedSessionUser: User = currentUser 
+      ? { ...currentUser, email: newEmail.trim() }
+      : { id: userId, email: newEmail.trim(), name: "User", role: "candidate" }
+
+    localStorage.setItem(SESSION_KEY, JSON.stringify(updatedSessionUser))
     window.dispatchEvent(new Event('hiresmart_auth_changed'))
+    return updatedSessionUser
+  },
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<boolean> {
+    await delay(400)
+
+    if (!currentPassword) {
+      throw new Error("Current password is required.")
+    }
+    if (!newPassword || newPassword.length < 8) {
+      throw new Error("New password must be at least 8 characters long.")
+    }
+    if (currentPassword === newPassword) {
+      throw new Error("New password must be different from your current password.")
+    }
+
+    const users = this.getUsers()
+    const currentUser = this.getCurrentUser()
+    
+    const userIndex = users.findIndex(u => 
+      u.id === userId || (currentUser?.email && u.email && u.email.toLowerCase() === currentUser.email.toLowerCase())
+    )
+
+    if (userIndex !== -1) {
+      const user = users[userIndex]
+      if (user.password) {
+        const inputHash = await hashPassword(currentPassword)
+        const isCurrentValid = user.password === inputHash || user.password === currentPassword
+        if (!isCurrentValid) {
+          throw new Error("The current password you entered is incorrect.")
+        }
+      }
+
+      // Hash new password - never stored in plaintext
+      const newHash = await hashPassword(newPassword)
+      users[userIndex].password = newHash
+      localStorage.setItem(USERS_KEY, JSON.stringify(users))
+      return true
+    } else {
+      const newHash = await hashPassword(newPassword)
+      if (currentUser) {
+        users.push({
+          id: currentUser.id || userId,
+          email: currentUser.email,
+          name: currentUser.name,
+          role: currentUser.role,
+          password: newHash,
+          company: currentUser.company
+        })
+        localStorage.setItem(USERS_KEY, JSON.stringify(users))
+      }
+      return true
+    }
+  },
+
+  logout() {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(SESSION_KEY)
+      if (typeof sessionStorage !== "undefined") {
+        sessionStorage.clear()
+      }
+      window.dispatchEvent(new Event('hiresmart_auth_changed'))
+    }
   },
 
   isAuthenticated(): boolean {

@@ -1,59 +1,148 @@
-import { defaultMockNotifications } from "../data/mockNotifications"
+import { 
+  defaultMockNotifications, 
+  defaultRecruiterNotifications, 
+  defaultAdminNotifications 
+} from "../data/mockNotifications"
 import type { AppNotification } from "../data/mockNotifications"
+import { authService } from "./authService"
 
-const NOTIFICATIONS_STORAGE_KEY = "hiresmart_notifications"
+export type NotificationRole = "candidate" | "recruiter" | "admin"
+
+const BASE_STORAGE_KEY = "hiresmart_notifications"
+
+function getStorageKey(role: NotificationRole): string {
+  return `${BASE_STORAGE_KEY}_${role}`
+}
+
+function resolveRole(explicitRole?: string): NotificationRole {
+  if (explicitRole === "candidate" || explicitRole === "recruiter" || explicitRole === "admin") {
+    return explicitRole
+  }
+  const currentUser = authService.getCurrentUser()
+  if (currentUser?.role === "candidate" || currentUser?.role === "recruiter" || currentUser?.role === "admin") {
+    return currentUser.role
+  }
+  return "candidate"
+}
+
+function getDefaultNotifications(role: NotificationRole): AppNotification[] {
+  switch (role) {
+    case "recruiter":
+      return defaultRecruiterNotifications
+    case "admin":
+      return defaultAdminNotifications
+    case "candidate":
+    default:
+      return defaultMockNotifications
+  }
+}
+
+function sanitizeNotificationLink(link: string | undefined, role: NotificationRole): string {
+  if (!link) {
+    return role === "admin" ? "/admin" : `/${role}/dashboard`
+  }
+
+  // Public routes are accessible to all roles
+  const publicRoutes = ["/about", "/terms", "/privacy", "/safety", "/help", "/complaint"]
+  if (publicRoutes.includes(link) || publicRoutes.some(p => link.startsWith(`${p}/`))) {
+    return link
+  }
+
+  // Check if link matches the target role prefix
+  if (role === "admin") {
+    if (link.startsWith("/admin")) return link
+    return "/admin"
+  } else {
+    if (link.startsWith(`/${role}`)) return link
+    return `/${role}/dashboard`
+  }
+}
 
 export const notificationService = {
-  getNotifications(): AppNotification[] {
-    const stored = localStorage.getItem(NOTIFICATIONS_STORAGE_KEY)
-    if (stored) {
-      try {
-        return JSON.parse(stored)
-      } catch (e) {
-        console.error("Failed to parse notifications", e)
+  getNotifications(role?: string): AppNotification[] {
+    const targetRole = resolveRole(role)
+    const storageKey = getStorageKey(targetRole)
+
+    if (typeof window !== "undefined") {
+      let stored = localStorage.getItem(storageKey)
+      
+      // Backward compatibility: If candidate storage doesn't exist yet, check legacy key
+      if (!stored && targetRole === "candidate") {
+        stored = localStorage.getItem(BASE_STORAGE_KEY)
       }
+
+      if (stored) {
+        try {
+          const parsed: AppNotification[] = JSON.parse(stored)
+          // Sanitize any corrupt or cross-role links
+          const sanitized = parsed.map(n => ({
+            ...n,
+            role: targetRole,
+            link: sanitizeNotificationLink(n.link, targetRole)
+          }))
+          return sanitized
+        } catch (e) {
+          console.error(`Failed to parse notifications for ${targetRole}`, e)
+        }
+      }
+
+      // Initialize with role-specific defaults
+      const defaults = getDefaultNotifications(targetRole)
+      localStorage.setItem(storageKey, JSON.stringify(defaults))
+      return defaults
     }
-    
-    // Initialize with default
-    localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(defaultMockNotifications))
-    return defaultMockNotifications
+
+    return getDefaultNotifications(targetRole)
   },
 
-  saveNotifications(notifications: AppNotification[]): void {
-    localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(notifications))
-    window.dispatchEvent(new Event("hiresmart_notifications_updated"))
+  saveNotifications(notifications: AppNotification[], role?: string): void {
+    const targetRole = resolveRole(role)
+    const storageKey = getStorageKey(targetRole)
+
+    if (typeof window !== "undefined") {
+      const sanitized = notifications.map(n => ({
+        ...n,
+        role: targetRole,
+        link: sanitizeNotificationLink(n.link, targetRole)
+      }))
+      localStorage.setItem(storageKey, JSON.stringify(sanitized))
+      window.dispatchEvent(new Event("hiresmart_notifications_updated"))
+    }
   },
 
-  getUnreadCount(): number {
-    return this.getNotifications().filter(n => !n.read).length
+  getUnreadCount(role?: string): number {
+    return this.getNotifications(role).filter(n => !n.read).length
   },
 
-  markAsRead(id: string): void {
-    const notifications = this.getNotifications()
+  markAsRead(id: string, role?: string): void {
+    const notifications = this.getNotifications(role)
     const updated = notifications.map(n => n.id === id ? { ...n, read: true } : n)
-    this.saveNotifications(updated)
+    this.saveNotifications(updated, role)
   },
 
-  markAllAsRead(): void {
-    const notifications = this.getNotifications()
+  markAllAsRead(role?: string): void {
+    const notifications = this.getNotifications(role)
     const updated = notifications.map(n => ({ ...n, read: true }))
-    this.saveNotifications(updated)
+    this.saveNotifications(updated, role)
   },
 
-  deleteNotification(id: string): void {
-    const notifications = this.getNotifications()
+  deleteNotification(id: string, role?: string): void {
+    const notifications = this.getNotifications(role)
     const updated = notifications.filter(n => n.id !== id)
-    this.saveNotifications(updated)
+    this.saveNotifications(updated, role)
   },
 
-  addNotification(notification: Omit<AppNotification, "id" | "time" | "read">): void {
-    const notifications = this.getNotifications()
+  addNotification(notification: Omit<AppNotification, "id" | "time" | "read">, role?: string): void {
+    const targetRole = resolveRole(role || notification.role)
+    const notifications = this.getNotifications(targetRole)
     const newNotification: AppNotification = {
       ...notification,
-      id: `notif_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      id: `notif_${targetRole}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       time: "Just now",
-      read: false
+      read: false,
+      role: targetRole,
+      link: sanitizeNotificationLink(notification.link, targetRole)
     }
-    this.saveNotifications([newNotification, ...notifications])
+    this.saveNotifications([newNotification, ...notifications], targetRole)
   }
 }

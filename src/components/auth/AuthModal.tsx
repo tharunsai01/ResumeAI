@@ -49,8 +49,11 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
 
     try {
       if (mode === "login") {
-        await authService.login(email, password)
+        await authService.login(email, password, role)
       } else {
+        if (role === "admin") {
+          throw new Error("Administrator accounts cannot be self-registered.")
+        }
         await authService.register({ email, password, name, role, company })
       }
       onClose()
@@ -65,6 +68,9 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
     setIsLoading(true)
     setError(null)
     try {
+      if (mode === "register" && role === "admin") {
+        throw new Error("Administrator accounts cannot be registered via Google OAuth.")
+      }
       // If registering, pass the selected role. If logging in, don't pass role so it tries to find the existing user.
       await authService.googleAuth(mode === "register" ? role : undefined)
       onClose()
@@ -114,7 +120,10 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
             <div className="flex p-1 bg-brand-light rounded-xl mb-6">
               <button
                 type="button"
-                onClick={() => setRole("candidate")}
+                onClick={() => {
+                  setRole("candidate")
+                  setError(null)
+                }}
                 className={cn(
                   "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
                   role === "candidate" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
@@ -124,7 +133,10 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
               </button>
               <button
                 type="button"
-                onClick={() => setRole("recruiter")}
+                onClick={() => {
+                  setRole("recruiter")
+                  setError(null)
+                }}
                 className={cn(
                   "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
                   role === "recruiter" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
@@ -134,7 +146,15 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
               </button>
               <button
                 type="button"
-                onClick={() => setRole("admin")}
+                onClick={() => {
+                  setRole("admin")
+                  if (mode === "register") {
+                    setMode("login")
+                    setError("Administrator accounts cannot be self-registered. Please sign in with existing credentials.")
+                  } else {
+                    setError(null)
+                  }
+                }}
                 className={cn(
                   "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
                   role === "admin" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
@@ -250,7 +270,18 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
                 {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
                 <button
                   type="button"
-                  onClick={() => setMode(mode === "login" ? "register" : "login")}
+                  onClick={() => {
+                    if (mode === "login") {
+                      if (role === "admin") {
+                        setRole("candidate")
+                      }
+                      setMode("register")
+                      setError(null)
+                    } else {
+                      setMode("login")
+                      setError(null)
+                    }
+                  }}
                   className="font-semibold text-brand-indigo hover:underline ml-1"
                 >
                   {mode === "login" ? "Create one" : "Sign In"}

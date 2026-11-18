@@ -7,11 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Ca
 import { Badge } from "../../components/ui/Badge"
 import { Button } from "../../components/ui/Button"
 import { MatchScore } from "../../components/shared/MatchScore"
-import { useJobActions } from "../../hooks/useJobActions"
+import { useJobActions, type AppliedJob } from "../../hooks/useJobActions"
 import { mockResumeAnalysis } from "../../data/mockResume"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import { jobService } from "../../services/jobService"
+import { applicationService } from "../../services/applicationService"
 import type { JobMatchResult } from "../../services/jobService"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
@@ -21,35 +22,82 @@ export default function CandidateApplicationDetails() {
   const { applicationId } = useParams<{ applicationId: string }>()
   const navigate = useNavigate()
   
-  const { getApplication, updateApplicationNote, withdrawApplication } = useJobActions()
-  const application = getApplication(applicationId || "")
+  const { updateApplicationNote, withdrawApplication } = useJobActions()
 
   const [loading, setLoading] = React.useState(true)
+  const [application, setApplication] = React.useState<AppliedJob | null>(null)
   const [matchData, setMatchData] = React.useState<JobMatchResult | null>(null)
+  const [error, setError] = React.useState<string | null>(null)
   
-  const [noteContent, setNoteContent] = React.useState(application?.notes || "")
+  const [noteContent, setNoteContent] = React.useState("")
   const [isSavingNote, setIsSavingNote] = React.useState(false)
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false)
 
-  React.useEffect(() => {
-    const fetchMatchDetails = async () => {
-      if (application) {
-        setNoteContent(application.notes)
-        const job = await jobService.getJobById(application.id)
-        if (job) {
-          const match = jobService.calculateJobMatch(mockResumeAnalysis, job)
-          setMatchData(match)
-        }
+  const loadApplication = React.useCallback(async () => {
+    if (!applicationId) {
+      setError("No application ID was provided.")
+      setLoading(false)
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const appRecord = applicationService.getApplication(applicationId)
+      if (!appRecord) {
+        // Genuinely not found - loading completes, application stays null
+        setApplication(null)
+        setMatchData(null)
+        setLoading(false)
+        return
       }
+
+      const job = await jobService.getJobById(appRecord.jobId)
+      if (!job) {
+        setError("The job posting associated with this application could not be found.")
+        setLoading(false)
+        return
+      }
+
+      const fullApp: AppliedJob = {
+        ...job,
+        applicationId: appRecord.id,
+        appliedDate: appRecord.appliedDate,
+        status: appRecord.status,
+        matchScore: appRecord.matchScore,
+        timeline: appRecord.timeline || [{ status: appRecord.status, date: appRecord.appliedDate }],
+        notes: appRecord.notes || ""
+      }
+
+      const match = jobService.calculateJobMatch(mockResumeAnalysis, job)
+      
+      setApplication(fullApp)
+      setNoteContent(appRecord.notes || "")
+      setMatchData(match)
+      setLoading(false)
+    } catch (err: any) {
+      setError(err?.message || "An unexpected error occurred while loading application details.")
       setLoading(false)
     }
-    fetchMatchDetails()
-  }, [application])
+  }, [applicationId])
+
+  React.useEffect(() => {
+    loadApplication()
+
+    const handleUpdate = () => {
+      loadApplication()
+    }
+
+    window.addEventListener("hiresmart_applications_updated", handleUpdate)
+    return () => {
+      window.removeEventListener("hiresmart_applications_updated", handleUpdate)
+    }
+  }, [loadApplication])
 
   const handleSaveNote = async () => {
     if (!application) return
     setIsSavingNote(true)
-    // Simulate fetching
     updateApplicationNote(application.applicationId, noteContent)
     setIsSavingNote(false)
   }
@@ -73,12 +121,36 @@ export default function CandidateApplicationDetails() {
     )
   }
 
+  if (error) {
+    return (
+      <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+        <div className="text-center p-12 max-w-md mx-auto">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-semantic-error/10 text-semantic-error mb-4">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <h2 className="text-xl font-display font-semibold text-brand-navy">Unable to load application</h2>
+          <p className="text-brand-navy/60 text-sm mt-2">{error}</p>
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <Button variant="outline" onClick={() => loadApplication()}>Retry</Button>
+            <Button onClick={() => navigate("/candidate/applications")}>Back to Applications</Button>
+          </div>
+        </div>
+      </DashboardShell>
+    )
+  }
+
   if (!application || !matchData) {
     return (
       <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
-        <div className="text-center p-12">
+        <div className="text-center p-12 max-w-md mx-auto">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-brand-gray/50 text-brand-navy/40 mb-4">
+            <FileText className="w-6 h-6" />
+          </div>
           <h2 className="text-xl font-display font-semibold text-brand-navy">Application not found</h2>
-          <Button className="mt-4" onClick={() => navigate("/candidate/applications")}>Back to Applications</Button>
+          <p className="text-brand-navy/60 text-sm mt-2">
+            The application you are looking for does not exist or may have been removed.
+          </p>
+          <Button className="mt-6" onClick={() => navigate("/candidate/applications")}>Back to Applications</Button>
         </div>
       </DashboardShell>
     )

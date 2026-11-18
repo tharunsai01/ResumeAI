@@ -62,7 +62,11 @@ export default function Landing() {
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role)
     setIsRoleSelectorOpen(false)
-    setAuthMode("register")
+    if (role === "admin") {
+      setAuthMode("login")
+    } else {
+      setAuthMode("register")
+    }
     setIsAuthModalOpen(true)
   }
 
@@ -95,7 +99,15 @@ export default function Landing() {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <button onClick={handleSignIn} className="text-sm font-semibold text-brand-navy hover:text-brand-indigo transition-colors px-4 py-2 hidden sm:block">
+              <button 
+                onClick={toggleTheme} 
+                aria-label="Toggle theme"
+                className="p-2 rounded-lg text-brand-navy/60 hover:text-brand-indigo transition-colors"
+                title="Toggle Theme"
+              >
+                {theme === "Dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+              <button onClick={handleSignIn} className="text-sm font-semibold text-brand-navy dark:text-white/80 hover:text-brand-indigo transition-colors px-4 py-2 hidden sm:block">
                 Sign In
               </button>
               <Button onClick={handleGetStarted} className="px-6 py-2.5 h-auto">Get Started</Button>
@@ -534,18 +546,18 @@ export default function Landing() {
             <div>
               <h4 className="text-white font-bold mb-6">Support</h4>
               <ul className="space-y-3 text-sm">
-                <li><Link to="/recruiter/help" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link to="/recruiter/complaint" className="hover:text-white transition-colors">Report a Complaint</Link></li>
+                <li><Link to="/help" className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link to="/complaint" className="hover:text-white transition-colors">Report a Complaint</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="text-white font-bold mb-6">Legal</h4>
               <ul className="space-y-3 text-sm">
-                <li><Link to="/recruiter/safety" className="hover:text-white transition-colors">Safety Tips</Link></li>
-                <li><Link to="/recruiter/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
-                <li><Link to="/recruiter/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/recruiter/about" className="hover:text-white transition-colors">About HireSmart AI</Link></li>
+                <li><Link to="/safety" className="hover:text-white transition-colors">Safety Tips</Link></li>
+                <li><Link to="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/about" className="hover:text-white transition-colors">About HireSmart AI</Link></li>
               </ul>
             </div>
           </div>

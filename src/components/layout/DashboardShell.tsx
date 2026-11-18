@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, Search, Briefcase, 
   Settings, LogOut, Bell, User, Menu, BarChart,
   CheckCircle2, AlertCircle, Calendar, Star, Check,
-  HelpCircle, AlertTriangle, Shield, FileText as FileTextIcon, Lock, Info, ChevronDown, ChevronUp, ChevronRight, Sun, Moon
+  HelpCircle, AlertTriangle, Shield, FileText as FileTextIcon, Lock, Info, ChevronDown, ChevronRight, Sun, Moon
 } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { notificationService } from "../../services/notificationService"
@@ -13,9 +13,8 @@ import { authService } from "../../services/authService"
 import { settingsService } from "../../services/settingsService"
 import type { AppNotification } from "../../data/mockNotifications"
 import { PageTransition } from "./PageTransition"
-import SpotlightCard from "../ui/SpotlightCard";
 
-let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
+
 
 interface DashboardShellProps {
   children: React.ReactNode
@@ -31,7 +30,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
   
   // Notification State
   const [isNotifOpen, setIsNotifOpen] = React.useState(false)
-  const [notifications, setNotifications] = React.useState<AppNotification[]>(() => notificationService.getNotifications())
+  const [notifications, setNotifications] = React.useState<AppNotification[]>(() => notificationService.getNotifications(type))
   const unreadCount = notifications.filter(n => !n.read).length
 
   // Theme Toggle State
@@ -77,13 +76,13 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
 
   React.useEffect(() => {
     // Load initial
-    setNotifications(notificationService.getNotifications())
+    setNotifications(notificationService.getNotifications(type))
     
     // Listen for custom event from our service
-    const handleUpdate = () => setNotifications(notificationService.getNotifications())
+    const handleUpdate = () => setNotifications(notificationService.getNotifications(type))
     
     // Listen for cross-tab storage events
-    const handleStorage = () => setNotifications(notificationService.getNotifications())
+    const handleStorage = () => setNotifications(notificationService.getNotifications(type))
     
     window.addEventListener('hiresmart_notifications_updated', handleUpdate)
     window.addEventListener('storage', handleStorage)
@@ -92,7 +91,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
       window.removeEventListener('hiresmart_notifications_updated', handleUpdate)
       window.removeEventListener('storage', handleStorage)
     }
-  }, [])
+  }, [type])
 
   const candidateExploreLinks = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/candidate/dashboard", iconBg: "bg-brand-indigo/10 text-brand-indigo dark:bg-brand-indigo/20" },
@@ -138,22 +137,35 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
 
   const handleLogout = () => {
     authService.logout()
-    // The ProtectedRoute or App routing might auto-redirect, but we explicitly navigate to root
-    navigate("/")
+    navigate("/", { replace: true })
   }
 
   const handleNotificationClick = (notif: AppNotification) => {
-    notificationService.markAsRead(notif.id)
-    setNotifications(notificationService.getNotifications())
+    notificationService.markAsRead(notif.id, type)
+    setNotifications(notificationService.getNotifications(type))
     setIsNotifOpen(false)
-    if (notif.link) {
+
+    const fallbackDashboard = type === "candidate" ? "/candidate/dashboard" : "/recruiter/dashboard"
+    if (!notif.link) {
+      navigate(fallbackDashboard)
+      return
+    }
+
+    const publicRoutes = ["/about", "/terms", "/privacy", "/safety", "/help", "/complaint"]
+    const isPublic = publicRoutes.some(p => notif.link === p || notif.link?.startsWith(`${p}/`))
+    const expectedPrefix = `/${type}`
+
+    if (notif.link.startsWith(expectedPrefix) || isPublic) {
       navigate(notif.link)
+    } else {
+      console.warn(`Prevented cross-role notification redirect: ${notif.link}`)
+      navigate(fallbackDashboard)
     }
   }
 
   const handleMarkAllAsRead = () => {
-    notificationService.markAllAsRead()
-    setNotifications(notificationService.getNotifications())
+    notificationService.markAllAsRead(type)
+    setNotifications(notificationService.getNotifications(type))
   }
 
   const getNotifIcon = (type: string) => {
@@ -307,7 +319,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                               : "text-brand-navy/70 hover:text-brand-navy dark:text-white/60 dark:hover:text-white"
                           )}
                         >
-                          {({ isActive }) => (
+                          {() => (
                             <>
                               <div className={cn("w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-colors", link.iconBg)}>
                                 <link.icon className="h-3 w-3" strokeWidth={2} />
@@ -329,10 +341,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
       {/* LOGOUT BUTTON */}
       <div className="p-4 mt-auto">
         <button
-          onClick={() => {
-            authService.logout()
-            navigate("/login")
-          }}
+          onClick={handleLogout}
           className={cn(
             "w-full flex items-center gap-3 rounded-xl px-2.5 py-2 transition-all duration-200 active:scale-95 relative group",
             "hover:bg-rose-500/5 dark:hover:bg-rose-500/10"

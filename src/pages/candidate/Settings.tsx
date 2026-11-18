@@ -7,12 +7,13 @@ import { Input } from "../../components/ui/Input"
 import { Modal } from "../../components/ui/Modal"
 import { settingsService } from "../../services/settingsService"
 import { profileService } from "../../services/profileService"
+import { authService } from "../../services/authService"
 import type { CandidateSettings } from "../../data/mockSettings"
 import type { CandidateProfile } from "../../data/mockProfile"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import { 
-  User, Bell, Briefcase, Lock, Palette, Shield, ChevronRight, Check, AlertTriangle, Laptop, Monitor
+  User, Bell, Briefcase, Lock, Palette, Shield, ChevronRight, Check, AlertTriangle, Laptop, Monitor, AlertCircle
 } from "lucide-react"
 
 type TabId = "account" | "notifications" | "job_preferences" | "privacy" | "appearance" | "security"
@@ -24,7 +25,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = React.useState<TabId>("account")
   const [settings, setSettings] = React.useState<CandidateSettings | null>(() => settingsService.getSettings())
-  const [profile] = React.useState<CandidateProfile | null>(() => profileService.getCandidateProfile())
+  const [profile, setProfile] = React.useState<CandidateProfile | null>(() => profileService.getCandidateProfile())
   const [showToast, setShowToast] = React.useState(false)
   const [toastMessage, setToastMessage] = React.useState("Settings saved successfully ✓")
 
@@ -33,8 +34,25 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
   const [isPasswordModalOpen, setIsPasswordModalOpen] = React.useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
 
+  // Email form state
+  const [newEmail, setNewEmail] = React.useState("")
+  const [confirmEmail, setConfirmEmail] = React.useState("")
+  const [emailError, setEmailError] = React.useState<string | null>(null)
+  const [isSubmittingEmail, setIsSubmittingEmail] = React.useState(false)
+
+  // Password form state
+  const [currentPassword, setCurrentPassword] = React.useState("")
+  const [newPassword, setNewPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
+  const [passwordError, setPasswordError] = React.useState<string | null>(null)
+  const [isSubmittingPassword, setIsSubmittingPassword] = React.useState(false)
+
   React.useEffect(() => {
-    // If we need to listen for settings or profile changes, we could do it here
+    const handleProfileUpdate = () => {
+      setProfile(profileService.getCandidateProfile())
+    }
+    window.addEventListener("hiresmart_profile_updated", handleProfileUpdate)
+    return () => window.removeEventListener("hiresmart_profile_updated", handleProfileUpdate)
   }, [])
 
   const saveSettings = (newSettings: CandidateSettings) => {
@@ -74,11 +92,124 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
     { id: "security", label: "Security", icon: Shield },
   ]
 
-  const handleClearData = () => {
-    if (window.confirm("Are you sure you want to clear all local data? This will reset your session.")) {
-      settingsService.clearAllLocalData()
-      navigate("/")
+  const handleOpenEmailModal = () => {
+    setNewEmail("")
+    setConfirmEmail("")
+    setEmailError(null)
+    setIsEmailModalOpen(true)
+  }
+
+  const handleCloseEmailModal = () => {
+    setIsEmailModalOpen(false)
+    setNewEmail("")
+    setConfirmEmail("")
+    setEmailError(null)
+  }
+
+  const handleUpdateEmail = async () => {
+    setEmailError(null)
+    const cleanEmail = newEmail.trim()
+    const cleanConfirm = confirmEmail.trim()
+
+    if (!cleanEmail) {
+      setEmailError("New email address is required.")
+      return
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(cleanEmail)) {
+      setEmailError("Please enter a valid email address.")
+      return
+    }
+    if (profile && cleanEmail.toLowerCase() === profile.email.toLowerCase()) {
+      setEmailError("New email address must be different from current email.")
+      return
+    }
+    if (cleanEmail !== cleanConfirm) {
+      setEmailError("Email addresses do not match.")
+      return
+    }
+
+    setIsSubmittingEmail(true)
+    try {
+      const currentUser = authService.getCurrentUser()
+      const userId = currentUser?.id || profile?.id || "cand_1"
+      await authService.updateEmail(userId, cleanEmail)
+      const updatedProfile = profileService.updateCandidateProfile({ email: cleanEmail })
+      setProfile(updatedProfile)
+      handleCloseEmailModal()
+      triggerToast("Email address updated successfully ✓")
+    } catch (err: any) {
+      setEmailError(err.message || "Failed to update email address.")
+    } finally {
+      setIsSubmittingEmail(false)
+    }
+  }
+
+  const handleOpenPasswordModal = () => {
+    setCurrentPassword("")
+    setNewPassword("")
+    setConfirmPassword("")
+    setPasswordError(null)
+    setIsPasswordModalOpen(true)
+  }
+
+  const handleClosePasswordModal = () => {
+    setIsPasswordModalOpen(false)
+    setCurrentPassword("")
+    setNewPassword("")
+    setConfirmPassword("")
+    setPasswordError(null)
+  }
+
+  const handleUpdatePassword = async () => {
+    setPasswordError(null)
+
+    if (!currentPassword) {
+      setPasswordError("Current password is required.")
+      return
+    }
+    if (!newPassword || newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters long.")
+      return
+    }
+    if (newPassword === currentPassword) {
+      setPasswordError("New password must be different from current password.")
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match.")
+      return
+    }
+
+    setIsSubmittingPassword(true)
+    try {
+      const currentUser = authService.getCurrentUser()
+      const userId = currentUser?.id || profile?.id || "cand_1"
+      await authService.changePassword(userId, currentPassword, newPassword)
+      handleClosePasswordModal()
+      triggerToast("Password changed successfully ✓")
+    } catch (err: any) {
+      setPasswordError(err.message || "Failed to change password.")
+    } finally {
+      setIsSubmittingPassword(false)
+    }
+  }
+
+  const handleClearData = () => {
+    if (window.confirm("Are you sure you want to clear all local data? This will reset your candidate session and local settings.")) {
+      settingsService.clearAllLocalData()
+      navigate("/", { replace: true })
+    }
+  }
+
+  const handleDeleteAccount = () => {
+    const currentUser = authService.getCurrentUser()
+    if (currentUser?.id) {
+      authService.deleteAccount(currentUser.id)
+    }
+    settingsService.clearAllLocalData()
+    setIsDeleteModalOpen(false)
+    navigate("/", { replace: true })
   }
 
   return (
@@ -223,7 +354,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             <label className="block text-xs font-semibold text-brand-navy/60 uppercase tracking-wider mb-2">Email Address</label>
                             <div className="flex items-center justify-between bg-brand-light px-4 py-2.5 rounded-lg border border-brand-gray/50">
                               <span className="text-sm font-medium text-brand-navy">{profile.email}</span>
-                              <button onClick={() => setIsEmailModalOpen(true)} className="text-xs font-semibold text-brand-indigo hover:underline">Change</button>
+                              <button onClick={handleOpenEmailModal} className="text-xs font-semibold text-brand-indigo hover:underline">Change</button>
                             </div>
                           </div>
                           <div>
@@ -246,7 +377,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                             <h4 className="font-medium text-brand-navy">Password</h4>
                             <p className="text-sm text-brand-navy/60 mt-1">••••••••••••</p>
                           </div>
-                          <button onClick={() => setIsPasswordModalOpen(true)} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
+                          <button onClick={handleOpenPasswordModal} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
                             Change Password
                           </button>
                         </div>
@@ -502,44 +633,93 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
       </motion.div>
 
       {/* MODALS */}
-      <Modal isOpen={isEmailModalOpen} onClose={() => setIsEmailModalOpen(false)} title="Change Email Address">
+      <Modal isOpen={isEmailModalOpen} onClose={handleCloseEmailModal} title="Change Email Address">
         <div className="space-y-4 mt-4">
+          {emailError && (
+            <div className="p-3 bg-semantic-error/10 border border-semantic-error/20 rounded-xl flex items-center gap-2 text-semantic-error text-xs font-medium">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{emailError}</span>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-brand-navy mb-1.5">Current Email</label>
-            <Input value={profile.email} disabled className="bg-transparent" />
+            <Input value={profile.email} disabled className="bg-transparent opacity-70" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-brand-navy mb-1.5">New Email</label>
-            <Input type="email" placeholder="new.email@example.com" />
+            <label className="block text-sm font-medium text-brand-navy mb-1.5">New Email *</label>
+            <Input 
+              type="email" 
+              placeholder="new.email@example.com" 
+              value={newEmail}
+              onChange={e => { setNewEmail(e.target.value); setEmailError(null); }}
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-brand-navy mb-1.5">Confirm New Email</label>
-            <Input type="email" placeholder="new.email@example.com" />
+            <label className="block text-sm font-medium text-brand-navy mb-1.5">Confirm New Email *</label>
+            <Input 
+              type="email" 
+              placeholder="new.email@example.com" 
+              value={confirmEmail}
+              onChange={e => { setConfirmEmail(e.target.value); setEmailError(null); }}
+            />
           </div>
-          <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsEmailModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
-            <button onClick={() => { setIsEmailModalOpen(false); triggerToast(); }} className="btn-interactive btn-primary px-4 py-2 font-semibold rounded-lg">Update Email</button>
+          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-brand-gray/30">
+            <button onClick={handleCloseEmailModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg">Cancel</button>
+            <button 
+              onClick={handleUpdateEmail} 
+              disabled={isSubmittingEmail}
+              className="btn-interactive btn-primary px-4 py-2 font-semibold text-sm rounded-lg"
+            >
+              {isSubmittingEmail ? "Updating..." : "Update Email"}
+            </button>
           </div>
         </div>
       </Modal>
 
-      <Modal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} title="Change Password">
+      <Modal isOpen={isPasswordModalOpen} onClose={handleClosePasswordModal} title="Change Password">
         <div className="space-y-4 mt-4">
+          {passwordError && (
+            <div className="p-3 bg-semantic-error/10 border border-semantic-error/20 rounded-xl flex items-center gap-2 text-semantic-error text-xs font-medium">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{passwordError}</span>
+            </div>
+          )}
           <div>
-            <label className="block text-sm font-medium text-brand-navy mb-1.5">Current Password</label>
-            <Input type="password" placeholder="••••••••" />
+            <label className="block text-sm font-medium text-brand-navy mb-1.5">Current Password *</label>
+            <Input 
+              type="password" 
+              placeholder="••••••••" 
+              value={currentPassword}
+              onChange={e => { setCurrentPassword(e.target.value); setPasswordError(null); }}
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-brand-navy mb-1.5">New Password</label>
-            <Input type="password" placeholder="Minimum 8 characters" />
+            <label className="block text-sm font-medium text-brand-navy mb-1.5">New Password *</label>
+            <Input 
+              type="password" 
+              placeholder="Minimum 8 characters" 
+              value={newPassword}
+              onChange={e => { setNewPassword(e.target.value); setPasswordError(null); }}
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-brand-navy mb-1.5">Confirm New Password</label>
-            <Input type="password" placeholder="Minimum 8 characters" />
+            <label className="block text-sm font-medium text-brand-navy mb-1.5">Confirm New Password *</label>
+            <Input 
+              type="password" 
+              placeholder="Minimum 8 characters" 
+              value={confirmPassword}
+              onChange={e => { setConfirmPassword(e.target.value); setPasswordError(null); }}
+            />
           </div>
-          <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsPasswordModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
-            <button onClick={() => { setIsPasswordModalOpen(false); triggerToast(); }} className="btn-interactive btn-primary px-4 py-2 font-semibold rounded-lg">Update Password</button>
+          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-brand-gray/30">
+            <button onClick={handleClosePasswordModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg">Cancel</button>
+            <button 
+              onClick={handleUpdatePassword} 
+              disabled={isSubmittingPassword}
+              className="btn-interactive btn-primary px-4 py-2 font-semibold text-sm rounded-lg"
+            >
+              {isSubmittingPassword ? "Updating..." : "Update Password"}
+            </button>
           </div>
         </div>
       </Modal>
@@ -549,7 +729,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
           <p className="text-brand-navy/70 mb-6">This action cannot be undone. All your data, applications, and profile information will be permanently removed.</p>
           <div className="flex justify-end gap-3 mt-6">
             <button onClick={() => setIsDeleteModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
-            <button onClick={handleClearData} className="btn-interactive bg-semantic-error text-white hover:bg-semantic-error/90 px-4 py-2 font-semibold rounded-lg">Delete Account</button>
+            <button onClick={handleDeleteAccount} className="btn-interactive bg-semantic-error text-white hover:bg-semantic-error/90 px-4 py-2 font-semibold rounded-lg">Delete Account</button>
           </div>
         </div>
       </Modal>

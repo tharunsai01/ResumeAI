@@ -10,6 +10,7 @@ import { staggerContainer, slideUp } from "../../lib/animations"
 import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
 import { cn } from "../../lib/utils"
 import { settingsService } from "../../services/settingsService"
+import { recruiterProfileService } from "../../services/recruiterProfileService"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
 export default function RecruiterSettings() {
@@ -74,8 +75,38 @@ export default function RecruiterSettings() {
     showToast(`Appearance set to ${newTheme}.`) 
   }
 
-  const handleSaveProfile = () => showToast("Profile updated successfully.")
-  const handleSaveCompany = () => showToast("Company details updated successfully.")
+  React.useEffect(() => {
+    const p = recruiterProfileService.getProfile()
+    setProfile(prev => ({
+      ...prev,
+      name: p.fullName || prev.name,
+      email: p.email || prev.email,
+      phone: p.phone || prev.phone,
+      designation: p.designation || prev.designation,
+      location: p.location || prev.location
+    }))
+    if (p.company) {
+      setCompany(prev => ({ ...prev, name: p.company }))
+    }
+  }, [])
+
+  const handleSaveProfile = () => {
+    recruiterProfileService.updateProfile({
+      fullName: profile.name,
+      email: profile.email,
+      phone: profile.phone,
+      designation: profile.designation,
+      location: profile.location
+    })
+    showToast("Profile updated successfully.")
+  }
+
+  const handleSaveCompany = () => {
+    recruiterProfileService.updateProfile({
+      company: company.name
+    })
+    showToast("Company details updated successfully.")
+  }
   const handleSavePrefs = () => showToast("Recruitment preferences updated.")
   const handleSaveAI = () => showToast(`AI Screening threshold updated to ${aiThreshold}%.`)
   const handleNotifToggle = (key: keyof typeof notifs) => setNotifs({ ...notifs, [key]: !notifs[key] })
