@@ -7,6 +7,7 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
+import { jobService } from "../../services/jobService"
 import { cn } from "../../lib/utils"
 
 const StatCard = ({ title, data, icon: Icon, color, delay, loading }: any) => (
@@ -40,10 +41,12 @@ export default function RecruiterDashboard() {
   const navigate = useNavigate()
   const [loading, setLoading] = React.useState(true)
 
+  const [activeJobsCount, setActiveJobsCount] = React.useState(8)
+
   // MOCK DATA
   // Structured to be easily replaced by API responses later
   const stats = {
-    activeJobs: { value: 8, indicator: "+2 this month" },
+    activeJobs: { value: activeJobsCount, indicator: "+2 this month" },
     totalCandidates: { value: 245, indicator: "+18 this week" },
     aiScreened: { value: 186, indicator: "76% of applications" },
     shortlisted: { value: 42, indicator: "+8 this week" },
@@ -56,7 +59,7 @@ export default function RecruiterDashboard() {
     { label: "Screened", value: 186, route: "/recruiter/screening", icon: Search },
     { label: "Shortlisted", value: 42, route: "/recruiter/shortlist", icon: CheckCircle2 },
     { label: "Interview", value: 16, route: "/recruiter/interviews", icon: Calendar },
-    { label: "Hired", value: 7, route: "/recruiter/candidates", icon: Award }
+    { label: "Hired", value: 7, route: "/recruiter/hiring", icon: Award }
   ]
 
   const screeningStats = {
@@ -66,30 +69,49 @@ export default function RecruiterDashboard() {
     low: 18
   }
 
-  const recentJobs = [
-    { id: "job1", title: "Software Engineer", location: "Bangalore", applicants: 24, status: "Active", posted: "2 days ago" },
-    { id: "job2", title: "AI Engineer", location: "Hyderabad", applicants: 18, status: "Active", posted: "3 days ago" },
-    { id: "job3", title: "Frontend Developer", location: "Remote", applicants: 31, status: "Active", posted: "1 week ago" },
-    { id: "job4", title: "Backend Developer", location: "Pune", applicants: 12, status: "Draft", posted: "Just now" }
+  const defaultRecentJobs = [
+    { id: "job_101", title: "Software Engineer", location: "Bangalore", applicants: 24, status: "Active", posted: "2 days ago" },
+    { id: "job_102", title: "AI Engineer", location: "Hyderabad", applicants: 18, status: "Active", posted: "3 days ago" },
+    { id: "job_103", title: "Frontend Developer", location: "Remote", applicants: 31, status: "Active", posted: "1 week ago" },
+    { id: "job_104", title: "Backend Developer", location: "Pune", applicants: 12, status: "Draft", posted: "Just now" }
   ]
 
+  const [recentJobsList, setRecentJobsList] = React.useState(defaultRecentJobs)
+
   const topMatches = [
-    { id: "c1", name: "Rahul Sharma", role: "Software Engineer", match: 96, skills: ["React", "Node.js", "TypeScript"] },
-    { id: "c2", name: "Priya Singh", role: "AI Engineer", match: 93, skills: ["Python", "TensorFlow", "NLP"] },
-    { id: "c3", name: "Arjun Kumar", role: "Backend Developer", match: 89, skills: ["Go", "PostgreSQL", "Docker"] }
+    { id: "cand_1", name: "Rahul Sharma", role: "Software Engineer", match: 96, skills: ["React", "Node.js", "TypeScript"] },
+    { id: "cand_2", name: "Priya Singh", role: "AI Engineer", match: 93, skills: ["Python", "TensorFlow", "NLP"] },
+    { id: "cand_3", name: "Arjun Kumar", role: "Backend Developer", match: 89, skills: ["Go", "PostgreSQL", "Docker"] }
   ]
 
   const recentApplications = [
-    { id: "a1", candidateName: "Rahul Sharma", role: "Software Engineer", match: 92, date: "Today", status: "Shortlisted" },
-    { id: "a2", candidateName: "Ananya Patel", role: "AI Engineer", match: 88, date: "Yesterday", status: "Screening" },
-    { id: "a3", candidateName: "Arjun Kumar", role: "Backend Developer", match: 81, date: "2 days ago", status: "Applied" },
-    { id: "a4", candidateName: "Vikram Reddy", role: "Frontend Developer", match: 74, date: "3 days ago", status: "Applied" }
+    { id: "a1", candidateId: "cand_1", candidateName: "Rahul Sharma", role: "Software Engineer", match: 92, date: "Today", status: "Shortlisted" },
+    { id: "a2", candidateId: "cand_2", candidateName: "Ananya Patel", role: "AI Engineer", match: 88, date: "Yesterday", status: "Screening" },
+    { id: "a3", candidateId: "cand_3", candidateName: "Arjun Kumar", role: "Backend Developer", match: 81, date: "2 days ago", status: "Applied" },
+    { id: "a4", candidateId: "cand_4", candidateName: "Vikram Reddy", role: "Frontend Developer", match: 74, date: "3 days ago", status: "Applied" }
   ]
 
   React.useEffect(() => {
-    // Simulate initial data loading for micro-interactions
-    setLoading(false)
-    
+    const loadDashboardData = async () => {
+      const allJobs = await jobService.getRecruiterJobs()
+      if (allJobs && allJobs.length > 0) {
+        setRecentJobsList(allJobs.slice(0, 4).map(j => ({
+          id: j.id,
+          title: j.title,
+          location: j.location,
+          applicants: j.applications || 0,
+          status: j.status,
+          posted: j.postedDate || "Just now"
+        })))
+        const activeCount = allJobs.filter(j => j.status === "Active").length
+        setActiveJobsCount(activeCount)
+      }
+      setLoading(false)
+    }
+
+    loadDashboardData()
+    window.addEventListener("hiresmart_jobs_updated", loadDashboardData)
+    return () => window.removeEventListener("hiresmart_jobs_updated", loadDashboardData)
   }, [])
 
 
@@ -261,7 +283,7 @@ export default function RecruiterDashboard() {
                           </tr>
                         ))
                       ) : (
-                        recentJobs.map(job => (
+                        recentJobsList.map(job => (
                           <tr key={job.id} className="hover:bg-brand-light/50 transition-colors group">
                             <td className="px-5 py-3.5">
                               <div className="font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors">{job.title}</div>
@@ -384,7 +406,7 @@ export default function RecruiterDashboard() {
                       recentApplications.map(app => (
                         <tr 
                           key={app.id} 
-                          onClick={() => navigate(`/recruiter/candidates/${app.id}`)}
+                          onClick={() => navigate(`/recruiter/candidates/${app.candidateId}`)}
                           className="hover:bg-brand-indigo/[0.03] transition-colors cursor-pointer group"
                         >
                           <td className="px-6 py-4 font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors flex items-center gap-3">

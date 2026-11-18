@@ -1,12 +1,12 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, Edit, Users, Search, CheckCircle2, Calendar, Award, Building, MapPin, Briefcase, Clock, DollarSign, Sparkles, XCircle } from "lucide-react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialRecruiterJobs } from "../../data/recruiterMockData"
+import { jobService } from "../../services/jobService"
 import { cn } from "../../lib/utils"
 
 const SummaryCard = ({ title, value, icon: Icon, color, route }: any) => {
@@ -33,25 +33,46 @@ const SummaryCard = ({ title, value, icon: Icon, color, route }: any) => {
 
 export default function RecruiterJobDetails() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { jobId } = useParams()
   
   const [job, setJob] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(true)
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
-  const handleCloseJob = () => {
+  React.useEffect(() => {
+    if (location.state && (location.state as any).toast) {
+      setToastMsg((location.state as any).toast)
+      setTimeout(() => setToastMsg(null), 3000)
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state])
+
+  const loadJob = React.useCallback(async () => {
+    if (!jobId) {
+      setLoading(false)
+      return
+    }
+    const foundJob = await jobService.getRecruiterJobById(jobId)
+    setJob(foundJob || null)
+    setLoading(false)
+  }, [jobId])
+
+  React.useEffect(() => {
+    loadJob()
+    window.addEventListener("hiresmart_jobs_updated", loadJob)
+    return () => window.removeEventListener("hiresmart_jobs_updated", loadJob)
+  }, [loadJob])
+
+  const handleCloseJob = async () => {
+    if (!jobId) return
     if (window.confirm("Are you sure you want to close this job? It will no longer accept applications.")) {
+      const updated = await jobService.updateJob(jobId, { status: "Closed" })
+      if (updated) setJob(updated)
       setToastMsg("Job closed successfully ✓")
       setTimeout(() => setToastMsg(null), 3000)
     }
   }
-
-  React.useEffect(() => {
-    // Simulate loading data
-    const foundJob = initialRecruiterJobs.find(j => j.id === jobId)
-    setJob(foundJob)
-    setLoading(false)
-  }, [jobId])
 
   if (loading) {
     return (

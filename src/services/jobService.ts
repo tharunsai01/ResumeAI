@@ -3,6 +3,8 @@ import type { Job } from "../data/mockJobs"
 import { mockResumeAnalysis } from "../data/mockResume"
 import type { ResumeAnalysisResult } from "../data/mockResume"
 import { profileService } from "./profileService"
+import { initialRecruiterJobs } from "../data/recruiterMockData"
+import type { RecruiterJob } from "../data/recruiterMockData"
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -22,54 +24,171 @@ export interface JobMatchResult {
 }
 
 const STORAGE_KEY = "hiresmart_created_jobs"
+const RECRUITER_STORAGE_KEY = "hiresmart_recruiter_jobs"
 
 export const jobService = {
+  getRecruiterJobs: async (): Promise<RecruiterJob[]> => {
+    await delay(0)
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(RECRUITER_STORAGE_KEY)
+      if (stored) {
+        try {
+          return JSON.parse(stored)
+        } catch (e) {
+          console.error("Failed to parse recruiter jobs from localStorage", e)
+        }
+      }
+      // Initialize with initialRecruiterJobs if not stored
+      localStorage.setItem(RECRUITER_STORAGE_KEY, JSON.stringify(initialRecruiterJobs))
+    }
+    return [...initialRecruiterJobs]
+  },
+
+  getRecruiterJobById: async (id: string): Promise<RecruiterJob | undefined> => {
+    await delay(0)
+    const jobs = await jobService.getRecruiterJobs()
+    return jobs.find(j => j.id === id)
+  },
+
   getJobs: async (): Promise<Job[]> => {
     await delay(0)
     let customJobs: Job[] = []
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        customJobs = JSON.parse(stored)
+        try {
+          customJobs = JSON.parse(stored)
+        } catch (_) {}
       }
     }
     return [...customJobs, ...mockJobs]
   },
 
-  getJobById: async (id: string): Promise<Job | undefined> => {
+  getJobById: async (id: string): Promise<any | undefined> => {
     await delay(0)
+    const recruiterJob = await jobService.getRecruiterJobById(id)
+    if (recruiterJob) return recruiterJob
     const allJobs = await jobService.getJobs()
     return allJobs.find(j => j.id === id)
   },
 
-  createJob: async (job: Omit<Job, "id">): Promise<Job> => {
+  createJob: async (jobData: any): Promise<RecruiterJob> => {
     await delay(0)
-    const newJob: Job = { ...job, id: `job-${Date.now()}` }
-    let customJobs: Job[] = []
+    const jobs = await jobService.getRecruiterJobs()
+    const newId = `job_${Date.now()}`
+
+    const skillsList: string[] = jobData.skills 
+      ? jobData.skills 
+      : Array.from(new Set([
+          ...(jobData.requiredSkills || []),
+          ...(jobData.preferredSkills || [])
+        ]))
+
+    const newJob: RecruiterJob = {
+      id: newId,
+      title: jobData.title,
+      company: jobData.company || "HireSmart Technologies",
+      location: jobData.location,
+      workMode: jobData.workMode || "Hybrid",
+      jobType: jobData.jobType || jobData.type || "Full-time",
+      experience: jobData.experience || "1–3 years",
+      salary: jobData.salaryNotDisclosed ? "Salary not disclosed" : (jobData.salary || "Salary not disclosed"),
+      skills: skillsList,
+      description: jobData.description || "",
+      status: jobData.status || "Active",
+      applications: jobData.applications !== undefined ? jobData.applications : 0,
+      postedDate: jobData.postedDate || "Just now"
+    }
+
+    const updatedJobs = [newJob, ...jobs]
     if (typeof window !== "undefined") {
+      localStorage.setItem(RECRUITER_STORAGE_KEY, JSON.stringify(updatedJobs))
+
+      // Also sync to candidate customJobs so it appears across candidate recommendations & searches
+      let customJobs: any[] = []
       const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) customJobs = JSON.parse(stored)
-      customJobs.unshift(newJob)
+      if (stored) {
+        try { customJobs = JSON.parse(stored) } catch (_) {}
+      }
+      customJobs.unshift({
+        ...newJob,
+        category: jobData.category || "Software Development",
+        type: newJob.jobType,
+        aboutCompany: "We are a leading organization in our sector, committed to innovation and excellence.",
+        additionalInfo: "",
+        responsibilities: [],
+        requirements: newJob.skills
+      })
       localStorage.setItem(STORAGE_KEY, JSON.stringify(customJobs))
+
+      window.dispatchEvent(new Event("hiresmart_jobs_updated"))
     }
     return newJob
   },
 
-  updateJob: async (id: string, updates: Partial<Job>): Promise<Job | undefined> => {
+  updateJob: async (id: string, updates: any): Promise<RecruiterJob | undefined> => {
     await delay(0)
-    if (typeof window !== "undefined") {
-      let customJobs: Job[] = []
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) customJobs = JSON.parse(stored)
-      
-      const idx = customJobs.findIndex(j => j.id === id)
-      if (idx !== -1) {
-        customJobs[idx] = { ...customJobs[idx], ...updates }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(customJobs))
-        return customJobs[idx]
-      }
+    const jobs = await jobService.getRecruiterJobs()
+    const index = jobs.findIndex(j => j.id === id)
+    if (index === -1) return undefined
+
+    const existing = jobs[index]
+    const updatedSkills = updates.skills 
+      ? updates.skills 
+      : (updates.requiredSkills 
+          ? Array.from(new Set([...updates.requiredSkills, ...(updates.preferredSkills || [])])) 
+          : existing.skills)
+
+    const updatedJob: RecruiterJob = {
+      ...existing,
+      ...updates,
+      skills: updatedSkills,
+      jobType: updates.jobType || updates.type || existing.jobType,
+      workMode: updates.workMode || existing.workMode,
+      salary: updates.salaryNotDisclosed ? "Salary not disclosed" : (updates.salary !== undefined ? updates.salary : existing.salary)
     }
-    return undefined
+
+    jobs[index] = updatedJob
+    if (typeof window !== "undefined") {
+      localStorage.setItem(RECRUITER_STORAGE_KEY, JSON.stringify(jobs))
+
+      // Also update in candidate customJobs if exists
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        try {
+          let customJobs: any[] = JSON.parse(stored)
+          const cIndex = customJobs.findIndex(j => j.id === id)
+          if (cIndex !== -1) {
+            customJobs[cIndex] = { ...customJobs[cIndex], ...updatedJob, type: updatedJob.jobType }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(customJobs))
+          }
+        } catch (_) {}
+      }
+
+      window.dispatchEvent(new Event("hiresmart_jobs_updated"))
+    }
+    return updatedJob
+  },
+
+  deleteJob: async (id: string): Promise<boolean> => {
+    await delay(0)
+    const jobs = await jobService.getRecruiterJobs()
+    const filtered = jobs.filter(j => j.id !== id)
+    if (typeof window !== "undefined") {
+      localStorage.setItem(RECRUITER_STORAGE_KEY, JSON.stringify(filtered))
+
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        try {
+          let customJobs: any[] = JSON.parse(stored)
+          customJobs = customJobs.filter(j => j.id !== id)
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(customJobs))
+        } catch (_) {}
+      }
+
+      window.dispatchEvent(new Event("hiresmart_jobs_updated"))
+    }
+    return true
   },
 
   calculateJobMatch: (candidate: ResumeAnalysisResult, job: Job): JobMatchResult => {

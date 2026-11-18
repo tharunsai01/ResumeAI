@@ -44,6 +44,26 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
     preferredSkills: initialData?.preferredSkills || []
   })
 
+  React.useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({
+        ...prev,
+        title: initialData.title !== undefined ? initialData.title : prev.title,
+        company: initialData.company !== undefined ? initialData.company : prev.company,
+        category: initialData.category !== undefined ? initialData.category : prev.category,
+        location: initialData.location !== undefined ? initialData.location : prev.location,
+        type: initialData.type !== undefined ? initialData.type : prev.type,
+        workMode: initialData.workMode !== undefined ? initialData.workMode : prev.workMode,
+        experience: initialData.experience !== undefined ? initialData.experience : prev.experience,
+        salary: initialData.salary !== undefined ? initialData.salary : prev.salary,
+        salaryNotDisclosed: initialData.salaryNotDisclosed !== undefined ? initialData.salaryNotDisclosed : prev.salaryNotDisclosed,
+        description: initialData.description !== undefined ? initialData.description : prev.description,
+        requiredSkills: initialData.requiredSkills !== undefined ? initialData.requiredSkills : prev.requiredSkills,
+        preferredSkills: initialData.preferredSkills !== undefined ? initialData.preferredSkills : prev.preferredSkills
+      }))
+    }
+  }, [initialData])
+
   const [newRequiredSkill, setNewRequiredSkill] = React.useState("")
   const [newPreferredSkill, setNewPreferredSkill] = React.useState("")
   const [errors, setErrors] = React.useState<Partial<Record<keyof JobFormData, string>>>({})
@@ -69,6 +89,10 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
 
   const handleSaveDraft = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData.title.trim()) {
+      setErrors(prev => ({ ...prev, title: "Job title is required to save a draft." }))
+      return
+    }
     onSubmit(formData, "Draft")
   }
 

@@ -1,12 +1,12 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Briefcase, Search, Plus, Users, FileText, CheckCircle2, MoreHorizontal, Edit, Copy, XCircle, Trash2, Eye, Filter } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialRecruiterJobs } from "../../data/recruiterMockData"
+import { jobService } from "../../services/jobService"
 import type { RecruiterJob, JobStatus, JobType, WorkMode } from "../../data/recruiterMockData"
 import { DeleteJobModal } from "./components/DeleteJobModal"
 import { cn } from "../../lib/utils"
@@ -33,8 +33,10 @@ const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
 
 export default function RecruiterJobs() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [loading, setLoading] = React.useState(true)
   const [jobs, setJobs] = React.useState<RecruiterJob[]>([])
+  const [toastMsg, setToastMsg] = React.useState<string | null>(null)
   
   // Filters
   const [searchTerm, setSearchTerm] = React.useState("")
@@ -49,10 +51,24 @@ export default function RecruiterJobs() {
   const [jobToDelete, setJobToDelete] = React.useState<{id: string, title: string} | null>(null)
 
   React.useEffect(() => {
-    // Simulate initial data loading
-    setJobs([...initialRecruiterJobs])
+    if (location.state && (location.state as any).toast) {
+      setToastMsg((location.state as any).toast)
+      setTimeout(() => setToastMsg(null), 3000)
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state])
+
+  const loadJobs = React.useCallback(async () => {
+    const recruiterJobs = await jobService.getRecruiterJobs()
+    setJobs(recruiterJobs)
     setLoading(false)
   }, [])
+
+  React.useEffect(() => {
+    loadJobs()
+    window.addEventListener("hiresmart_jobs_updated", loadJobs)
+    return () => window.removeEventListener("hiresmart_jobs_updated", loadJobs)
+  }, [loadJobs])
 
   // Close dropdown on outside click
   React.useEffect(() => {
@@ -86,34 +102,35 @@ export default function RecruiterJobs() {
     totalApps: jobs.reduce((sum, j) => sum + j.applications, 0)
   }
 
-  const handleDuplicate = (job: RecruiterJob) => {
-    const newJob: RecruiterJob = {
+  const handleDuplicate = async (job: RecruiterJob) => {
+    await jobService.createJob({
       ...job,
-      id: `job_${Date.now()}`,
       title: `${job.title} — Copy`,
       status: "Draft",
       applications: 0,
       postedDate: "Just now"
-    }
-    setJobs([newJob, ...jobs])
+    })
+    setToastMsg("Job duplicated as draft ✓")
+    setTimeout(() => setToastMsg(null), 3000)
   }
 
-  const handleToggleStatus = (jobId: string, currentStatus: JobStatus) => {
-    setJobs(jobs.map(j => {
-      if (j.id === jobId) {
-        return { ...j, status: currentStatus === "Closed" ? "Active" : "Closed" }
-      }
-      return j
-    }))
+  const handleToggleStatus = async (jobId: string, currentStatus: JobStatus) => {
+    const newStatus: JobStatus = currentStatus === "Closed" ? "Active" : "Closed"
+    await jobService.updateJob(jobId, { status: newStatus })
+    setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: newStatus } : j))
+    setToastMsg(`Job status updated to ${newStatus} ✓`)
+    setTimeout(() => setToastMsg(null), 3000)
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (jobToDelete) {
-      setJobs(jobs.filter(j => j.id !== jobToDelete.id))
+      await jobService.deleteJob(jobToDelete.id)
+      setJobs(prev => prev.filter(j => j.id !== jobToDelete.id))
       setJobToDelete(null)
+      setToastMsg("Job deleted successfully ✓")
+      setTimeout(() => setToastMsg(null), 3000)
     }
   }
-
 
   const getStatusStyle = (status: JobStatus) => {
     switch (status) {
@@ -125,6 +142,19 @@ export default function RecruiterJobs() {
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 right-6 z-50 bg-semantic-success text-white px-4 py-3 rounded-lg flex items-center gap-2 shadow-xl"
+          >
+            <span className="text-sm font-medium">{toastMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-7xl mx-auto space-y-6 pb-12">
         
         {/* HEADER */}

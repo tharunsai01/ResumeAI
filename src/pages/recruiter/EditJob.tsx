@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { JobForm } from "./components/JobForm"
 import type { JobFormData } from "./components/JobForm"
-import { initialRecruiterJobs } from "../../data/recruiterMockData"
+import { jobService } from "../../services/jobService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 
 export default function EditJob() {
@@ -15,33 +15,82 @@ export default function EditJob() {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [loading, setLoading] = React.useState(true)
   const [initialData, setInitialData] = React.useState<Partial<JobFormData> | null>(null)
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    // Simulate fetching job data
-    const job = initialRecruiterJobs.find(j => j.id === jobId)
-    if (job) {
-      setInitialData({
-        title: job.title,
-        company: job.company,
-        location: job.location,
-        type: job.jobType,
-        workMode: job.workMode,
-        experience: job.experience,
-        salary: job.salary === "Salary not disclosed" ? "" : job.salary,
-        salaryNotDisclosed: job.salary === "Salary not disclosed",
-        description: job.description,
-        requiredSkills: job.skills,
-        preferredSkills: [] // Mocking preferred as empty for edit since it's not in the simple interface
-      })
+    const fetchJob = async () => {
+      if (!jobId) {
+        setLoading(false)
+        return
+      }
+      const job = await jobService.getRecruiterJobById(jobId)
+      if (job) {
+        setInitialData({
+          title: job.title,
+          company: job.company,
+          category: (job as any).category || "Software Development",
+          location: job.location,
+          type: job.jobType,
+          workMode: job.workMode,
+          experience: job.experience,
+          salary: job.salary === "Salary not disclosed" ? "" : job.salary,
+          salaryNotDisclosed: job.salary === "Salary not disclosed",
+          description: job.description,
+          requiredSkills: job.skills,
+          preferredSkills: (job as any).preferredSkills || []
+        })
+      }
+      setLoading(false)
     }
-    setLoading(false)
+    fetchJob()
   }, [jobId])
 
-  const handleSubmit = (_data: JobFormData, _status: "Active" | "Draft") => {
+  const handleSubmit = async (data: JobFormData, status: "Active" | "Draft") => {
+    if (!jobId || isSubmitting) return
+
+    // Validation
+    if (!data.title?.trim() || !data.company?.trim() || !data.location?.trim() || !data.description?.trim()) {
+      setErrorMsg("Please fill in all required fields.")
+      setTimeout(() => setErrorMsg(null), 3500)
+      return
+    }
+
+    if (data.requiredSkills.length === 0) {
+      setErrorMsg("Please add at least one required skill.")
+      setTimeout(() => setErrorMsg(null), 3500)
+      return
+    }
+
     setIsSubmitting(true)
-    setIsSubmitting(false)
-    // Displaying success toast "Job updated successfully." would go here.
-    navigate(`/recruiter/jobs/${jobId}`)
+    setErrorMsg(null)
+
+    try {
+      await jobService.updateJob(jobId, {
+        title: data.title.trim(),
+        company: data.company.trim(),
+        category: data.category || "Software Development",
+        location: data.location.trim(),
+        jobType: data.type as any,
+        type: data.type as any,
+        workMode: data.workMode as any,
+        experience: data.experience,
+        salary: data.salaryNotDisclosed ? "Salary not disclosed" : (data.salary.trim() || "Salary not disclosed"),
+        salaryNotDisclosed: data.salaryNotDisclosed,
+        description: data.description.trim(),
+        skills: Array.from(new Set([...data.requiredSkills, ...data.preferredSkills])),
+        requiredSkills: data.requiredSkills,
+        preferredSkills: data.preferredSkills,
+        status: status
+      })
+
+      navigate(`/recruiter/jobs/${jobId}`, {
+        state: { toast: "Job updated successfully ✓" }
+      })
+    } catch (err) {
+      console.error("Failed to update job:", err)
+      setErrorMsg("An error occurred while updating the job. Please try again.")
+      setIsSubmitting(false)
+    }
   }
 
   const handleCancel = () => {
@@ -50,6 +99,19 @@ export default function EditJob() {
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
+      <AnimatePresence>
+        {errorMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 right-6 z-50 bg-semantic-error text-white px-4 py-3 rounded-lg flex items-center gap-2 shadow-xl"
+          >
+            <span className="text-sm font-medium">{errorMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-6xl mx-auto pb-16">
         <motion.div variants={slideUp} className="mb-6 flex items-center gap-4">
           <button 
