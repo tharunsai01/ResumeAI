@@ -115,7 +115,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-2.5 sm:p-4 overflow-y-auto">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -127,25 +127,25 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
         <MotionSpotlightCard
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="glass-card relative w-full max-w-md overflow-hidden flex flex-col"
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          className="glass-card relative w-full max-w-md overflow-hidden flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2rem)] my-auto"
         >
-          <div className="absolute top-4 right-4 z-10">
-            <button onClick={onClose} className="p-2 text-brand-navy/40 hover:bg-brand-gray/50 rounded-full transition-colors">
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
+            <button onClick={onClose} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-brand-navy/40 hover:bg-brand-gray/50 rounded-full transition-colors" aria-label="Close modal">
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="p-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-display font-semibold text-brand-navy">
+          <div className="p-4 sm:p-6 md:p-8 overflow-y-auto flex-1 overscroll-contain">
+            <div className="text-center mb-5 sm:mb-8 pr-8 pl-2">
+              <h2 className="text-lg sm:text-2xl font-display font-semibold text-brand-navy break-words">
                 {mode === "forgot"
                   ? "Reset Password"
                   : mode === "login" 
                     ? "Welcome back" 
                     : `Create ${role === 'candidate' ? 'Candidate' : role === 'admin' ? 'Admin' : 'Recruiter'} Account`}
               </h2>
-              <p className="text-brand-navy/60 mt-2 text-sm">
+              <p className="text-brand-navy/60 mt-1.5 sm:mt-2 text-xs sm:text-sm break-words leading-relaxed">
                 {mode === "forgot"
                   ? "Enter your account email to verify existence and request reset instructions."
                   : mode === "login" 
@@ -156,7 +156,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
 
             {/* Role Tabs */}
             {mode !== "forgot" && (
-              <div className="flex p-1 bg-brand-light rounded-xl mb-6">
+              <div className="flex p-1 bg-brand-light rounded-xl mb-5 sm:mb-6">
                 <button
                   type="button"
                   onClick={() => {
@@ -164,7 +164,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
                     setError(null)
                   }}
                   className={cn(
-                    "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                    "flex-1 py-1.5 sm:py-2 px-1 text-xs sm:text-sm font-semibold rounded-lg transition-all text-center truncate",
                     role === "candidate" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
                   )}
                 >
@@ -177,7 +177,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
                     setError(null)
                   }}
                   className={cn(
-                    "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                    "flex-1 py-1.5 sm:py-2 px-1 text-xs sm:text-sm font-semibold rounded-lg transition-all text-center truncate",
                     role === "recruiter" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
                   )}
                 >
@@ -195,7 +195,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
                     }
                   }}
                   className={cn(
-                    "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                    "flex-1 py-1.5 sm:py-2 px-1 text-xs sm:text-sm font-semibold rounded-lg transition-all text-center truncate",
                     role === "admin" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
                   )}
                 >
@@ -324,7 +324,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
                   type="button"
                   onClick={handleGoogleAuth}
                   disabled={isLoading}
-                  className="btn-interactive btn-secondary rounded-lg w-full flex items-center justify-center gap-3 border-2 hover:-brand-gray/50 font-semibold py-3 h-12"
+                  className="btn-interactive btn-secondary rounded-lg w-full flex items-center justify-center gap-2.5 sm:gap-3 border-2 hover:border-brand-gray/50 font-semibold py-2.5 sm:py-3 h-11 sm:h-12 text-xs sm:text-sm"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>

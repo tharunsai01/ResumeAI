@@ -34,22 +34,22 @@ export function AdminServiceDetailsModal({ isOpen, onClose, service }: AdminServ
       isOpen={isOpen}
       onClose={onClose}
       title="Service Details"
-      className="max-w-xl"
+      className="max-w-xl w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] flex flex-col"
     >
-      <div className="py-2 space-y-6">
+      <div className="py-2 space-y-4 sm:space-y-6 max-h-[calc(100dvh-10rem)] overflow-y-auto">
         
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border bg-brand-light/20 border-brand-gray/20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-xl border bg-brand-light/20 border-brand-gray/20">
           <div>
-            <h2 className="text-xl font-display font-semibold text-brand-navy mb-1">{service.name}</h2>
+            <h2 className="text-xl font-display font-semibold text-brand-navy mb-1 break-words">{service.name}</h2>
             <div className="flex items-center gap-2">
-              <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border flex items-center gap-1 ${getStatusColor(service.status)}`}>
+              <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border flex items-center gap-1 whitespace-nowrap shrink-0 ${getStatusColor(service.status)}`}>
                 {getStatusIcon(service.status)}
                 {service.status}
               </span>
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             <div className="text-xs text-brand-navy/50 font-medium uppercase tracking-wider mb-1">Response Time</div>
             <div className="text-lg font-semibold text-brand-navy">{service.responseTime}</div>
           </div>

@@ -20,6 +20,13 @@
 @variant dark (&:where(.dark, .dark *));
 
 @layer base {
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-brand-light text-slate-900 font-sans antialiased selection:bg-brand-indigo/30 transition-colors duration-300;
     @apply dark:bg-brand-navy dark:text-brand-light;
@@ -32,7 +39,15 @@
   h5,
   h6 {
     @apply font-display tracking-tight font-semibold text-brand-navy dark:text-white;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
+}
+
+@utility table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @utility glass {

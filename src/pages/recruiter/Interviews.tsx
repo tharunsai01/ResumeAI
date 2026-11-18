@@ -14,15 +14,15 @@ import SpotlightCard from "../../components/ui/SpotlightCard";
 const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
   <motion.div variants={slideUp} custom={delay}>
     <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200">
-      <PremiumCardContent className="p-5 flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-          <h3 className="text-2xl font-display font-bold text-brand-navy">
+      <PremiumCardContent className="p-3.5 sm:p-5 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-brand-navy/60 mb-0.5 sm:mb-1 truncate">{title}</p>
+          <h3 className="text-xl sm:text-2xl font-display font-bold text-brand-navy truncate">
             {value}
           </h3>
         </div>
-        <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
-          <Icon className="w-5 h-5" />
+        <div className={`p-2.5 sm:p-3 rounded-xl shrink-0 ${color.bg} ${color.text}`}>
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
       </PremiumCardContent>
     </PremiumCard>
@@ -123,16 +123,16 @@ export default function RecruiterInterviews() {
         {/* HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">Interviews</h1>
-            <p className="text-brand-navy/60 mt-1">Schedule, manage, and track candidate interviews.</p>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Interviews</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Schedule, manage, and track candidate interviews.</p>
           </div>
-          <Button onClick={() => setScheduleModalOpen(true)} className="bg-brand-indigo hover:bg-brand-blue shrink-0">
+          <Button onClick={() => setScheduleModalOpen(true)} className="w-full sm:w-auto bg-brand-indigo hover:bg-brand-blue shrink-0">
             <CalendarIcon className="w-4 h-4 mr-2" /> Schedule Interview
           </Button>
         </motion.div>
 
         {/* SUMMARY CARDS */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard title="Upcoming" value={upcomingCount} icon={CalendarIcon} delay={0} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
           <StatCard title="Today" value={todayCount} icon={Clock} delay={1} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
           <StatCard title="Completed" value={completedCount} icon={CheckCircle2} delay={2} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
@@ -140,19 +140,19 @@ export default function RecruiterInterviews() {
         </div>
 
         {/* FILTERS */}
-        <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-4">
-          <SpotlightCard className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
-            <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
+        <motion.div variants={slideUp} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <SpotlightCard className="glass-card flex-1 flex items-center px-3 sm:px-4 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all min-w-0">
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-brand-navy/40 mr-2.5 sm:mr-3 shrink-0" />
             <input
               type="text"
               placeholder="Search by candidate, job, interviewer..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
+              className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-10 sm:h-11 text-xs sm:text-sm min-w-0"
             />
           </SpotlightCard>
-          <div className="flex flex-col sm:flex-row gap-3 lg:flex">
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+          <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full sm:w-auto bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Statuses</option>
               <option value="Scheduled">Scheduled</option>
               <option value="Completed">Completed</option>

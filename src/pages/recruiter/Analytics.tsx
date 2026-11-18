@@ -27,17 +27,17 @@ const MOCK_JOBS = [
 const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
     <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200 h-full">
-      <PremiumCardContent className="p-5 flex flex-col justify-between h-full">
-        <div className="flex justify-between items-start mb-4">
-          <div className={`p-2.5 rounded-lg ${color.bg} ${color.text}`}>
-            <Icon className="w-5 h-5" />
+      <PremiumCardContent className="p-3.5 sm:p-5 flex flex-col justify-between h-full">
+        <div className="flex justify-between items-start mb-2 sm:mb-4">
+          <div className={`p-2 sm:p-2.5 rounded-lg ${color.bg} ${color.text}`}>
+            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
-        <div>
-          <h3 className="text-2xl font-display font-bold text-brand-navy">
-            {loading ? <div className="h-8 w-16 bg-brand-gray/20 rounded animate-pulse" /> : value}
+        <div className="min-w-0">
+          <h3 className="text-xl sm:text-2xl font-display font-bold text-brand-navy truncate">
+            {loading ? <div className="h-7 sm:h-8 w-16 bg-brand-gray/20 rounded animate-pulse" /> : value}
           </h3>
-          <p className="text-sm font-medium text-brand-navy/60 mt-1">{title}</p>
+          <p className="text-xs sm:text-sm font-medium text-brand-navy/60 mt-0.5 sm:mt-1 truncate">{title}</p>
         </div>
       </PremiumCardContent>
     </PremiumCard>
@@ -151,16 +151,16 @@ export default function RecruiterAnalytics() {
         {/* HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">Recruitment Analytics</h1>
-            <p className="text-brand-navy/60 mt-1">Track hiring activity, candidate progress, and AI screening insights.</p>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Recruitment Analytics</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Track hiring activity, candidate progress, and AI screening insights.</p>
           </div>
-          <Button onClick={handleExport} className="bg-white text-brand-navy border border-brand-gray/40 hover:bg-brand-gray/10 shrink-0">
+          <Button onClick={handleExport} className="w-full sm:w-auto bg-white text-brand-navy border border-brand-gray/40 hover:bg-brand-gray/10 shrink-0">
             <Download className="w-4 h-4 mr-2" /> Export Report
           </Button>
         </motion.div>
 
         {/* SUMMARY CARDS */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
           <StatCard title="Total Applications" value={MOCK_STATS.totalApplications} icon={Users} delay={0} loading={loading} color={{ bg: "bg-brand-gray/10", text: "text-brand-navy" }} />
           <StatCard title="AI Screened" value={MOCK_STATS.aiScreened} icon={Search} delay={1} loading={loading} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
           <StatCard title="AI Qualified" value={MOCK_STATS.aiQualified} icon={CheckCircle2} delay={2} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
@@ -178,7 +178,7 @@ export default function RecruiterAnalytics() {
               <PremiumCardHeader className="border-b border-brand-gray/20">
                 <PremiumCardTitle>Hiring Funnel</PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-8">
+              <PremiumCardContent className="p-4 sm:p-8">
                 {loading ? (
                   <div className="h-40 flex items-center justify-center"><div className="w-8 h-8 border-2 border-brand-indigo border-t-transparent rounded-full animate-spin" /></div>
                 ) : (
@@ -206,7 +206,7 @@ export default function RecruiterAnalytics() {
               <PremiumCardHeader className="border-b border-brand-gray/20">
                 <PremiumCardTitle>AI Screening Insights</PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-6">
+              <PremiumCardContent className="p-4 sm:p-6">
                 <p className="text-xs text-brand-navy/60 mb-6 leading-relaxed bg-brand-blue/5 p-3 rounded-lg border border-brand-blue/10">
                   Candidates scoring <span className="font-bold text-brand-indigo">{AI_SCREENING_THRESHOLD}%</span> or above are considered AI-qualified for recruiter review.
                 </p>

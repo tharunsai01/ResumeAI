@@ -443,7 +443,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                         <label className="block text-sm font-semibold text-brand-navy mb-2">Preferred Locations</label>
                         <Input value={profile.careerPreferences.preferredLocations.join(", ")} disabled className="bg-transparent" />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-semibold text-brand-navy mb-2">Expected Salary</label>
                           <Input value={profile.careerPreferences.expectedSalary} disabled className="bg-transparent" />
@@ -456,7 +456,7 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                         </div>
                       </div>
                       <div className="pt-4 flex justify-end">
-                        <button onClick={() => navigate("/candidate/profile")} className="btn-interactive btn-primary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
+                        <button onClick={() => navigate("/candidate/profile")} className="btn-interactive btn-primary px-4 py-2 text-sm font-semibold rounded-lg transition-colors w-full sm:w-auto">
                           Edit Job Preferences in Profile
                         </button>
                       </div>
@@ -604,21 +604,21 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
                         <PremiumCardDescription>Irreversible and destructive actions for your account.</PremiumCardDescription>
                       </PremiumCardHeader>
                       <PremiumCardContent className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-semantic-error/5 rounded-xl">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-semantic-error/5 rounded-xl gap-3">
                           <div>
                             <h4 className="font-semibold text-brand-navy">Clear Local Data</h4>
                             <p className="text-sm text-brand-navy/60 mt-1">Removes all saved settings, notifications, and mock data from this browser.</p>
                           </div>
-                          <button onClick={handleClearData} className="btn-interactive rounded-lg bg-semantic-error/10 text-semantic-error font-semibold hover:bg-semantic-error/20 shrink-0 px-4 py-2">
+                          <button onClick={handleClearData} className="btn-interactive rounded-lg bg-semantic-error/10 text-semantic-error font-semibold hover:bg-semantic-error/20 shrink-0 px-4 py-2 self-start sm:self-auto">
                             Clear Data
                           </button>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-semantic-error/5 rounded-xl">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-semantic-error/5 rounded-xl gap-3">
                           <div>
                             <h4 className="font-semibold text-brand-navy">Delete Account</h4>
                             <p className="text-sm text-brand-navy/60 mt-1">Permanently delete your account and all associated data.</p>
                           </div>
-                          <button onClick={() => setIsDeleteModalOpen(true)} className="btn-interactive bg-semantic-error text-white font-semibold rounded-lg hover:bg-semantic-error/90 shrink-0 px-4 py-2 transition-colors">
+                          <button onClick={() => setIsDeleteModalOpen(true)} className="btn-interactive bg-semantic-error text-white font-semibold rounded-lg hover:bg-semantic-error/90 shrink-0 px-4 py-2 transition-colors self-start sm:self-auto">
                             Delete Account
                           </button>
                         </div>
@@ -663,12 +663,12 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
               onChange={e => { setConfirmEmail(e.target.value); setEmailError(null); }}
             />
           </div>
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-brand-gray/30">
-            <button onClick={handleCloseEmailModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg">Cancel</button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-6 pt-4 border-t border-brand-gray/30">
+            <button onClick={handleCloseEmailModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg w-full sm:w-auto">Cancel</button>
             <button 
               onClick={handleUpdateEmail} 
               disabled={isSubmittingEmail}
-              className="btn-interactive btn-primary px-4 py-2 font-semibold text-sm rounded-lg"
+              className="btn-interactive btn-primary px-4 py-2 font-semibold text-sm rounded-lg w-full sm:w-auto"
             >
               {isSubmittingEmail ? "Updating..." : "Update Email"}
             </button>
@@ -711,12 +711,12 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
               onChange={e => { setConfirmPassword(e.target.value); setPasswordError(null); }}
             />
           </div>
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-brand-gray/30">
-            <button onClick={handleClosePasswordModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg">Cancel</button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-6 pt-4 border-t border-brand-gray/30">
+            <button onClick={handleClosePasswordModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg w-full sm:w-auto">Cancel</button>
             <button 
               onClick={handleUpdatePassword} 
               disabled={isSubmittingPassword}
-              className="btn-interactive btn-primary px-4 py-2 font-semibold text-sm rounded-lg"
+              className="btn-interactive btn-primary px-4 py-2 font-semibold text-sm rounded-lg w-full sm:w-auto"
             >
               {isSubmittingPassword ? "Updating..." : "Update Password"}
             </button>
@@ -727,9 +727,9 @@ export default function CandidateSettingsPage({ type = "candidate" }: SettingsPa
       <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="Delete your account?">
         <div className="mt-4">
           <p className="text-brand-navy/70 mb-6">This action cannot be undone. All your data, applications, and profile information will be permanently removed.</p>
-          <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsDeleteModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
-            <button onClick={handleDeleteAccount} className="btn-interactive bg-semantic-error text-white hover:bg-semantic-error/90 px-4 py-2 font-semibold rounded-lg">Delete Account</button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-6">
+            <button onClick={() => setIsDeleteModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg w-full sm:w-auto">Cancel</button>
+            <button onClick={handleDeleteAccount} className="btn-interactive bg-semantic-error text-white hover:bg-semantic-error/90 px-4 py-2 font-semibold rounded-lg w-full sm:w-auto">Delete Account</button>
           </div>
         </div>
       </Modal>

@@ -85,10 +85,10 @@ export function AiOverview() {
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex sm:justify-end">
           <button 
             onClick={() => navigate('/admin/ai-evaluation')}
-            className="flex items-center gap-2 text-sm font-medium text-brand-violet hover:text-brand-violet/80 transition-colors py-2 px-4 bg-brand-violet/5 rounded-lg hover:bg-brand-violet/10"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 text-sm font-medium text-brand-violet hover:text-brand-violet/80 transition-colors py-2 px-4 bg-brand-violet/5 rounded-lg hover:bg-brand-violet/10"
           >
             View AI Evaluation <ArrowRight className="w-4 h-4" />
           </button>

@@ -33,12 +33,12 @@ export default function CandidateRecommended() {
     <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-6xl mx-auto space-y-8 pb-12">
         <motion.div variants={slideUp} className="flex items-center gap-3">
-          <div className="p-3 bg-brand-indigo/10 rounded-xl">
-            <Sparkles className="w-6 h-6 text-brand-indigo" />
+          <div className="p-2.5 sm:p-3 bg-brand-indigo/10 rounded-xl shrink-0">
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-brand-indigo" />
           </div>
           <div>
-            <h1 className="text-2xl font-display font-semibold text-brand-navy">AI Recommended Jobs</h1>
-            <p className="text-brand-navy/60">Jobs selected based on your resume, skills, and experience.</p>
+            <h1 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy">AI Recommended Jobs</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60">Jobs selected based on your resume, skills, and experience.</p>
           </div>
         </motion.div>
 

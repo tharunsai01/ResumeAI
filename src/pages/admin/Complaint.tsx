@@ -164,43 +164,43 @@ export default function AdminComplaintForm() {
       />
 
       {/* Quick Metrics Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-xl border border-brand-gray/20 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">Open Tickets</p>
-            <p className="text-2xl font-display font-bold text-brand-navy mt-1">{openCount}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-brand-gray/20 shadow-sm flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider truncate">Open Tickets</p>
+            <p className="text-2xl font-display font-bold text-brand-navy mt-1 truncate">{openCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-brand-indigo/10 flex items-center justify-center text-brand-indigo">
+          <div className="w-10 h-10 rounded-lg bg-brand-indigo/10 flex items-center justify-center text-brand-indigo shrink-0">
             <Clock className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-brand-gray/20 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">In Review</p>
-            <p className="text-2xl font-display font-bold text-amber-600 mt-1">{inReviewCount}</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-brand-gray/20 shadow-sm flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider truncate">In Review</p>
+            <p className="text-2xl font-display font-bold text-amber-600 mt-1 truncate">{inReviewCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600">
+          <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
             <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-brand-gray/20 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">High / Critical</p>
-            <p className="text-2xl font-display font-bold text-semantic-error mt-1">{highPriorityCount}</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-brand-gray/20 shadow-sm flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider truncate">High / Critical</p>
+            <p className="text-2xl font-display font-bold text-semantic-error mt-1 truncate">{highPriorityCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-semantic-error/10 flex items-center justify-center text-semantic-error">
+          <div className="w-10 h-10 rounded-lg bg-semantic-error/10 flex items-center justify-center text-semantic-error shrink-0">
             <ShieldAlert className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-brand-gray/20 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">Resolved</p>
-            <p className="text-2xl font-display font-bold text-semantic-success mt-1">{resolvedCount}</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-brand-gray/20 shadow-sm flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider truncate">Resolved</p>
+            <p className="text-2xl font-display font-bold text-semantic-success mt-1 truncate">{resolvedCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-semantic-success/10 flex items-center justify-center text-semantic-success">
+          <div className="w-10 h-10 rounded-lg bg-semantic-success/10 flex items-center justify-center text-semantic-success shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </div>
         </div>
@@ -391,19 +391,19 @@ export default function AdminComplaintForm() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="pt-2 flex items-center justify-between border-t border-brand-gray/10">
+                <div className="pt-2 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-brand-gray/10">
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-brand-navy/70 hover:text-brand-navy hover:bg-brand-gray/10 rounded-lg transition-colors"
+                    className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium text-brand-navy/70 hover:text-brand-navy hover:bg-brand-gray/10 rounded-lg transition-colors w-full sm:w-auto"
                   >
                     <RotateCcw className="w-4 h-4" /> Reset Form
                   </button>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
                     <button
                       type="submit"
-                      className="flex items-center gap-2 px-5 py-2.5 bg-brand-indigo hover:bg-brand-indigo/90 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
+                      className="flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-indigo hover:bg-brand-indigo/90 text-white text-sm font-medium rounded-lg shadow-sm transition-colors w-full sm:w-auto"
                     >
                       <Send className="w-4 h-4" /> Submit Ticket
                     </button>

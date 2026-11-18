@@ -12,15 +12,15 @@ export function AccountInformation({ user }: { user: AdminUser }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <div className="text-brand-navy/50 text-xs uppercase tracking-wider font-semibold mb-1">User ID</div>
-            <div className="font-medium text-brand-navy">{user.id}</div>
+            <div className="font-medium text-brand-navy font-mono break-all">{user.id}</div>
           </div>
           <div>
             <div className="text-brand-navy/50 text-xs uppercase tracking-wider font-semibold mb-1">Full Name</div>
-            <div className="font-medium text-brand-navy">{user.name}</div>
+            <div className="font-medium text-brand-navy break-words">{user.name}</div>
           </div>
           <div>
             <div className="text-brand-navy/50 text-xs uppercase tracking-wider font-semibold mb-1">Email</div>
-            <div className="font-medium text-brand-navy">{user.email}</div>
+            <div className="font-medium text-brand-navy break-all">{user.email}</div>
           </div>
           <div>
             <div className="text-brand-navy/50 text-xs uppercase tracking-wider font-semibold mb-1">Registration Date</div>

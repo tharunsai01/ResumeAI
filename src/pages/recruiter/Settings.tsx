@@ -141,8 +141,8 @@ export default function RecruiterSettings() {
 
         {/* HEADER */}
         <motion.div variants={slideUp}>
-          <h1 className="text-3xl font-display font-semibold text-brand-navy">Settings</h1>
-          <p className="text-brand-navy/60 mt-1">Manage your account, preferences, and platform configuration.</p>
+          <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Settings</h1>
+          <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Manage your account, preferences, and platform configuration.</p>
         </motion.div>
 
         {/* PROFILE CARD SUMMARY BANNER */}
@@ -154,20 +154,20 @@ export default function RecruiterSettings() {
                 <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <div className="p-8 flex flex-col sm:flex-row items-center gap-6 relative z-10">
-              <div className="w-20 h-20 rounded-full bg-[#1e293b] flex items-center justify-center border-2 border-white/20 shrink-0 shadow-lg">
-                <span className="text-3xl font-display font-bold text-white">{profile.name.charAt(0)}</span>
+            <div className="p-5 sm:p-8 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 relative z-10">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#1e293b] flex items-center justify-center border-2 border-white/20 shrink-0 shadow-lg">
+                <span className="text-2xl sm:text-3xl font-display font-bold text-white">{profile.name.charAt(0)}</span>
               </div>
-              <div className="text-center sm:text-left flex-1">
-                <h2 className="text-2xl font-display font-bold text-white">{profile.name}</h2>
-                <div className="text-white/90 font-medium text-sm mt-1">{profile.designation} • {profile.department}</div>
-                <div className="flex flex-col sm:flex-row items-center gap-4 mt-2 text-xs text-white/80">
+              <div className="text-center sm:text-left flex-1 min-w-0">
+                <h2 className="text-xl sm:text-2xl font-display font-bold text-white break-words">{profile.name}</h2>
+                <div className="text-white/90 font-medium text-xs sm:text-sm mt-1">{profile.designation} • {profile.department}</div>
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mt-2 text-xs text-white/80">
                   <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> {profile.email}</span>
                   <span className="hidden sm:inline">•</span>
                   <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {profile.location}</span>
                 </div>
               </div>
-              <Button onClick={() => setActiveTab("profile")} className="bg-[#1e293b] text-white hover:bg-slate-800 mt-4 sm:mt-0 shrink-0 border border-white/10">
+              <Button onClick={() => setActiveTab("profile")} className="w-full sm:w-auto bg-[#1e293b] text-white hover:bg-slate-800 mt-3 sm:mt-0 shrink-0 border border-white/10">
                 Edit Profile
               </Button>
             </div>
@@ -476,12 +476,12 @@ export default function RecruiterSettings() {
                         </button>
                       </div>
                       
-                      <div className="pt-4 border-t border-brand-gray/30 flex items-center justify-between">
+                      <div className="pt-4 border-t border-brand-gray/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                           <h4 className="font-medium text-brand-navy">Two-Factor Authentication</h4>
                           <p className="text-sm text-brand-navy/60 mt-1">Protect your account with an extra security layer.</p>
                         </div>
-                        <button onClick={() => setIs2FAModalOpen(true)} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
+                        <button onClick={() => setIs2FAModalOpen(true)} className="btn-interactive btn-secondary w-full sm:w-auto px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
                           Enable 2FA
                         </button>
                       </div>
@@ -546,9 +546,9 @@ export default function RecruiterSettings() {
             <label className="block text-sm font-medium text-brand-navy mb-1.5">Confirm New Email</label>
             <Input type="email" placeholder="new.email@example.com" />
           </div>
-          <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsEmailModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
-            <button onClick={() => { setIsEmailModalOpen(false); showToast("Email successfully updated ✓"); }} className="btn-interactive btn-primary px-4 py-2 font-semibold rounded-lg transition-colors">Update Email</button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <button onClick={() => setIsEmailModalOpen(false)} className="btn-interactive btn-ghost w-full sm:w-auto px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={() => { setIsEmailModalOpen(false); showToast("Email successfully updated ✓"); }} className="btn-interactive btn-primary w-full sm:w-auto px-4 py-2 font-semibold rounded-lg transition-colors">Update Email</button>
           </div>
         </div>
       </Modal>
@@ -567,9 +567,9 @@ export default function RecruiterSettings() {
             <label className="block text-sm font-medium text-brand-navy mb-1.5">Confirm New Password</label>
             <Input type="password" placeholder="Minimum 8 characters" />
           </div>
-          <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIsPasswordModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
-            <button onClick={() => { setIsPasswordModalOpen(false); showToast("Password successfully changed ✓"); }} className="btn-interactive btn-primary px-4 py-2 font-semibold rounded-lg transition-colors">Update Password</button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <button onClick={() => setIsPasswordModalOpen(false)} className="btn-interactive btn-ghost w-full sm:w-auto px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={() => { setIsPasswordModalOpen(false); showToast("Password successfully changed ✓"); }} className="btn-interactive btn-primary w-full sm:w-auto px-4 py-2 font-semibold rounded-lg transition-colors">Update Password</button>
           </div>
         </div>
       </Modal>
@@ -584,9 +584,9 @@ export default function RecruiterSettings() {
             <label className="block text-sm font-medium text-brand-navy mb-1.5">Enter 6-digit verification code</label>
             <Input type="text" placeholder="000000" maxLength={6} className="text-center tracking-[0.5em] text-lg font-bold font-mono" />
           </div>
-          <div className="flex justify-end gap-3 mt-6">
-            <button onClick={() => setIs2FAModalOpen(false)} className="btn-interactive btn-ghost px-4 py-2 font-semibold rounded-lg">Cancel</button>
-            <button onClick={() => { setIs2FAModalOpen(false); showToast("2FA Successfully Enabled ✓"); }} className="btn-interactive bg-semantic-success text-white px-4 py-2 font-semibold rounded-lg transition-colors">Verify & Enable</button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <button onClick={() => setIs2FAModalOpen(false)} className="btn-interactive btn-ghost w-full sm:w-auto px-4 py-2 font-semibold rounded-lg">Cancel</button>
+            <button onClick={() => { setIs2FAModalOpen(false); showToast("2FA Successfully Enabled ✓"); }} className="btn-interactive bg-semantic-success text-white w-full sm:w-auto px-4 py-2 font-semibold rounded-lg transition-colors">Verify & Enable</button>
           </div>
         </div>
       </Modal>

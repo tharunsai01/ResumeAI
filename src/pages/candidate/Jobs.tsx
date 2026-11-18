@@ -177,18 +177,18 @@ export default function CandidateJobs() {
               placeholder="Search job title, company, or keyword..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-12"
+              className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 placeholder:text-xs sm:placeholder:text-sm text-sm sm:text-base h-12 truncate"
             />
           </div>
           <Button className="shrink-0 rounded-xl hidden sm:flex px-8" onClick={(e) => e.preventDefault()}>Search</Button>
-          <Button variant="outline" className="sm:hidden mr-2" onClick={(e) => { e.preventDefault(); setIsMobileFiltersOpen(!isMobileFiltersOpen); }}>
+          <Button variant="outline" className="sm:hidden mr-2 shrink-0" onClick={(e) => { e.preventDefault(); setIsMobileFiltersOpen(!isMobileFiltersOpen); }}>
             <SlidersHorizontal className="w-5 h-5" />
           </Button>
         </MotionSpotlightCard>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
           {/* Desktop Filters Sidebar */}
-          <motion.div variants={slideUp} className={cn("w-full lg:w-72 shrink-0 sticky top-24 h-[calc(100vh-8rem)] flex-col", isMobileFiltersOpen ? "flex" : "hidden lg:flex")}>
+          <motion.div variants={slideUp} className={cn("w-full lg:w-72 shrink-0 flex-col", isMobileFiltersOpen ? "flex max-h-[80vh] lg:max-h-none lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]" : "hidden lg:flex lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]")}>
             <div className="flex items-center justify-between mb-4 shrink-0">
               <h2 className="font-display font-semibold text-brand-navy flex items-center gap-2">
                 <Filter className="w-4 h-4" /> Filters
@@ -299,17 +299,17 @@ export default function CandidateJobs() {
 
           {/* Main List */}
           <div className="flex-1 w-full space-y-6">
-            <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-light/50 p-4 rounded-xl border border-brand-gray/30">
-              <p className="text-brand-navy/70 font-medium">
+            <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-brand-light/50 p-3 sm:p-4 rounded-xl border border-brand-gray/30">
+              <p className="text-sm sm:text-base text-brand-navy/70 font-medium">
                 {loading ? "Searching..." : `${filteredJobs.length} jobs found`}
               </p>
 
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-brand-navy/60">Sort by:</span>
+              <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+                <span className="text-sm text-brand-navy/60 shrink-0">Sort by:</span>
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="bg-white border border-brand-gray/50 rounded-lg py-1.5 px-3 text-sm font-medium text-brand-navy outline-none focus:border-brand-indigo/50"
+                  className="bg-white border border-brand-gray/50 rounded-lg py-1.5 px-3 text-sm font-medium text-brand-navy outline-none focus:border-brand-indigo/50 flex-1 sm:flex-initial"
                 >
                   <option value="Best Match">Best Match</option>
                   <option value="Newest">Newest</option>

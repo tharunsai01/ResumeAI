@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { 
   LayoutDashboard, Users, AlertOctagon, Tags, ScrollText, 
   BrainCircuit, Activity, Settings, LogOut, Bell, Menu,
-  Search, Shield, FileText as FileTextIcon, Lock, Info, ChevronRight, Sun, Moon, HelpCircle, CheckCircle2, Check
+  Search, Shield, FileText as FileTextIcon, Lock, Info, ChevronRight, Sun, Moon, HelpCircle, CheckCircle2, Check, X
 } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { notificationService } from "../../services/notificationService"
@@ -197,7 +197,7 @@ export function AdminShell({ children }: AdminShellProps) {
   const renderSidebarContent = () => (
     <div className="flex h-full flex-col">
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex h-[80px] items-center px-5 border-b border-brand-gray/20">
+        <div className="flex h-[80px] items-center px-5 border-b border-brand-gray/20 justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-[12px] bg-brand-indigo flex items-center justify-center shrink-0 shadow-sm">
               <span className="text-white font-display font-bold text-lg">H</span>
@@ -208,6 +208,23 @@ export function AdminShell({ children }: AdminShellProps) {
               </span>
             )}
           </div>
+          {isMobileOpen ? (
+            <button 
+              onClick={toggleMobile} 
+              className="p-1.5 text-brand-navy/40 hover:text-brand-navy hover:bg-brand-gray/20 rounded-md transition-colors lg:hidden"
+              aria-label="Close navigation"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          ) : isSidebarOpen ? (
+            <button 
+              onClick={toggleSidebar} 
+              className="hidden lg:block p-1.5 text-brand-navy/40 hover:text-brand-navy hover:bg-brand-gray/20 rounded-md transition-colors"
+              aria-label="Collapse sidebar"
+            >
+              <ChevronRight className="w-4 h-4 rotate-180" />
+            </button>
+          ) : null}
         </div>
         <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-4 py-4">
           
@@ -434,7 +451,7 @@ export function AdminShell({ children }: AdminShellProps) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="glass-card absolute right-0 top-full mt-2 w-80 sm:w-96 z-50 overflow-hidden flex flex-col max-h-[80vh]"
+                      className="glass-card absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] max-w-sm sm:w-96 z-50 overflow-hidden flex flex-col max-h-[80vh]"
                     >
                       <div className="p-4 border-b border-brand-gray/30 flex items-center justify-between bg-brand-light/30">
                         <h3 className="font-semibold text-brand-navy dark:text-white">Notifications</h3>
@@ -499,7 +516,7 @@ export function AdminShell({ children }: AdminShellProps) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="glass-card absolute right-0 top-full mt-2 w-48 z-50 overflow-hidden flex flex-col py-2"
+                      className="glass-card absolute right-0 top-full mt-2 w-48 max-w-[calc(100vw-2rem)] z-50 overflow-hidden flex flex-col py-2"
                     >
                       <button onClick={() => { setIsProfileOpen(false); navigate(`/admin/settings`); }} className="w-full text-left px-4 py-2 text-sm text-brand-navy/70 hover:bg-brand-light hover:text-brand-indigo transition-colors flex items-center gap-2">
                         <Settings className="w-4 h-4" /> Settings
@@ -516,7 +533,7 @@ export function AdminShell({ children }: AdminShellProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-brand-light">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-8 bg-brand-light">
           <div className="mx-auto max-w-7xl h-full">
             <AnimatePresence mode="wait">
               <PageTransition>

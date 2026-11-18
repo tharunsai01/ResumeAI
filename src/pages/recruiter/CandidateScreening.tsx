@@ -77,44 +77,44 @@ export default function RecruiterCandidateScreening() {
         <motion.div variants={slideUp}>
           <PremiumCard className="border-none shadow-md overflow-hidden">
             <div className="h-2 bg-gradient-to-r from-brand-indigo via-brand-blue to-transparent" />
-            <PremiumCardContent className="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-              <div className="flex items-center gap-5">
-                <div className="w-20 h-20 rounded-2xl bg-brand-indigo/10 flex items-center justify-center border border-brand-indigo/20 shrink-0">
-                  <span className="text-3xl font-display font-bold text-brand-indigo">
+            <PremiumCardContent className="p-4 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
+              <div className="flex items-center gap-3 sm:gap-5 min-w-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-brand-indigo/10 flex items-center justify-center border border-brand-indigo/20 shrink-0">
+                  <span className="text-2xl sm:text-3xl font-display font-bold text-brand-indigo">
                     {candidate.name.split(" ").map(n => n[0]).join("")}
                   </span>
                 </div>
-                <div>
-                  <h1 className="text-3xl font-display font-bold text-brand-navy">{candidate.name}</h1>
-                  <p className="text-brand-navy/60 font-medium mt-1">{candidate.role} • {candidate.experience} exp</p>
+                <div className="min-w-0">
+                  <h1 className="text-2xl sm:text-3xl font-display font-bold text-brand-navy break-words">{candidate.name}</h1>
+                  <p className="text-brand-navy/60 font-medium text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">{candidate.role} • {candidate.experience} exp</p>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
                 <div className="flex items-center gap-4 pr-0 sm:pr-6 sm:border-r border-brand-gray/20">
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <div className="text-xs font-semibold uppercase tracking-wider text-brand-navy/50 mb-1">Overall Match</div>
-                    <div className="text-2xl font-bold text-brand-indigo">{candidate.overallMatch}%</div>
+                    <div className="text-xl sm:text-2xl font-bold text-brand-indigo">{candidate.overallMatch}%</div>
                   </div>
                   <CandidateMatchScore score={candidate.overallMatch} size="lg" showLabel={false} />
                 </div>
-                <div className="flex flex-wrap sm:flex-col gap-2 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full sm:w-auto">
                   {candidate.status !== "Shortlisted" && candidate.status !== "Rejected" && (
                     isQualified ? (
-                      <Button onClick={handleShortlist} className="flex-1 bg-brand-navy hover:bg-brand-navy/90 text-sm h-9">
+                      <Button onClick={handleShortlist} className="w-full sm:w-auto bg-brand-navy hover:bg-brand-navy/90 text-sm h-9">
                         Shortlist Candidate
                       </Button>
                     ) : (
-                      <Button disabled className="flex-1 bg-brand-gray/20 text-brand-navy/40 cursor-not-allowed border border-brand-gray/30 text-sm h-9">
+                      <Button disabled className="w-full sm:w-auto bg-brand-gray/20 text-brand-navy/40 cursor-not-allowed border border-brand-gray/30 text-sm h-9">
                         Below Threshold
                       </Button>
                     )
                   )}
                   {candidate.status !== "Shortlisted" && candidate.status !== "Rejected" && (
-                    <Button onClick={() => setCandidateToReject(true)} variant="outline" className="flex-1 text-semantic-error border-brand-gray/40 hover:bg-semantic-error/10 text-sm h-9">
+                    <Button onClick={() => setCandidateToReject(true)} variant="outline" className="w-full sm:w-auto text-semantic-error border-brand-gray/40 hover:bg-semantic-error/10 text-sm h-9">
                       Reject Candidate
                     </Button>
                   )}
-                  <Button variant="ghost" onClick={() => navigate(`/recruiter/candidates/${candidate.id}`)} className="flex-1 text-brand-indigo hover:bg-brand-indigo/10 text-sm h-9">
+                  <Button variant="ghost" onClick={() => navigate(`/recruiter/candidates/${candidate.id}`)} className="w-full sm:w-auto text-brand-indigo hover:bg-brand-indigo/10 text-sm h-9">
                     <User className="w-4 h-4 mr-2" /> View Full Profile
                   </Button>
                 </div>
@@ -135,7 +135,7 @@ export default function RecruiterCandidateScreening() {
                   <Brain className="w-5 h-5" /> AI Match Breakdown
                 </PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-6">
+              <PremiumCardContent className="p-4 sm:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                   {[
                     { label: "Skills Match", score: candidate.skillMatch },
@@ -207,7 +207,7 @@ export default function RecruiterCandidateScreening() {
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30">
                 <PremiumCardTitle>Required Skills vs Candidate Skills</PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-6">
+              <PremiumCardContent className="p-4 sm:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
                     <h4 className="text-sm font-semibold text-brand-navy mb-4 border-b border-brand-gray/20 pb-2">Required by Job</h4>

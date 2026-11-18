@@ -161,11 +161,11 @@ export default function AdminSkills() {
           title="Skill Taxonomy" 
           description="Manage the standardized skills used for resume analysis and job matching."
           action={
-            <div className="flex items-center gap-3 shrink-0">
-              <Button variant="outline" onClick={() => setCategoryModalOpen(true)}>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
+              <Button variant="outline" onClick={() => setCategoryModalOpen(true)} className="flex-1 sm:flex-initial justify-center">
                 <Layers className="w-4 h-4 mr-2" /> Manage Categories
               </Button>
-              <Button onClick={() => setSkillModalOpen(true)} className="bg-brand-indigo hover:bg-brand-blue text-white">
+              <Button onClick={() => setSkillModalOpen(true)} className="bg-brand-indigo hover:bg-brand-blue text-white flex-1 sm:flex-initial justify-center">
                 <Plus className="w-4 h-4 mr-2" /> Add Skill
               </Button>
             </div>
@@ -173,7 +173,7 @@ export default function AdminSkills() {
         />
 
         {/* STATS */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <AdminStatCard title="Total Skills" value={skills.length} icon={BookOpen} delay={0} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
           <AdminStatCard title="Categories" value={categories.length} icon={Layers} delay={1} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
           <AdminStatCard title="Active Skills" value={skills.filter(s => s.status === "Active").length} icon={CheckCircle2} delay={2} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
@@ -234,30 +234,30 @@ export default function AdminSkills() {
             {/* TABLE */}
             <motion.div variants={slideUp}>
               <PremiumCard>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left">
                     <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
                       <tr>
-                        <th className="px-5 py-4">Skill</th>
-                        <th className="px-5 py-4">Category</th>
-                        <th className="px-5 py-4 hidden sm:table-cell">Aliases</th>
-                        <th className="px-5 py-4 text-center">Usage</th>
-                        <th className="px-5 py-4 text-center">Status</th>
-                        <th className="px-5 py-4 text-right">Actions</th>
+                        <th className="px-3 sm:px-5 py-3 sm:py-4 whitespace-nowrap">Skill</th>
+                        <th className="px-3 sm:px-5 py-3 sm:py-4 whitespace-nowrap">Category</th>
+                        <th className="px-3 sm:px-5 py-3 sm:py-4 hidden sm:table-cell whitespace-nowrap">Aliases</th>
+                        <th className="px-3 sm:px-5 py-3 sm:py-4 text-center whitespace-nowrap">Usage</th>
+                        <th className="px-3 sm:px-5 py-3 sm:py-4 text-center whitespace-nowrap">Status</th>
+                        <th className="px-3 sm:px-5 py-3 sm:py-4 text-right whitespace-nowrap">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-brand-gray/20">
                       {paginatedSkills.length > 0 ? (
                         paginatedSkills.map(skill => (
                           <tr key={skill.id} className="hover:bg-brand-light/30 transition-colors group">
-                            <td className="px-5 py-3">
+                            <td className="px-3 sm:px-5 py-3 whitespace-nowrap">
                               <div className="font-semibold text-brand-navy">{skill.name}</div>
                               <div className="text-[10px] text-brand-navy/40 mt-0.5 sm:hidden">{skill.aliases.join(", ")}</div>
                             </td>
-                            <td className="px-5 py-3">
+                            <td className="px-3 sm:px-5 py-3 whitespace-nowrap">
                               <span className="text-brand-navy/80">{categories.find(c => c.id === skill.categoryId)?.name || "-"}</span>
                             </td>
-                            <td className="px-5 py-3 hidden sm:table-cell">
+                            <td className="px-3 sm:px-5 py-3 hidden sm:table-cell whitespace-nowrap">
                               <div className="flex flex-wrap gap-1">
                                 {skill.aliases.map(alias => (
                                   <span key={alias} className="px-1.5 py-0.5 bg-white text-[10px] border border-brand-gray/40 rounded text-brand-navy/60 whitespace-nowrap">
@@ -267,13 +267,13 @@ export default function AdminSkills() {
                                 {skill.aliases.length === 0 && <span className="text-brand-navy/40 text-xs">-</span>}
                               </div>
                             </td>
-                            <td className="px-5 py-3 text-center">
+                            <td className="px-3 sm:px-5 py-3 text-center whitespace-nowrap">
                               <span className="text-brand-navy font-medium">{skill.usageCount} <span className="text-xs text-brand-navy/50 font-normal">profiles</span></span>
                             </td>
-                            <td className="px-5 py-3 text-center">
+                            <td className="px-3 sm:px-5 py-3 text-center whitespace-nowrap">
                               <AdminStatusBadge status={skill.status} />
                             </td>
-                            <td className="px-5 py-3 text-right">
+                            <td className="px-3 sm:px-5 py-3 text-right whitespace-nowrap">
                               <div className="flex items-center justify-end gap-1">
                                 <button 
                                   onClick={() => handleOpenView(skill)}
@@ -325,15 +325,15 @@ export default function AdminSkills() {
                 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="p-4 border-t border-brand-gray/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="text-sm text-brand-navy/60">
+                  <div className="p-4 border-t border-brand-gray/20 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                    <div className="text-sm text-brand-navy/60 text-center sm:text-left">
                       Showing <span className="font-medium text-brand-navy">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-brand-navy">{Math.min(currentPage * itemsPerPage, filteredSkills.length)}</span> of <span className="font-medium text-brand-navy">{filteredSkills.length}</span> skills
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Button variant="outline" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="px-3 h-8 text-xs">
+                    <div className="flex flex-wrap items-center justify-center gap-1">
+                      <Button variant="outline" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="px-3 h-8 text-xs shrink-0">
                         Previous
                       </Button>
-                      <div className="flex gap-1 px-2">
+                      <div className="flex gap-1 px-1 overflow-x-auto max-w-[180px] sm:max-w-none py-1">
                         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                           let pageNum = currentPage
                           if (currentPage < 3) pageNum = i + 1

@@ -29,13 +29,13 @@ export function UserActionMenu({ user, onSuspend, onReactivate }: UserActionMenu
       <AnimatePresence>
         {isOpen && (
           <>
-            <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+            <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-brand-gray/30 overflow-hidden z-20 py-1"
+              className="absolute right-0 mt-1 w-48 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-lg border border-brand-gray/30 overflow-hidden z-30 py-1"
             >
               <button
                 onClick={() => {

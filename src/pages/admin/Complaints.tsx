@@ -92,14 +92,14 @@ export default function AdminComplaints() {
         action={
           <button 
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-light border border-brand-gray/50 hover:bg-brand-gray/10 text-brand-navy rounded-lg font-medium transition-colors text-sm"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-brand-light border border-brand-gray/50 hover:bg-brand-gray/10 text-brand-navy rounded-lg font-medium transition-colors text-sm"
           >
             <Download className="w-4 h-4" /> Export Complaints
           </button>
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
         <AdminStatCard title="Total Complaints" value={stats.total} icon={MessageSquare} delay={1} />
         <AdminStatCard title="Open" value={stats.open} icon={AlertCircle} delay={2} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
         <AdminStatCard title="In Review" value={stats.inReview} icon={Clock} delay={3} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
@@ -131,26 +131,26 @@ export default function AdminComplaints() {
         <>
           <ComplaintTable complaints={paginatedComplaints} />
           
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-            <span className="text-sm text-brand-navy/60">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-4">
+            <span className="text-sm text-brand-navy/60 text-center sm:text-left">
               Showing <span className="font-medium text-brand-navy">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-brand-navy">{Math.min(currentPage * itemsPerPage, filteredComplaints.length)}</span> of <span className="font-medium text-brand-navy">{filteredComplaints.length}</span> complaints
             </span>
             
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-2 max-w-full">
               <button 
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-lg border border-brand-gray/50 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-light"
+                className="px-3 py-1.5 rounded-lg border border-brand-gray/50 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-light shrink-0"
               >
                 Previous
               </button>
               
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] sm:max-w-none py-1">
                 {Array.from({ length: totalPages }).map((_, i) => (
                   <button 
                     key={i}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`w-8 h-8 rounded-lg text-sm font-medium flex items-center justify-center transition-colors ${
+                    className={`w-8 h-8 rounded-lg text-sm font-medium flex items-center justify-center transition-colors shrink-0 ${
                       currentPage === i + 1 ? 'bg-brand-indigo text-white' : 'hover:bg-brand-light text-brand-navy/70'
                     }`}
                   >
@@ -162,7 +162,7 @@ export default function AdminComplaints() {
               <button 
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 rounded-lg border border-brand-gray/50 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-light"
+                className="px-3 py-1.5 rounded-lg border border-brand-gray/50 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-light shrink-0"
               >
                 Next
               </button>

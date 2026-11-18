@@ -70,15 +70,15 @@ export default function RecruiterScreening() {
   const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
     <motion.div variants={slideUp} custom={delay}>
       <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200">
-        <PremiumCardContent className="p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-            <h3 className="text-2xl font-display font-bold text-brand-navy">
-              {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
+        <PremiumCardContent className="p-3.5 sm:p-5 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-brand-navy/60 mb-0.5 sm:mb-1 truncate">{title}</p>
+            <h3 className="text-xl sm:text-2xl font-display font-bold text-brand-navy truncate">
+              {loading ? <div className="h-7 sm:h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
             </h3>
           </div>
-          <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
-            <Icon className="w-5 h-5" />
+          <div className={`p-2.5 sm:p-3 rounded-xl shrink-0 ${color.bg} ${color.text}`}>
+            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </PremiumCardContent>
       </PremiumCard>
@@ -91,12 +91,12 @@ export default function RecruiterScreening() {
         
         {/* HEADER */}
         <motion.div variants={slideUp}>
-          <h1 className="text-3xl font-display font-semibold text-brand-navy">AI Resume Screening</h1>
-          <p className="text-brand-navy/60 mt-1">Use AI-powered analysis to identify candidates who best match your job requirements.</p>
+          <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">AI Resume Screening</h1>
+          <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Use AI-powered analysis to identify candidates who best match your job requirements.</p>
         </motion.div>
 
         {/* SUMMARY CARDS */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard title="Applications" value={totalApplications} icon={FileText} delay={0} color={{ bg: "bg-brand-gray/20", text: "text-brand-navy/70" }} />
           <StatCard title="AI Screened" value={totalScreened} icon={Search} delay={1} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
           <StatCard title="Strong Matches" value={totalStrongMatches} icon={CheckCircle2} delay={2} color={{ bg: "bg-semantic-success/10", text: "text-semantic-success" }} />
@@ -105,7 +105,7 @@ export default function RecruiterScreening() {
 
         {/* JOB SELECTOR */}
         <motion.div variants={slideUp} className="pt-4 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-display font-semibold text-brand-navy">Select Job for Screening</h2>
               <p className="text-xs text-brand-navy/60 mt-0.5">Showing {filteredJobs.length} of {screeningJobs.length} roles</p>
@@ -116,7 +116,7 @@ export default function RecruiterScreening() {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onClick={handleResetFilters}
+                  onClick={handleResetFilters} 
                   className="text-xs text-brand-navy/60 hover:text-brand-navy flex items-center gap-1"
                 >
                   <RotateCcw className="w-3.5 h-3.5" /> Clear
@@ -236,38 +236,38 @@ export default function RecruiterScreening() {
             ) : (
               filteredJobs.map(job => (
                 <PremiumCard key={job.id} className="group hover:border-brand-indigo/30 hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/recruiter/screening/${job.id}`)}>
-                  <PremiumCardContent className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-lg font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors">{job.title}</h3>
+                  <PremiumCardContent className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+                        <h3 className="text-base sm:text-lg font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors break-words">{job.title}</h3>
                         {job.pending > 0 && (
-                          <span className="px-2.5 py-0.5 bg-semantic-warning/10 text-semantic-warning text-[10px] font-bold uppercase tracking-wider rounded-md border border-semantic-warning/20">
+                          <span className="px-2.5 py-0.5 bg-semantic-warning/10 text-semantic-warning text-[10px] font-bold uppercase tracking-wider rounded-md border border-semantic-warning/20 shrink-0">
                             {job.pending} Pending
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-brand-navy/60">
-                        <Briefcase className="w-4 h-4" />
-                        <span>{job.location}</span>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-brand-navy/60">
+                        <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                        <span className="truncate">{job.location}</span>
                       </div>
                       
-                      <div className="flex items-center gap-6 mt-4">
+                      <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-3 sm:mt-4">
                         <div>
-                          <div className="text-xs text-brand-navy/50 mb-0.5">Applications</div>
-                          <div className="font-semibold text-brand-navy">{job.applications}</div>
+                          <div className="text-[11px] sm:text-xs text-brand-navy/50 mb-0.5">Applications</div>
+                          <div className="font-semibold text-brand-navy text-sm sm:text-base">{job.applications}</div>
                         </div>
                         <div>
-                          <div className="text-xs text-brand-navy/50 mb-0.5">Screened</div>
-                          <div className="font-semibold text-brand-navy">{job.screened}</div>
+                          <div className="text-[11px] sm:text-xs text-brand-navy/50 mb-0.5">Screened</div>
+                          <div className="font-semibold text-brand-navy text-sm sm:text-base">{job.screened}</div>
                         </div>
                         <div>
-                          <div className="text-xs text-brand-navy/50 mb-0.5">Strong Matches</div>
-                          <div className="font-semibold text-semantic-success">{job.strongMatches}</div>
+                          <div className="text-[11px] sm:text-xs text-brand-navy/50 mb-0.5">Strong Matches</div>
+                          <div className="font-semibold text-semantic-success text-sm sm:text-base">{job.strongMatches}</div>
                         </div>
                       </div>
                     </div>
                     
-                    <Button variant="ghost" className="shrink-0 group-hover:bg-brand-indigo group-hover:text-white transition-colors self-start sm:self-center">
+                    <Button variant="ghost" className="w-full sm:w-auto shrink-0 group-hover:bg-brand-indigo group-hover:text-white transition-colors self-start sm:self-center">
                       View Screening <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </PremiumCardContent>

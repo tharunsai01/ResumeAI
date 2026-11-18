@@ -93,48 +93,48 @@ const SECTIONS = [
 export default function RecruiterSafety() {
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
-      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-4xl mx-auto space-y-8 pb-16">
-        
+      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-16">
+
         {/* HEADER */}
-        <motion.div variants={slideUp} className="text-center space-y-4 pt-12 pb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-indigo/10 text-brand-indigo mb-2">
-            <Shield className="w-8 h-8" />
+        <motion.div variants={slideUp} className="text-center space-y-3 sm:space-y-4 pt-8 sm:pt-12 pb-4 sm:pb-6">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand-indigo/10 text-brand-indigo mb-2">
+            <Shield className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <h1 className="text-4xl font-display font-bold text-brand-navy">Safety Tips</h1>
-          <p className="text-lg text-brand-navy/60 max-w-2xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-display font-bold text-brand-navy break-words">Safety Tips</h1>
+          <p className="text-sm sm:text-lg text-brand-navy/60 max-w-2xl mx-auto break-words leading-relaxed">
             Guidelines for safer and more responsible recruitment on HireSmart AI.
           </p>
         </motion.div>
 
         {/* CONTENT */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {SECTIONS.map((section, idx) => (
             <motion.div key={idx} variants={slideUp}>
               <PremiumCard className="border-brand-gray/30 shadow-sm overflow-hidden">
-                <div className="bg-brand-light/30 px-6 py-5 border-b border-brand-gray/20 flex items-start gap-4">
-                  <SpotlightCard className="glass-card p-3 shrink-0">
-                    <section.icon className="w-6 h-6 text-brand-indigo" />
+                <div className="bg-brand-light/30 px-4 sm:px-6 py-4 sm:py-5 border-b border-brand-gray/20 flex items-start gap-3 sm:gap-4">
+                  <SpotlightCard className="glass-card p-2.5 sm:p-3 shrink-0">
+                    <section.icon className="w-5 h-5 sm:w-6 sm:h-6 text-brand-indigo" />
                   </SpotlightCard>
-                  <div className="mt-1">
-                    <h2 className="text-xl font-bold text-brand-navy">{section.title}</h2>
+                  <div className="mt-1 min-w-0">
+                    <h2 className="text-lg sm:text-xl font-bold text-brand-navy break-words">{section.title}</h2>
                   </div>
                 </div>
-                <PremiumCardContent className="p-6 md:p-8">
-                  <p className="text-brand-navy/80 font-medium mb-4">{section.description}</p>
-                  
+                <PremiumCardContent className="p-4 sm:p-6 md:p-8">
+                  <p className="text-brand-navy/80 font-medium mb-3 sm:mb-4 text-xs sm:text-sm md:text-base leading-relaxed break-words">{section.description}</p>
+
                   {section.bullets.length > 0 && (
-                    <ul className="space-y-3">
+                    <ul className="space-y-2 sm:space-y-3">
                       {section.bullets.map((bullet, bIdx) => (
-                        <li key={bIdx} className="flex items-start gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-semantic-success shrink-0 mt-0.5" />
-                          <span className="text-sm text-brand-navy/70 leading-relaxed">{bullet}</span>
+                        <li key={bIdx} className="flex items-start gap-2.5 sm:gap-3">
+                          <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-semantic-success shrink-0 mt-0.5" />
+                          <span className="text-xs sm:text-sm text-brand-navy/70 leading-relaxed">{bullet}</span>
                         </li>
                       ))}
                     </ul>
                   )}
 
                   {section.note && (
-                    <div className="mt-6 p-4 bg-semantic-warning/10 border border-semantic-warning/20 rounded-lg text-sm text-semantic-warning font-medium italic">
+                    <div className="mt-4 sm:mt-6 p-3.5 sm:p-4 bg-semantic-warning/10 border border-semantic-warning/20 rounded-lg text-xs sm:text-sm text-semantic-warning font-medium italic leading-relaxed">
                       {section.note}
                     </div>
                   )}

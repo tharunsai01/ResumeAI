@@ -9,17 +9,17 @@ export function PlatformActivityChart() {
 
   return (
     <PremiumCard className="col-span-1 lg:col-span-2">
-      <PremiumCardHeader className="flex flex-row items-center justify-between pb-2">
+      <PremiumCardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
         <div>
           <PremiumCardTitle className="text-xl font-display font-semibold text-brand-navy">Platform Activity</PremiumCardTitle>
           <p className="text-sm text-brand-navy/60">User and platform activity over the last {timeRange.toLowerCase()}</p>
         </div>
-        <div className="flex bg-brand-light p-1 rounded-lg">
+        <div className="flex bg-brand-light p-1 rounded-lg self-start sm:self-auto overflow-x-auto max-w-full">
           {["7 Days", "30 Days", "90 Days"].map(range => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+              className={`px-3 py-1 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                 timeRange === range 
                   ? "bg-white text-brand-navy shadow-sm" 
                   : "text-brand-navy/60 hover:text-brand-navy"
@@ -31,7 +31,7 @@ export function PlatformActivityChart() {
         </div>
       </PremiumCardHeader>
       <PremiumCardContent>
-        <div className="h-[300px] w-full mt-4">
+        <div className="h-[250px] sm:h-[300px] w-full mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={platformActivityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>

@@ -113,14 +113,14 @@ export default function CandidateResume() {
 
   return (
     <DashboardShell type="candidate" userName="Rahul Sharma">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-brand-navy">My Resume</h1>
-          <p className="text-brand-navy/60 mt-1 max-w-2xl">
+          <h1 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy">My Resume</h1>
+          <p className="text-sm sm:text-base text-brand-navy/60 mt-1 max-w-2xl">
             Upload your resume and let HireSmart AI understand your skills, experience, and career profile.
           </p>
         </div>
-        <Badge variant={uploadState === "complete" ? "success" : "secondary"}>
+        <Badge variant={uploadState === "complete" ? "success" : "secondary"} className="self-start sm:self-auto shrink-0">
           {uploadState === "complete" ? "Analyzed ✓" : "Not Analyzed"}
         </Badge>
       </div>
@@ -136,7 +136,7 @@ export default function CandidateResume() {
               exit={{ opacity: 0, scale: 0.98 }}
               className="glass-card overflow-hidden"
             >
-              <div className="p-8 md:p-12">
+              <div className="p-4 sm:p-8 md:p-12">
                 <div className="text-center mb-8">
                   <h2 className="text-xl font-display font-semibold text-brand-navy">Upload your resume</h2>
                   <p className="text-brand-navy/60 mt-2">
@@ -151,7 +151,7 @@ export default function CandidateResume() {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   className={cn(
-                    "relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-all duration-300",
+                    "relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 sm:p-12 transition-all duration-300",
                     isDragging 
                       ? "border-brand-indigo bg-brand-indigo/5 scale-[1.02]" 
                       : "border-brand-gray/70 hover:border-brand-indigo/50 hover:bg-brand-light",
@@ -209,7 +209,7 @@ export default function CandidateResume() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              className="glass-card p-8"
+              className="glass-card p-4 sm:p-8"
             >
               <h2 className="text-xl font-display font-semibold text-brand-navy mb-6">Ready to analyze</h2>
               
@@ -262,7 +262,7 @@ export default function CandidateResume() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2">
                 {/* Left side: Checklist */}
-                <div className="p-8 md:p-10 border-b md:border-b-0 md:border-r border-brand-gray/50 flex flex-col justify-center">
+                <div className="p-5 sm:p-8 md:p-10 border-b md:border-b-0 md:border-r border-brand-gray/50 flex flex-col justify-center">
                   <div className="mb-8">
                     <h2 className="text-2xl font-display font-semibold text-brand-navy">
                       {uploadState === "complete" ? "Resume Analysis Complete ✓" : "Analyzing your resume..."}
@@ -317,7 +317,7 @@ export default function CandidateResume() {
                 </div>
 
                 {/* Right side: Stylized Resume Visual */}
-                <div className="p-8 bg-brand-light flex items-center justify-center relative overflow-hidden min-h-[300px]">
+                <div className="p-4 sm:p-8 bg-brand-light flex items-center justify-center relative overflow-hidden min-h-[260px] sm:min-h-[300px]">
                   {/* Floating tags */}
                   <AnimatePresence>
                     {uploadState !== "complete" && analysisStep >= 3 && (

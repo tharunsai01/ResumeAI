@@ -38,17 +38,17 @@ export default function CandidateProfilePreview() {
           <Card className="overflow-hidden border-none shadow-xl ">
             <div className="h-40 bg-gradient-to-r from-brand-navy to-brand-indigo relative" />
             
-            <CardContent className="px-8 pb-10 pt-0 relative">
-              <div className="flex justify-between items-start -mt-16 mb-6">
-                <div className="relative rounded-2xl overflow-hidden border-4 border-white shadow-lg w-32 h-32 bg-brand-light flex items-center justify-center bg-white">
+            <CardContent className="px-4 sm:px-8 pb-8 sm:pb-10 pt-0 relative">
+              <div className="flex justify-between items-start -mt-12 sm:-mt-16 mb-4 sm:mb-6">
+                <div className="relative rounded-2xl overflow-hidden border-4 border-white shadow-lg w-24 h-24 sm:w-32 sm:h-32 bg-brand-light flex items-center justify-center bg-white shrink-0">
                   {profile.avatar ? (
                     <img src={profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-5xl text-brand-navy/30 font-display font-bold">{profile.fullName.charAt(0)}</span>
+                    <span className="text-4xl sm:text-5xl text-brand-navy/30 font-display font-bold">{profile.fullName.charAt(0)}</span>
                   )}
                 </div>
                 {profile.openToWork && (
-                  <Badge variant="success" className="mt-20 font-medium tracking-wide">
+                  <Badge variant="success" className="mt-14 sm:mt-20 font-medium tracking-wide shrink-0">
                     OPEN TO WORK
                   </Badge>
                 )}
@@ -57,15 +57,15 @@ export default function CandidateProfilePreview() {
               <div className="space-y-8">
                 {/* Header Info */}
                 <div>
-                  <h1 className="text-3xl font-bold font-display text-brand-navy">{profile.fullName}</h1>
-                  <p className="text-xl text-brand-indigo font-medium mt-1">{profile.currentRole}</p>
+                  <h1 className="text-2xl sm:text-3xl font-bold font-display text-brand-navy break-words">{profile.fullName}</h1>
+                  <p className="text-lg sm:text-xl text-brand-indigo font-medium mt-1">{profile.currentRole}</p>
                   
                   <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-sm text-brand-navy/60 mt-4">
                     <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{profile.location}</div>
                     <div className="flex items-center gap-1.5"><Mail className="w-4 h-4" />{profile.email}</div>
                     <div className="flex items-center gap-1.5"><Phone className="w-4 h-4" />{profile.phone}</div>
                   </div>
-                  <div className="flex gap-4 mt-4">
+                  <div className="flex flex-wrap gap-3 sm:gap-4 mt-4">
                     <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><Globe className="w-4 h-4" /> LinkedIn</a>
                     <a href="https://github.com" target="_blank" rel="noreferrer" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><Globe className="w-4 h-4" /> GitHub</a>
                     <a href="https://example.com" target="_blank" rel="noreferrer" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><ExternalLink className="w-4 h-4" /> Portfolio</a>

@@ -127,16 +127,16 @@ export default function CandidateApplications() {
         </motion.div>
 
         {/* Summary Cards */}
-        <motion.div variants={slideUp} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div variants={slideUp} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {summaryStats.map((stat, i) => (
             <PremiumCard key={i} className="group hover:border-brand-indigo/30 transition-colors">
-              <PremiumCardContent className="p-5 flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              <PremiumCardContent className="p-3.5 sm:p-5 flex items-center gap-3 sm:gap-4 min-w-0">
+                <div className={`p-2 sm:p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform shrink-0`}>
+                  <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                 </div>
-                <div>
-                  <p className="text-sm text-brand-navy/60 font-medium">{stat.label}</p>
-                  <p className="text-2xl font-display font-semibold text-brand-navy">{stat.value}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm text-brand-navy/60 font-medium truncate">{stat.label}</p>
+                  <p className="text-lg sm:text-2xl font-display font-semibold text-brand-navy truncate">{stat.value}</p>
                 </div>
               </PremiumCardContent>
             </PremiumCard>
@@ -242,16 +242,16 @@ export default function CandidateApplications() {
             <div className="flex-1 w-full space-y-4">
               
               {/* List Controls */}
-              <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-light/50 p-4 rounded-xl border border-brand-gray/30">
+              <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-brand-light/50 p-3 sm:p-4 rounded-xl border border-brand-gray/30">
                 <p className="text-brand-navy/70 font-medium text-sm">
                   {filteredApplications.length} applications found
                 </p>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-brand-navy/60">Sort by:</span>
+                <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+                  <span className="text-sm text-brand-navy/60 shrink-0">Sort by:</span>
                   <select 
                     value={sortBy}
                     onChange={e => setSortBy(e.target.value)}
-                    className="bg-white border border-brand-gray/50 rounded-lg py-1.5 px-3 text-sm font-medium text-brand-navy outline-none focus:border-brand-indigo/50"
+                    className="bg-white border border-brand-gray/50 rounded-lg py-1.5 px-3 text-sm font-medium text-brand-navy outline-none focus:border-brand-indigo/50 flex-1 sm:flex-initial"
                   >
                     <option value="Newest">Newest</option>
                     <option value="Oldest">Oldest</option>
@@ -272,51 +272,53 @@ export default function CandidateApplications() {
                 <motion.div variants={staggerContainer} className="space-y-3">
                   {/* Desktop Table View */}
                   <SpotlightCard className="glass-card hidden md:block overflow-hidden">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-brand-light/50 border-b border-brand-gray/50">
-                          <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider">Job</th>
-                          <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider">Applied Date</th>
-                          <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider text-center">Match</th>
-                          <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider">Status</th>
-                          <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider text-right">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-brand-gray/30">
-                        {filteredApplications.map((app) => (
-                          <motion.tr 
-                            key={app.applicationId} 
-                            variants={slideUp}
-                            className="hover:bg-brand-light/30 transition-colors group"
-                          >
-                            <td className="py-4 px-4">
-                              <p className="font-semibold text-brand-navy text-sm group-hover:text-brand-indigo transition-colors">{app.title}</p>
-                              <p className="text-xs text-brand-navy/60 mt-0.5">{app.company}</p>
-                            </td>
-                            <td className="py-4 px-4">
-                              <p className="text-sm text-brand-navy">{formatDate(app.appliedDate)}</p>
-                            </td>
-                            <td className="py-4 px-4 text-center">
-                              <div className="flex justify-center">
-                                <MatchScore score={app.matchScore} size="sm" />
-                              </div>
-                            </td>
-                            <td className="py-4 px-4">
-                              {getStatusBadge(app.status)}
-                            </td>
-                            <td className="py-4 px-4 text-right">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => navigate(`/candidate/applications/${app.applicationId}`)}
-                              >
-                                View Details
-                              </Button>
-                            </td>
-                          </motion.tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-brand-light/50 border-b border-brand-gray/50">
+                            <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider whitespace-nowrap">Job</th>
+                            <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider whitespace-nowrap">Applied Date</th>
+                            <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider text-center whitespace-nowrap">Match</th>
+                            <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider whitespace-nowrap">Status</th>
+                            <th className="py-3 px-4 font-semibold text-xs text-brand-navy/60 uppercase tracking-wider text-right whitespace-nowrap">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-brand-gray/30">
+                          {filteredApplications.map((app) => (
+                            <motion.tr 
+                              key={app.applicationId} 
+                              variants={slideUp}
+                              className="hover:bg-brand-light/30 transition-colors group"
+                            >
+                              <td className="py-4 px-4 whitespace-nowrap">
+                                <p className="font-semibold text-brand-navy text-sm group-hover:text-brand-indigo transition-colors">{app.title}</p>
+                                <p className="text-xs text-brand-navy/60 mt-0.5">{app.company}</p>
+                              </td>
+                              <td className="py-4 px-4 whitespace-nowrap">
+                                <p className="text-sm text-brand-navy">{formatDate(app.appliedDate)}</p>
+                              </td>
+                              <td className="py-4 px-4 text-center whitespace-nowrap">
+                                <div className="flex justify-center">
+                                  <MatchScore score={app.matchScore} size="sm" />
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 whitespace-nowrap">
+                                {getStatusBadge(app.status)}
+                              </td>
+                              <td className="py-4 px-4 text-right whitespace-nowrap">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => navigate(`/candidate/applications/${app.applicationId}`)}
+                                >
+                                  View Details
+                                </Button>
+                              </td>
+                            </motion.tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </SpotlightCard>
 
                   {/* Mobile Card View */}
@@ -324,12 +326,14 @@ export default function CandidateApplications() {
                     {filteredApplications.map((app) => (
                       <PremiumCard key={app.applicationId} className="overflow-hidden">
                         <PremiumCardContent className="p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <p className="font-semibold text-brand-navy text-sm">{app.title}</p>
-                              <p className="text-xs text-brand-navy/60">{app.company}</p>
+                          <div className="flex justify-between items-start gap-3 mb-3">
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-brand-navy text-sm truncate">{app.title}</p>
+                              <p className="text-xs text-brand-navy/60 truncate">{app.company}</p>
                             </div>
-                            {getStatusBadge(app.status)}
+                            <div className="shrink-0">
+                              {getStatusBadge(app.status)}
+                            </div>
                           </div>
                           
                           <div className="flex items-center gap-4 text-xs text-brand-navy/60 mb-4">

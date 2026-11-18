@@ -402,22 +402,22 @@ export default function CandidateProfilePage() {
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-5xl mx-auto space-y-6 pb-20">
         
         {/* PAGE HEADER */}
-        <MotionSpotlightCard variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
+        <MotionSpotlightCard variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 sm:p-6">
           <div>
-            <h1 className="text-2xl font-display font-semibold text-brand-navy">My Profile</h1>
-            <p className="text-brand-navy/60">Manage your professional profile and career preferences.</p>
+            <h1 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy">My Profile</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60">Manage your professional profile and career preferences.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm font-medium text-brand-indigo bg-brand-indigo/10 px-4 py-2 rounded-lg">
-              <CheckCircle2 className="w-4 h-4" />
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full md:w-auto">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-brand-indigo bg-brand-indigo/10 px-3 sm:px-4 py-2 rounded-lg shrink-0">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
               Profile Completion: {profile.profileCompletion}%
             </div>
             {!isEditing ? (
-              <button onClick={() => setIsEditing(true)} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 text-sm font-semibold rounded-lg shadow-sm">
+              <button onClick={() => setIsEditing(true)} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 text-sm font-semibold rounded-lg shadow-sm shrink-0">
                 Edit Profile
               </button>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-2 shrink-0">
                 <button onClick={handleCancel} className="btn-interactive btn-secondary rounded-lg px-4 py-2 text-sm font-semibold">
                   Cancel
                 </button>
@@ -426,7 +426,7 @@ export default function CandidateProfilePage() {
                 </button>
               </div>
             )}
-            <button onClick={() => navigate("/candidate/profile/preview")} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg shadow-sm flex items-center gap-2">
+            <button onClick={() => navigate("/candidate/profile/preview")} className="btn-interactive btn-secondary px-4 py-2 text-sm font-semibold rounded-lg shadow-sm flex items-center gap-2 shrink-0">
               <Eye className="w-4 h-4" />
               Preview
             </button>
@@ -457,7 +457,7 @@ export default function CandidateProfilePage() {
             <motion.div variants={slideUp}>
               <PremiumCard className="overflow-hidden">
                 <div className="h-32 bg-gradient-to-r from-brand-indigo to-brand-blue relative" />
-                <PremiumCardContent className="px-8 pb-8 pt-0 relative">
+                <PremiumCardContent className="px-4 sm:px-8 pb-6 sm:pb-8 pt-0 relative">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end -mt-12 sm:-mt-16 mb-4">
                     <div className="relative group cursor-pointer rounded-full overflow-hidden border-4 border-white shadow-lg w-24 h-24 sm:w-32 sm:h-32 bg-brand-light flex items-center justify-center">
                       {profile.avatar ? (
@@ -906,9 +906,9 @@ export default function CandidateProfilePage() {
               <option value="Expert">Expert</option>
             </select>
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-brand-gray/30">
-            <button onClick={handleCloseSkillModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg">Cancel</button>
-            <button onClick={handleSaveSkill} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 font-semibold text-sm rounded-lg shadow-sm">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4 border-t border-brand-gray/30">
+            <button onClick={handleCloseSkillModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg w-full sm:w-auto">Cancel</button>
+            <button onClick={handleSaveSkill} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 font-semibold text-sm rounded-lg shadow-sm w-full sm:w-auto">
               {editingSkillId ? "Update Skill" : "Save Skill"}
             </button>
           </div>
@@ -936,7 +936,7 @@ export default function CandidateProfilePage() {
             <label className="block text-xs font-semibold text-brand-navy/60 uppercase tracking-wider mb-1.5">Location</label>
             <Input placeholder="e.g. Bangalore, India / Remote" value={expLocation} onChange={e => setExpLocation(e.target.value)} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs font-semibold text-brand-navy/60 uppercase tracking-wider mb-1.5">Start Date *</label>
               <Input placeholder="e.g. Jun 2022" value={expStartDate} onChange={e => { setExpStartDate(e.target.value); setExpError(null); }} />
@@ -965,9 +965,9 @@ export default function CandidateProfilePage() {
               className="w-full h-24 p-3 text-sm rounded-xl border border-brand-gray/50 focus:outline-none focus:ring-2 focus:ring-brand-indigo/50 bg-white text-brand-navy resize-none" 
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-brand-gray/30">
-            <button onClick={handleCloseExpModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg">Cancel</button>
-            <button onClick={handleSaveExp} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 font-semibold text-sm rounded-lg shadow-sm">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4 border-t border-brand-gray/30">
+            <button onClick={handleCloseExpModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg w-full sm:w-auto">Cancel</button>
+            <button onClick={handleSaveExp} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 font-semibold text-sm rounded-lg shadow-sm w-full sm:w-auto">
               {editingExpId ? "Update Experience" : "Save Experience"}
             </button>
           </div>
@@ -995,7 +995,7 @@ export default function CandidateProfilePage() {
             <label className="block text-xs font-semibold text-brand-navy/60 uppercase tracking-wider mb-1.5">Institution *</label>
             <Input placeholder="e.g. XYZ University" value={eduInstitution} onChange={e => { setEduInstitution(e.target.value); setEduError(null); }} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs font-semibold text-brand-navy/60 uppercase tracking-wider mb-1.5">Start Year *</label>
               <Input placeholder="e.g. 2019" value={eduStartYear} onChange={e => { setEduStartYear(e.target.value); setEduError(null); }} />
@@ -1009,9 +1009,9 @@ export default function CandidateProfilePage() {
             <label className="block text-xs font-semibold text-brand-navy/60 uppercase tracking-wider mb-1.5">Grade / CGPA (Optional)</label>
             <Input placeholder="e.g. 8.5 CGPA or 85%" value={eduGrade} onChange={e => setEduGrade(e.target.value)} />
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-brand-gray/30">
-            <button onClick={handleCloseEduModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg">Cancel</button>
-            <button onClick={handleSaveEdu} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 font-semibold text-sm rounded-lg shadow-sm">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4 border-t border-brand-gray/30">
+            <button onClick={handleCloseEduModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg w-full sm:w-auto">Cancel</button>
+            <button onClick={handleSaveEdu} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 font-semibold text-sm rounded-lg shadow-sm w-full sm:w-auto">
               {editingEduId ? "Update Education" : "Save Education"}
             </button>
           </div>
@@ -1035,9 +1035,9 @@ export default function CandidateProfilePage() {
               onChange={e => { setInterestName(e.target.value); setInterestError(null); }} 
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-brand-gray/30">
-            <button onClick={handleCloseInterestModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg">Cancel</button>
-            <button onClick={handleSaveInterest} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 font-semibold text-sm rounded-lg shadow-sm">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4 border-t border-brand-gray/30">
+            <button onClick={handleCloseInterestModal} className="btn-interactive btn-ghost px-4 py-2 font-semibold text-sm rounded-lg w-full sm:w-auto">Cancel</button>
+            <button onClick={handleSaveInterest} className="btn-interactive btn-primary bg-brand-navy px-4 py-2 font-semibold text-sm rounded-lg shadow-sm w-full sm:w-auto">
               Save Interest
             </button>
           </div>

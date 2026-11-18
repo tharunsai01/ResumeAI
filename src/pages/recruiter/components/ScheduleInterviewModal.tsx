@@ -59,8 +59,8 @@ export function ScheduleInterviewModal({ isOpen, onClose, onSchedule, initialCan
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Schedule Interview" className="p-0 sm:p-0 max-w-lg">
-        <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto no-scrollbar">
+    <Modal isOpen={isOpen} onClose={onClose} title="Schedule Interview" className="p-0 sm:p-0 max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col">
+        <div className="p-4 sm:p-6 space-y-4 max-h-[60vh] overflow-y-auto no-scrollbar">
           
           <div className="space-y-1">
             <label className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">Candidate *</label>
@@ -99,7 +99,7 @@ export function ScheduleInterviewModal({ isOpen, onClose, onSchedule, initialCan
             {errors.job && <p className="text-xs text-semantic-error mt-1">{errors.job}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">Date *</label>
               <div className="relative flex items-center">
@@ -128,7 +128,7 @@ export function ScheduleInterviewModal({ isOpen, onClose, onSchedule, initialCan
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider">Type *</label>
               <select 
@@ -195,9 +195,9 @@ export function ScheduleInterviewModal({ isOpen, onClose, onSchedule, initialCan
 
         </div>
 
-        <div className="p-6 border-t border-brand-gray/20 bg-brand-light/30 flex justify-end gap-3 rounded-b-2xl">
-          <Button variant="outline" onClick={onClose} className="border-brand-gray/40 text-brand-navy">Cancel</Button>
-          <Button onClick={handleSubmit} className="bg-brand-indigo hover:bg-brand-blue text-white">Schedule Interview</Button>
+        <div className="p-4 sm:p-6 border-t border-brand-gray/20 bg-brand-light/30 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 rounded-b-2xl">
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto border-brand-gray/40 text-brand-navy">Cancel</Button>
+          <Button onClick={handleSubmit} className="w-full sm:w-auto bg-brand-indigo hover:bg-brand-blue text-white">Schedule Interview</Button>
         </div>
     </Modal>
   )

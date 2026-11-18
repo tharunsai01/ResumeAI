@@ -26,9 +26,9 @@ export function AdminAuditDetailsModal({ isOpen, onClose, log }: AdminAuditDetai
       isOpen={isOpen}
       onClose={onClose}
       title="Audit Event Details"
-      className="max-w-2xl"
+      className="max-w-2xl w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] flex flex-col"
     >
-      <div className="py-4 space-y-6">
+      <div className="py-2 sm:py-4 space-y-4 sm:space-y-6 max-h-[calc(100dvh-10rem)] overflow-y-auto">
         
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">

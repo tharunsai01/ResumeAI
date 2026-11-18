@@ -18,15 +18,15 @@ let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(
 const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
     <PremiumCard className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
-      <PremiumCardContent className="p-5 flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-          <h3 className="text-2xl font-display font-bold text-brand-navy">
-            {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
+      <PremiumCardContent className="p-3.5 sm:p-5 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-brand-navy/60 mb-0.5 sm:mb-1 truncate">{title}</p>
+          <h3 className="text-xl sm:text-2xl font-display font-bold text-brand-navy truncate">
+            {loading ? <div className="h-7 sm:h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
           </h3>
         </div>
-        <div className={cn("p-3 rounded-xl", color.bg, color.text)}>
-          <Icon className="w-5 h-5" />
+        <div className={cn("p-2.5 sm:p-3 rounded-xl shrink-0", color.bg, color.text)}>
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
       </PremiumCardContent>
     </PremiumCard>
@@ -124,10 +124,10 @@ export default function RecruiterCandidates() {
         {/* HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">Candidates</h1>
-            <p className="text-brand-navy/60 mt-1">Discover, review, and manage candidates across your job openings.</p>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Candidates</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Discover, review, and manage candidates across your job openings.</p>
           </div>
-          <Button onClick={() => navigate("/recruiter/screening")} className="shrink-0 px-6 bg-gradient-to-r from-brand-indigo to-brand-blue">
+          <Button onClick={() => navigate("/recruiter/screening")} className="w-full sm:w-auto shrink-0 px-6 bg-gradient-to-r from-brand-indigo to-brand-blue">
             <Search className="w-4 h-4 mr-2" /> AI Screen Candidates
           </Button>
         </motion.div>
@@ -145,7 +145,7 @@ export default function RecruiterCandidates() {
         </AnimatePresence>
 
         {/* SUMMARY CARDS */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard title="Total Candidates" value={stats.total} icon={Users} delay={0} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
           <StatCard title="New Applications" value={stats.new} icon={UserPlus} delay={1} loading={loading} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
           <StatCard title="AI Screened" value={stats.screened} icon={Search} delay={2} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
@@ -153,23 +153,23 @@ export default function RecruiterCandidates() {
         </div>
 
         {/* FILTERS */}
-        <MotionSpotlightCard variants={slideUp} className="glass-card p-4 space-y-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1 flex items-center px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl focus-within:border-brand-indigo/50 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
-              <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
+        <MotionSpotlightCard variants={slideUp} className="glass-card p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
+            <div className="flex-1 flex items-center px-3 sm:px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl focus-within:border-brand-indigo/50 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all min-w-0">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-brand-navy/40 mr-2.5 sm:mr-3 shrink-0" />
               <input
                 type="text"
                 placeholder="Search candidates by name, role, skill..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
+                className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-10 sm:h-11 text-sm min-w-0"
               />
             </div>
-            <Button variant="outline" className="lg:hidden" onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}>
+            <Button variant="outline" className="lg:hidden w-full sm:w-auto" onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}>
               <Filter className="w-4 h-4 mr-2" /> Filters
             </Button>
-            <div className={cn("flex flex-col sm:flex-row gap-3 lg:flex", isMobileFiltersOpen ? "flex" : "hidden")}>
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="bg-white border border-brand-gray/50 rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+            <div className={cn("flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 lg:flex", isMobileFiltersOpen ? "flex" : "hidden")}>
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="w-full sm:w-auto bg-white border border-brand-gray/50 rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
                 <option value="All">All Statuses</option>
                 <option value="Applied">Applied</option>
                 <option value="Screening">Screening</option>
@@ -177,7 +177,7 @@ export default function RecruiterCandidates() {
                 <option value="Interview">Interview</option>
                 <option value="Rejected">Rejected</option>
               </select>
-              <select value={screeningFilter} onChange={(e) => setScreeningFilter(e.target.value as any)} className="bg-white border border-brand-gray/50 rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+              <select value={screeningFilter} onChange={(e) => setScreeningFilter(e.target.value as any)} className="w-full sm:w-auto bg-white border border-brand-gray/50 rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
                 <option value="All">All Screening</option>
                 <option value="Not Screened">Not Screened</option>
                 <option value="Screened">Screened</option>
@@ -185,14 +185,14 @@ export default function RecruiterCandidates() {
                 <option value="Potential Match">Potential Match</option>
                 <option value="Low Match">Low Match</option>
               </select>
-              <select value={scoreFilter} onChange={(e) => setScoreFilter(e.target.value as any)} className="bg-white border border-brand-gray/50 rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+              <select value={scoreFilter} onChange={(e) => setScoreFilter(e.target.value as any)} className="w-full sm:w-auto bg-white border border-brand-gray/50 rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
                 <option value="All">All Scores</option>
                 <option value="90+">90%+</option>
                 <option value="80+">80%+</option>
                 <option value="70+">70%+</option>
                 <option value="Below 70">Below 70%</option>
               </select>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className="bg-white border border-brand-gray/50 rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className="w-full sm:w-auto bg-white border border-brand-gray/50 rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
                 <option value="Newest">Sort: Newest</option>
                 <option value="Oldest">Sort: Oldest</option>
                 <option value="Highest Match">Sort: Highest Match</option>
@@ -215,43 +215,43 @@ export default function RecruiterCandidates() {
           <PremiumCard>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="bg-brand-light text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
+                <thead className="bg-brand-light text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30 whitespace-nowrap">
                   <tr>
-                    <th className="px-6 py-4">Candidate</th>
-                    <th className="px-6 py-4">Applied Role & Skills</th>
-                    <th className="px-6 py-4 text-center">AI Match</th>
-                    <th className="px-6 py-4 text-center">Status</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">Candidate</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">Applied Role & Skills</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-center">AI Match</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-center">Status</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-gray/30">
                   {loading ? (
                     [1, 2, 3].map(i => (
                       <tr key={i} className="animate-pulse">
-                        <td className="px-6 py-4 flex gap-3"><div className="w-10 h-10 rounded-full bg-brand-gray/20"></div><div><div className="h-4 w-24 bg-brand-gray/20 rounded mb-2"></div><div className="h-3 w-32 bg-brand-gray/20 rounded"></div></div></td>
-                        <td className="px-6 py-4"><div className="h-4 w-32 bg-brand-gray/20 rounded mb-2"></div><div className="flex gap-1"><div className="h-4 w-12 bg-brand-gray/20 rounded"></div><div className="h-4 w-12 bg-brand-gray/20 rounded"></div></div></td>
-                        <td className="px-6 py-4"><div className="w-10 h-10 rounded-full bg-brand-gray/20 mx-auto"></div></td>
-                        <td className="px-6 py-4"><div className="w-20 h-5 bg-brand-gray/20 rounded-md mx-auto"></div></td>
-                        <td className="px-6 py-4"><div className="w-16 h-8 bg-brand-gray/20 rounded-lg ml-auto"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 flex gap-3"><div className="w-10 h-10 rounded-full bg-brand-gray/20 shrink-0"></div><div><div className="h-4 w-24 bg-brand-gray/20 rounded mb-2"></div><div className="h-3 w-32 bg-brand-gray/20 rounded"></div></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="h-4 w-32 bg-brand-gray/20 rounded mb-2"></div><div className="flex gap-1"><div className="h-4 w-12 bg-brand-gray/20 rounded"></div><div className="h-4 w-12 bg-brand-gray/20 rounded"></div></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="w-10 h-10 rounded-full bg-brand-gray/20 mx-auto"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="w-20 h-5 bg-brand-gray/20 rounded-md mx-auto"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="w-16 h-8 bg-brand-gray/20 rounded-lg ml-auto"></div></td>
                       </tr>
                     ))
                   ) : filteredAndSorted.length > 0 ? (
                     filteredAndSorted.map((cand) => (
                       <tr key={cand.id} className="hover:bg-brand-light/50 transition-colors group cursor-pointer" onClick={() => navigate(`/recruiter/candidates/${cand.id}`)}>
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 min-w-[200px]">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-indigo to-brand-blue text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
                               {cand.name.split(" ").map(n => n[0]).join("")}
                             </div>
-                            <div>
-                              <div className="font-semibold text-brand-navy text-base group-hover:text-brand-indigo transition-colors">
+                            <div className="min-w-0">
+                              <div className="font-semibold text-brand-navy text-base group-hover:text-brand-indigo transition-colors truncate">
                                 {cand.name}
                               </div>
-                              <div className="text-xs text-brand-navy/60 mt-0.5">{cand.title} • {cand.experience}</div>
+                              <div className="text-xs text-brand-navy/60 mt-0.5 truncate">{cand.title} • {cand.experience}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 whitespace-nowrap">
                           <div className="text-brand-navy/80 font-medium mb-1.5">{cand.appliedRole}</div>
                           <div className="flex flex-wrap gap-1">
                             {cand.skills.slice(0, 3).map(skill => (
@@ -266,16 +266,16 @@ export default function RecruiterCandidates() {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
                           <CandidateMatchScore score={cand.matchScore} size="sm" showLabel={false} />
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
                           <div className="flex flex-col items-center gap-1.5">
                             <CandidateStatusBadge status={cand.status} />
                             <span className="text-[10px] text-brand-navy/50">{cand.appliedDate}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-2">
                             {cand.status === "Shortlisted" ? (
                               <Button variant="outline" disabled size="sm" className="bg-brand-light text-brand-navy/40 border-brand-gray/30 text-xs">

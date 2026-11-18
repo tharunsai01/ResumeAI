@@ -16,15 +16,15 @@ let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(
 const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
     <PremiumCard className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
-      <PremiumCardContent className="p-5 flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-          <h3 className="text-2xl font-display font-bold text-brand-navy">
-            {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
+      <PremiumCardContent className="p-3.5 sm:p-5 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-brand-navy/60 mb-0.5 sm:mb-1 truncate">{title}</p>
+          <h3 className="text-xl sm:text-2xl font-display font-bold text-brand-navy truncate">
+            {loading ? <div className="h-7 sm:h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
           </h3>
         </div>
-        <div className={cn("p-3 rounded-xl", color.bg, color.text)}>
-          <Icon className="w-5 h-5" />
+        <div className={cn("p-2.5 sm:p-3 rounded-xl shrink-0", color.bg, color.text)}>
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
       </PremiumCardContent>
     </PremiumCard>
@@ -160,16 +160,16 @@ export default function RecruiterJobs() {
         {/* HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">Jobs</h1>
-            <p className="text-brand-navy/60 mt-1">Create, manage, and track your job openings.</p>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Jobs</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Create, manage, and track your job openings.</p>
           </div>
-          <Button onClick={() => navigate("/recruiter/jobs/create")} className="shrink-0 px-6 bg-gradient-to-r from-brand-indigo to-brand-blue">
+          <Button onClick={() => navigate("/recruiter/jobs/create")} className="w-full sm:w-auto shrink-0 px-6 bg-gradient-to-r from-brand-indigo to-brand-blue">
             <Plus className="w-4 h-4 mr-2" /> Create New Job
           </Button>
         </motion.div>
 
         {/* SUMMARY CARDS */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard title="Active Jobs" value={stats.active} icon={Briefcase} delay={0} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
           <StatCard title="Drafts" value={stats.drafts} icon={FileText} delay={1} loading={loading} color={{ bg: "bg-brand-gray/20", text: "text-brand-navy/70" }} />
           <StatCard title="Closed Jobs" value={stats.closed} icon={CheckCircle2} delay={2} loading={loading} color={{ bg: "bg-semantic-error/10", text: "text-semantic-error" }} />
@@ -177,42 +177,42 @@ export default function RecruiterJobs() {
         </div>
 
         {/* FILTERS */}
-        <MotionSpotlightCard variants={slideUp} className="glass-card p-4 space-y-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1 flex items-center px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl">
-              <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
+        <MotionSpotlightCard variants={slideUp} className="glass-card p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
+            <div className="flex-1 flex items-center px-3 sm:px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl min-w-0">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-brand-navy/40 mr-2.5 sm:mr-3 shrink-0" />
               <input
                 type="text"
                 placeholder="Search jobs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
+                className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-10 sm:h-11 text-sm min-w-0"
               />
             </div>
-            <Button variant="outline" className="lg:hidden" onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}>
+            <Button variant="outline" className="lg:hidden w-full sm:w-auto" onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}>
               <Filter className="w-4 h-4 mr-2" /> Filters
             </Button>
-            <div className={cn("flex flex-col sm:flex-row gap-3 lg:flex", isMobileFiltersOpen ? "flex" : "hidden")}>
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="bg-white border border-brand-gray/50 rounded-xl px-4 h-11 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+            <div className={cn("flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 lg:flex", isMobileFiltersOpen ? "flex" : "hidden")}>
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="w-full sm:w-auto bg-white border border-brand-gray/50 rounded-xl px-3 sm:px-4 h-10 sm:h-11 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
                 <option value="All">All Statuses</option>
                 <option value="Active">Active</option>
                 <option value="Draft">Draft</option>
                 <option value="Closed">Closed</option>
               </select>
-              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as any)} className="bg-white border border-brand-gray/50 rounded-xl px-4 h-11 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as any)} className="w-full sm:w-auto bg-white border border-brand-gray/50 rounded-xl px-3 sm:px-4 h-10 sm:h-11 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
                 <option value="All">All Types</option>
                 <option value="Full-time">Full-time</option>
                 <option value="Part-time">Part-time</option>
                 <option value="Contract">Contract</option>
                 <option value="Internship">Internship</option>
               </select>
-              <select value={modeFilter} onChange={(e) => setModeFilter(e.target.value as any)} className="bg-white border border-brand-gray/50 rounded-xl px-4 h-11 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+              <select value={modeFilter} onChange={(e) => setModeFilter(e.target.value as any)} className="w-full sm:w-auto bg-white border border-brand-gray/50 rounded-xl px-3 sm:px-4 h-10 sm:h-11 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
                 <option value="All">All Work Modes</option>
                 <option value="Remote">Remote</option>
                 <option value="Hybrid">Hybrid</option>
                 <option value="On-site">On-site</option>
               </select>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className="bg-white border border-brand-gray/50 rounded-xl px-4 h-11 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className="w-full sm:w-auto bg-white border border-brand-gray/50 rounded-xl px-3 sm:px-4 h-10 sm:h-11 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
                 <option value="Newest">Sort: Newest</option>
                 <option value="Oldest">Sort: Oldest</option>
                 <option value="Applications">Sort: Most Applications</option>
@@ -226,49 +226,49 @@ export default function RecruiterJobs() {
           <PremiumCard>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="bg-brand-light text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
+                <thead className="bg-brand-light text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30 whitespace-nowrap">
                   <tr>
-                    <th className="px-6 py-4">Job Info</th>
-                    <th className="px-6 py-4">Details</th>
-                    <th className="px-6 py-4 text-center">Applications</th>
-                    <th className="px-6 py-4">Posted Date</th>
-                    <th className="px-6 py-4 text-center">Status</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">Job Info</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">Details</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-center">Applications</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">Posted Date</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-center">Status</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-gray/30">
                   {loading ? (
                     [1, 2, 3, 4].map(i => (
                       <tr key={i} className="animate-pulse">
-                        <td className="px-6 py-4"><div className="h-5 bg-brand-gray/20 rounded w-3/4 mb-2"></div><div className="h-4 bg-brand-gray/20 rounded w-1/2"></div></td>
-                        <td className="px-6 py-4"><div className="h-4 bg-brand-gray/20 rounded w-full mb-1"></div><div className="h-4 bg-brand-gray/20 rounded w-2/3"></div></td>
-                        <td className="px-6 py-4"><div className="h-6 bg-brand-gray/20 rounded w-12 mx-auto"></div></td>
-                        <td className="px-6 py-4"><div className="h-4 bg-brand-gray/20 rounded w-20"></div></td>
-                        <td className="px-6 py-4"><div className="h-6 bg-brand-gray/20 rounded-full w-16 mx-auto"></div></td>
-                        <td className="px-6 py-4"><div className="h-8 bg-brand-gray/20 rounded w-8 ml-auto"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="h-5 bg-brand-gray/20 rounded w-3/4 mb-2"></div><div className="h-4 bg-brand-gray/20 rounded w-1/2"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="h-4 bg-brand-gray/20 rounded w-full mb-1"></div><div className="h-4 bg-brand-gray/20 rounded w-2/3"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="h-6 bg-brand-gray/20 rounded w-12 mx-auto"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="h-4 bg-brand-gray/20 rounded w-20"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="h-6 bg-brand-gray/20 rounded-full w-16 mx-auto"></div></td>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4"><div className="h-8 bg-brand-gray/20 rounded w-8 ml-auto"></div></td>
                       </tr>
                     ))
                   ) : filteredAndSortedJobs.length > 0 ? (
                     filteredAndSortedJobs.map((job) => (
                       <tr key={job.id} className="hover:bg-brand-light/50 transition-colors group">
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 min-w-[180px]">
                           <div className="font-semibold text-brand-navy text-base cursor-pointer group-hover:text-brand-indigo transition-colors" onClick={() => navigate(`/recruiter/jobs/${job.id}`)}>
                             {job.title}
                           </div>
                           <div className="text-xs text-brand-navy/60 mt-0.5">{job.company}</div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 whitespace-nowrap">
                           <div className="text-brand-navy/80 font-medium">{job.location} • {job.workMode}</div>
                           <div className="text-xs text-brand-navy/60 mt-0.5">{job.jobType} • {job.experience}</div>
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
                           <span className="font-bold text-brand-navy text-lg">{job.applications}</span>
                           <div className="text-[10px] uppercase tracking-wider text-brand-navy/50">Apps</div>
                         </td>
-                        <td className="px-6 py-4 text-brand-navy/70 text-sm">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-brand-navy/70 text-sm whitespace-nowrap">
                           {job.postedDate}
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
                           <span className={cn(
                             "inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border",
                             getStatusStyle(job.status)
@@ -276,7 +276,7 @@ export default function RecruiterJobs() {
                             {job.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-right whitespace-nowrap">
                           <div className="relative inline-block text-left">
                             <Button 
                               variant="ghost" 

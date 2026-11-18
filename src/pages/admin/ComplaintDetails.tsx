@@ -118,32 +118,32 @@ export default function AdminComplaintDetails() {
         action={
           <button 
             onClick={() => navigate('/admin/complaints')}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-light border border-brand-gray/50 hover:bg-brand-gray/10 text-brand-navy rounded-lg font-medium transition-colors text-sm"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-brand-light border border-brand-gray/50 hover:bg-brand-gray/10 text-brand-navy rounded-lg font-medium transition-colors text-sm"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Complaints
           </button>
         }
       />
 
-      <SpotlightCard className="glass-card p-6 mb-6 flex flex-col md:flex-row items-start md:items-center gap-6 justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h2 className="text-2xl font-display font-semibold text-brand-navy">{complaint.subject}</h2>
+      <SpotlightCard className="glass-card p-4 sm:p-6 mb-6 flex flex-col md:flex-row items-start md:items-center gap-4 sm:gap-6 justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+            <h2 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy break-words">{complaint.subject}</h2>
             {requiresAdditionalReview && (
-              <span className="flex items-center gap-1 text-xs font-medium text-semantic-warning bg-semantic-warning/10 px-2 py-1 rounded">
+              <span className="flex items-center gap-1 text-xs font-medium text-semantic-warning bg-semantic-warning/10 px-2 py-1 rounded whitespace-nowrap shrink-0">
                 <ShieldAlert className="w-3 h-3" /> Requires additional review
               </span>
             )}
           </div>
-          <p className="text-brand-navy/60 font-mono text-sm">{complaint.id}</p>
+          <p className="text-brand-navy/60 font-mono text-sm break-all">{complaint.id}</p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full md:w-auto">
+          <div className="flex flex-col flex-1 sm:flex-initial min-w-[120px]">
             <span className="text-xs text-brand-navy/50 font-semibold uppercase mb-1">Priority</span>
             <select 
               value={complaint.priority} 
               onChange={handlePriorityChange}
-              className="text-sm font-medium bg-brand-light border border-brand-gray/30 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-indigo"
+              className="text-sm font-medium bg-brand-light border border-brand-gray/30 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-indigo w-full"
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
@@ -151,12 +151,12 @@ export default function AdminComplaintDetails() {
               <option value="Critical">Critical</option>
             </select>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1 sm:flex-initial min-w-[120px]">
             <span className="text-xs text-brand-navy/50 font-semibold uppercase mb-1">Status</span>
             <select 
               value={complaint.status} 
               onChange={handleStatusChange}
-              className="text-sm font-medium bg-brand-light border border-brand-gray/30 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-indigo"
+              className="text-sm font-medium bg-brand-light border border-brand-gray/30 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-indigo w-full"
             >
               <option value="Open">Open</option>
               <option value="In Review">In Review</option>
@@ -208,11 +208,11 @@ export default function AdminComplaintDetails() {
                   {resolutionNoteError && (
                     <p className="text-sm text-semantic-error mb-3">Please add a resolution note before marking this complaint as resolved.</p>
                   )}
-                  <div className="flex justify-end">
+                  <div className="flex sm:justify-end">
                     <button 
                       onClick={handleAddNote}
                       disabled={!notes.trim()}
-                      className="px-4 py-2 bg-brand-indigo text-white rounded-lg hover:bg-brand-indigo/90 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full sm:w-auto px-4 py-2 bg-brand-indigo text-white rounded-lg hover:bg-brand-indigo/90 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed justify-center"
                     >
                       Save Notes
                     </button>

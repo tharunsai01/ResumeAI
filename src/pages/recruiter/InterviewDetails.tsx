@@ -153,18 +153,18 @@ export default function RecruiterInterviewDetails() {
         {/* HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <button onClick={() => navigate("/recruiter/interviews")} className="flex items-center text-sm font-medium text-brand-navy/60 hover:text-brand-indigo transition-colors">
-            <ChevronLeft className="w-4 h-4 mr-1" /> Back to Interviews
+            <ChevronLeft className="w-4 h-4 mr-1 shrink-0" /> Back to Interviews
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
             {interview.status === "Scheduled" && (
               <>
-                <Button variant="outline" className="text-semantic-error border-brand-gray/30 hover:bg-semantic-error/10" onClick={() => setCancelModalOpen(true)}>
+                <Button variant="outline" className="w-full sm:w-auto text-semantic-error border-brand-gray/30 hover:bg-semantic-error/10" onClick={() => setCancelModalOpen(true)}>
                   Cancel Interview
                 </Button>
-                <Button variant="outline" className="text-brand-indigo border-brand-indigo/30 hover:bg-brand-indigo/10" onClick={() => setRescheduleModalOpen(true)}>
+                <Button variant="outline" className="w-full sm:w-auto text-brand-indigo border-brand-indigo/30 hover:bg-brand-indigo/10" onClick={() => setRescheduleModalOpen(true)}>
                   Reschedule
                 </Button>
-                <Button className="bg-brand-indigo hover:bg-brand-blue" onClick={handleMarkCompleted}>
+                <Button className="w-full sm:w-auto bg-brand-indigo hover:bg-brand-blue" onClick={handleMarkCompleted}>
                   Mark Completed
                 </Button>
               </>
@@ -182,22 +182,22 @@ export default function RecruiterInterviewDetails() {
           <PremiumCard className="overflow-hidden border-none shadow-md ">
             <div className="h-2 bg-gradient-to-r from-brand-indigo to-brand-blue" />
             <PremiumCardContent className="p-0">
-              <div className="p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-brand-gray/20">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-brand-indigo/10 flex items-center justify-center border border-brand-indigo/20 shrink-0">
-                    <span className="text-2xl font-display font-bold text-brand-indigo">
+              <div className="p-4 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 border-b border-brand-gray/20">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-brand-indigo/10 flex items-center justify-center border border-brand-indigo/20 shrink-0">
+                    <span className="text-xl sm:text-2xl font-display font-bold text-brand-indigo">
                       {interview.candidateName.charAt(0)}
                     </span>
                   </div>
-                  <div>
-                    <h1 className="text-2xl font-display font-bold text-brand-navy">{interview.candidateName}</h1>
-                    <p className="text-brand-navy/60 font-medium">{interview.jobTitle}</p>
+                  <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl font-display font-bold text-brand-navy break-words">{interview.candidateName}</h1>
+                    <p className="text-brand-navy/60 font-medium text-xs sm:text-sm truncate">{interview.jobTitle}</p>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
                   {getStatusBadge(interview.status)}
-                  <Button variant="ghost" size="sm" className="text-brand-indigo hover:bg-brand-indigo/10 -mr-2" onClick={() => navigate(`/recruiter/candidates/${interview.candidateId}`)}>
-                    <User className="w-4 h-4 mr-2" /> View Candidate
+                  <Button variant="ghost" size="sm" className="text-brand-indigo hover:bg-brand-indigo/10 sm:-mr-2 text-xs" onClick={() => navigate(`/recruiter/candidates/${interview.candidateId}`)}>
+                    <User className="w-3.5 h-3.5 mr-1.5" /> View Candidate
                   </Button>
                 </div>
               </div>
@@ -247,7 +247,7 @@ export default function RecruiterInterviewDetails() {
                     <FileText className="w-5 h-5 text-brand-indigo" /> Interview Feedback
                   </PremiumCardTitle>
                 </PremiumCardHeader>
-                <PremiumCardContent className="p-6">
+                <PremiumCardContent className="p-4 sm:p-6">
                   {interview.feedback ? (
                     // Display saved feedback
                     <div className="space-y-6">
@@ -371,9 +371,9 @@ export default function RecruiterInterviewDetails() {
               Are you sure you want to cancel the interview with <span className="font-semibold text-brand-navy">{interview.candidateName}</span>? This action will mark the interview status as cancelled.
             </p>
           </div>
-          <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" onClick={() => setCancelModalOpen(false)} className="border-brand-gray/40 text-brand-navy">Keep Interview</Button>
-            <Button onClick={handleCancel} className="bg-semantic-error hover:bg-semantic-error/90 text-white">Cancel Interview</Button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <Button variant="outline" onClick={() => setCancelModalOpen(false)} className="w-full sm:w-auto border-brand-gray/40 text-brand-navy">Keep Interview</Button>
+            <Button onClick={handleCancel} className="w-full sm:w-auto bg-semantic-error hover:bg-semantic-error/90 text-white">Cancel Interview</Button>
           </div>
       </Modal>
     </DashboardShell>

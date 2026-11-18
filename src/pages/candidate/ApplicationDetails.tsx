@@ -193,11 +193,11 @@ export default function CandidateApplicationDetails() {
               "absolute top-0 left-0 w-full h-2",
               isWithdrawn ? "bg-brand-gray" : "bg-gradient-to-r from-brand-indigo to-brand-blue"
             )} />
-            <CardContent className="p-6 sm:p-8">
+            <CardContent className="p-4 sm:p-8">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <h1 className={cn("text-2xl sm:text-3xl font-display font-bold", isWithdrawn ? "text-brand-navy/50" : "text-brand-navy")}>{application.title}</h1>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                    <h1 className={cn("text-2xl sm:text-3xl font-display font-bold break-words", isWithdrawn ? "text-brand-navy/50" : "text-brand-navy")}>{application.title}</h1>
                     {getStatusBadge(application.status)}
                   </div>
                   
@@ -235,7 +235,7 @@ export default function CandidateApplicationDetails() {
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center p-4 bg-brand-light rounded-xl border border-brand-gray/50 shrink-0 min-w-[160px] opacity-90">
+                <div className="flex flex-col items-center justify-center p-4 bg-brand-light rounded-xl border border-brand-gray/50 shrink-0 w-full md:w-auto min-w-[160px] opacity-90">
                   <MatchScore score={application.matchScore} size="lg" />
                   <p className="font-semibold text-sm mt-3 text-brand-navy/80">
                     Match Score
@@ -409,7 +409,7 @@ export default function CandidateApplicationDetails() {
       {/* Withdraw Modal */}
       <AnimatePresence>
         {showWithdrawModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
@@ -421,17 +421,17 @@ export default function CandidateApplicationDetails() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               exit={{ opacity: 0, scale: 0.95, y: 20 }} 
-              className="glass-card relative w-full max-w-md overflow-hidden z-10"
+              className="glass-card relative w-full max-w-md overflow-hidden z-10 my-auto max-h-[calc(100dvh-2rem)] flex flex-col"
             >
-              <div className="p-6 sm:p-8 text-center flex flex-col items-center">
-                <div className="w-16 h-16 bg-semantic-error/10 rounded-full flex items-center justify-center mb-6">
+              <div className="p-6 sm:p-8 text-center flex flex-col items-center overflow-y-auto">
+                <div className="w-16 h-16 bg-semantic-error/10 rounded-full flex items-center justify-center mb-6 shrink-0">
                   <AlertTriangle className="w-8 h-8 text-semantic-error" />
                 </div>
-                <h3 className="text-xl font-display font-semibold text-brand-navy mb-2">Withdraw application?</h3>
+                <h3 className="text-xl font-display font-semibold text-brand-navy mb-2 break-words">Withdraw application?</h3>
                 <p className="text-brand-navy/60 mb-8 text-sm">
                   Are you sure you want to withdraw your application for <span className="font-semibold text-brand-navy">{application.title}</span> at <span className="font-semibold text-brand-navy">{application.company}</span>? This action cannot be undone.
                 </p>
-                <div className="flex gap-3 w-full">
+                <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 w-full shrink-0">
                   <Button variant="outline" className="flex-1" onClick={() => setShowWithdrawModal(false)}>
                     Cancel
                   </Button>

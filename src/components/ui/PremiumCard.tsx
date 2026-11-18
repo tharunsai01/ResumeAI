@@ -18,13 +18,13 @@ export function PremiumCard({ className, innerClassName, children, ...props }: P
 }
 
 export function PremiumCardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />;
+  return <div className={cn("flex flex-col space-y-1.5 p-4 sm:p-6", className)} {...props} />;
 }
 
 export function PremiumCardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn("premium-card-text font-display font-semibold leading-none tracking-tight text-slate-800 dark:text-slate-200", className)}
+      className={cn("premium-card-text font-display font-semibold leading-snug tracking-tight text-slate-800 dark:text-slate-200", className)}
       {...props}
     />
   );
@@ -40,5 +40,5 @@ export function PremiumCardDescription({ className, ...props }: React.HTMLAttrib
 }
 
 export function PremiumCardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-6 pt-0", className)} {...props} />;
+  return <div className={cn("p-4 sm:p-6 pt-0", className)} {...props} />;
 }

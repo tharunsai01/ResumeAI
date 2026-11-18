@@ -40,14 +40,14 @@ export function AccountStatusCard({ user, isCurrentUser, onSuspend, onReactivate
                 {user.status === "Suspended" ? (
                   <button 
                     onClick={onReactivate}
-                    className="flex items-center gap-2 px-4 py-2 bg-semantic-success text-white hover:bg-semantic-success/90 rounded-lg text-sm font-medium transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-semantic-success text-white hover:bg-semantic-success/90 rounded-lg text-sm font-medium transition-colors"
                   >
                     <CheckCircle className="w-4 h-4" /> Reactivate User
                   </button>
                 ) : (
                   <button 
                     onClick={onSuspend}
-                    className="flex items-center gap-2 px-4 py-2 bg-semantic-error text-white hover:bg-semantic-error/90 rounded-lg text-sm font-medium transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-semantic-error text-white hover:bg-semantic-error/90 rounded-lg text-sm font-medium transition-colors"
                   >
                     <Ban className="w-4 h-4" /> Suspend User
                   </button>

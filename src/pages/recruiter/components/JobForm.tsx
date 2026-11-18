@@ -118,10 +118,10 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
       <motion.div variants={slideUp} className="lg:col-span-2 space-y-6">
         <PremiumCard>
-          <PremiumCardHeader>
+          <PremiumCardHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
             <PremiumCardTitle>Basic Information</PremiumCardTitle>
           </PremiumCardHeader>
-          <PremiumCardContent className="space-y-4">
+          <PremiumCardContent className="p-4 sm:p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-brand-navy mb-1">Job Title *</label>
               <input
@@ -254,10 +254,10 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
         </PremiumCard>
 
         <PremiumCard>
-          <PremiumCardHeader>
+          <PremiumCardHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
             <PremiumCardTitle>Job Description & Responsibilities</PremiumCardTitle>
           </PremiumCardHeader>
-          <PremiumCardContent>
+          <PremiumCardContent className="p-4 sm:p-6">
             <div>
               <textarea
                 value={formData.description}
@@ -274,10 +274,10 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
         </PremiumCard>
 
         <PremiumCard>
-          <PremiumCardHeader>
+          <PremiumCardHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
             <PremiumCardTitle>Skills & Requirements</PremiumCardTitle>
           </PremiumCardHeader>
-          <PremiumCardContent className="space-y-6">
+          <PremiumCardContent className="p-4 sm:p-6 space-y-6">
             <div>
               <label className="block text-sm font-medium text-brand-navy mb-2">Required Skills *</label>
               <div className="flex flex-wrap gap-2 mb-3">
@@ -294,7 +294,7 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
                   ))}
                 </AnimatePresence>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={newRequiredSkill}
@@ -306,7 +306,7 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
                     errors.requiredSkills ? "border-semantic-error focus:border-semantic-error" : "border-brand-gray/50"
                   )}
                 />
-                <Button type="button" variant="outline" onClick={() => { addSkill("required", newRequiredSkill); setNewRequiredSkill(""); }}>Add</Button>
+                <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => { addSkill("required", newRequiredSkill); setNewRequiredSkill(""); }}>Add</Button>
               </div>
               {errors.requiredSkills && <p className="text-xs text-semantic-error mt-1">{errors.requiredSkills}</p>}
             </div>
@@ -327,7 +327,7 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
                   ))}
                 </AnimatePresence>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={newPreferredSkill}
@@ -336,7 +336,7 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
                   placeholder="Enter preferred skill..."
                   className="flex-1 bg-white border border-brand-gray/50 rounded-xl px-4 py-2 outline-none focus:border-brand-indigo/50 transition-all text-sm"
                 />
-                <Button type="button" variant="outline" onClick={() => { addSkill("preferred", newPreferredSkill); setNewPreferredSkill(""); }}>Add</Button>
+                <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => { addSkill("preferred", newPreferredSkill); setNewPreferredSkill(""); }}>Add</Button>
               </div>
             </div>
           </PremiumCardContent>
@@ -388,12 +388,12 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
             <Button onClick={handlePublish} disabled={isSubmitting} className="w-full bg-gradient-to-r from-brand-indigo to-brand-blue">
               {isSubmitting ? "Publishing..." : "Publish Job"}
             </Button>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={isSubmitting} className="flex-1 bg-white">
-                Save as Draft
-              </Button>
-              <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting} className="flex-1">
+            <div className="flex flex-col-reverse sm:flex-row gap-2">
+              <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting} className="w-full sm:flex-1">
                 Cancel
+              </Button>
+              <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={isSubmitting} className="w-full sm:flex-1 bg-white">
+                Save as Draft
               </Button>
             </div>
           </div>

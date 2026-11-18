@@ -74,9 +74,9 @@ export function AdminSkillModal({ isOpen, onClose, onSave, existingSkill, catego
       isOpen={isOpen}
       onClose={onClose}
       title={existingSkill ? "Edit Skill" : "Add Skill"}
-      className="max-w-md"
+      className="max-w-md w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] flex flex-col"
     >
-      <div className="space-y-4 py-4">
+      <div className="space-y-4 py-2 sm:py-4 max-h-[calc(100dvh-12rem)] overflow-y-auto">
         {error && (
           <div className="bg-semantic-error/10 text-semantic-error px-3 py-2 rounded-lg text-sm font-medium border border-semantic-error/20">
             {error}
@@ -142,9 +142,9 @@ export function AdminSkillModal({ isOpen, onClose, onSave, existingSkill, catego
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 mt-4 border-t border-brand-gray/20 pt-4">
-        <Button variant="outline" onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSave} className="bg-brand-indigo hover:bg-brand-blue text-white">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 mt-4 border-t border-brand-gray/20 pt-4">
+        <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
+        <Button onClick={handleSave} className="bg-brand-indigo hover:bg-brand-blue text-white w-full sm:w-auto">
           {existingSkill ? "Save Changes" : "Add Skill"}
         </Button>
       </div>

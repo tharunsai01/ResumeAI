@@ -91,9 +91,9 @@ export function AdminCategoryManager({ isOpen, onClose, categories, allSkills, o
       isOpen={isOpen}
       onClose={onClose}
       title={view === "list" ? "Manage Categories" : editingCategory ? "Edit Category" : "Add Category"}
-      className="max-w-2xl"
+      className="max-w-2xl w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] flex flex-col"
     >
-      <div className="py-4 h-[60vh] flex flex-col relative">
+      <div className="py-2 sm:py-4 h-[60vh] max-h-[calc(100dvh-10rem)] flex flex-col relative">
         {toastMsg && (
           <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg border border-emerald-200 flex items-center gap-2 text-sm font-medium shadow-md">
             <CheckCircle2 className="w-4 h-4" /> {toastMsg}
@@ -114,14 +114,14 @@ export function AdminCategoryManager({ isOpen, onClose, categories, allSkills, o
               </Button>
             </div>
             
-            <div className="flex-1 overflow-y-auto border border-brand-gray/20 rounded-xl bg-white shadow-sm scrollbar-thin">
+            <div className="flex-1 overflow-auto border border-brand-gray/20 rounded-xl bg-white shadow-sm scrollbar-thin">
               <table className="w-full text-sm text-left">
                 <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold sticky top-0 z-10 border-b border-brand-gray/20">
                   <tr>
-                    <th className="px-4 py-3">Category Name</th>
-                    <th className="px-4 py-3 text-center">Skills Count</th>
-                    <th className="px-4 py-3 text-center">Status</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Category Name</th>
+                    <th className="px-4 py-3 text-center whitespace-nowrap">Skills Count</th>
+                    <th className="px-4 py-3 text-center whitespace-nowrap">Status</th>
+                    <th className="px-4 py-3 text-right whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-gray/10">
@@ -227,9 +227,9 @@ export function AdminCategoryManager({ isOpen, onClose, categories, allSkills, o
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 shrink-0 pt-4 mt-auto border-t border-brand-gray/20">
-              <Button variant="outline" onClick={() => setView("list")}>Cancel</Button>
-              <Button onClick={handleSave} className="bg-brand-indigo hover:bg-brand-blue text-white">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 shrink-0 pt-4 mt-auto border-t border-brand-gray/20">
+              <Button variant="outline" onClick={() => setView("list")} className="w-full sm:w-auto">Cancel</Button>
+              <Button onClick={handleSave} className="bg-brand-indigo hover:bg-brand-blue text-white w-full sm:w-auto">
                 {editingCategory ? "Save Changes" : "Add Category"}
               </Button>
             </div>

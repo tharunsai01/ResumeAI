@@ -13,21 +13,21 @@ import { cn } from "../../lib/utils"
 const StatCard = ({ title, data, icon: Icon, color, delay, loading }: any) => (
   <motion.div variants={slideUp} custom={delay}>
     <PremiumCard className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default h-full border-brand-gray/40">
-      <PremiumCardContent className="p-5 flex flex-col h-full justify-between">
-        <div className="flex items-start justify-between mb-4">
-          <div className={cn("p-2.5 rounded-xl border", color.bg, color.text, color.border)}>
-            <Icon className="w-5 h-5" />
+      <PremiumCardContent className="p-3.5 sm:p-5 flex flex-col h-full justify-between min-w-0">
+        <div className="flex items-start justify-between mb-3 sm:mb-4">
+          <div className={cn("p-2 sm:p-2.5 rounded-xl border shrink-0", color.bg, color.text, color.border)}>
+            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
-        <div>
-          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-          <div className="flex items-end gap-3">
-            <h3 className="text-3xl font-display font-bold text-brand-navy">
-              {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : data.value}
+        <div className="min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-brand-navy/60 mb-1 truncate">{title}</p>
+          <div className="flex items-end gap-2 sm:gap-3">
+            <h3 className="text-xl sm:text-3xl font-display font-bold text-brand-navy truncate">
+              {loading ? <div className="h-7 sm:h-8 w-10 sm:w-12 bg-brand-gray/20 rounded animate-pulse" /> : data.value}
             </h3>
           </div>
           {!loading && (
-            <p className="text-xs font-medium text-brand-indigo mt-2 bg-brand-indigo/5 inline-block px-2 py-0.5 rounded-md">
+            <p className="text-[10px] sm:text-xs font-medium text-brand-indigo mt-1.5 sm:mt-2 bg-brand-indigo/5 inline-block px-1.5 sm:px-2 py-0.5 rounded-md truncate max-w-full">
               {data.indicator}
             </p>
           )}
@@ -122,19 +122,19 @@ export default function RecruiterDashboard() {
         {/* 1. PAGE HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">Good morning, Recruiter</h1>
-            <p className="text-brand-navy/60 mt-1">Here's an overview of your recruitment activity.</p>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Good morning, Recruiter</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Here's an overview of your recruitment activity.</p>
           </div>
           <Button 
             onClick={() => navigate("/recruiter/jobs/create")} 
-            className="shrink-0 px-6 bg-gradient-to-r from-brand-indigo to-brand-blue hover:shadow-lg hover:shadow-brand-indigo/20 transition-all duration-200 group"
+            className="w-full sm:w-auto shrink-0 px-6 bg-gradient-to-r from-brand-indigo to-brand-blue hover:shadow-lg hover:shadow-brand-indigo/20 transition-all duration-200 group"
           >
             Create New Job <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </motion.div>
 
         {/* 2. STATISTICS CARDS */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           <StatCard title="Active Jobs" data={stats.activeJobs} icon={Briefcase} delay={0} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo", border: "border-brand-indigo/20" }} />
           <StatCard title="Total Candidates" data={stats.totalCandidates} icon={Users} delay={1} loading={loading} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue", border: "border-brand-blue/20" }} />
           <StatCard title="AI Screened" data={stats.aiScreened} icon={Sparkles} delay={2} loading={loading} color={{ bg: "bg-semantic-info/10", text: "text-semantic-info", border: "border-semantic-info/20" }} />
@@ -263,7 +263,7 @@ export default function RecruiterDashboard() {
               </PremiumCardHeader>
               <PremiumCardContent className="p-0">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
+                  <table className="w-full text-sm text-left whitespace-nowrap">
                     <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold">
                       <tr>
                         <th className="px-5 py-3">Job Title & Location</th>
@@ -338,9 +338,9 @@ export default function RecruiterDashboard() {
                   ))
                 ) : (
                   topMatches.map(match => (
-                    <div key={match.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-brand-light/50 transition-colors group">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
+                    <div key={match.id} className="flex items-center justify-between gap-2 p-3 rounded-xl hover:bg-brand-light/50 transition-colors group">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="relative shrink-0">
                           <div className="w-10 h-10 rounded-full bg-brand-indigo/10 text-brand-indigo flex items-center justify-center font-bold font-display border border-brand-indigo/20">
                             {match.name.charAt(0)}
                           </div>
@@ -348,10 +348,10 @@ export default function RecruiterDashboard() {
                             {match.match}
                           </div>
                         </div>
-                        <div>
-                          <h4 className="font-semibold text-brand-navy text-sm">{match.name}</h4>
-                          <p className="text-xs text-brand-navy/60">{match.role}</p>
-                          <div className="flex gap-1 mt-1">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-semibold text-brand-navy text-sm truncate">{match.name}</h4>
+                          <p className="text-xs text-brand-navy/60 truncate">{match.role}</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
                             {match.skills.slice(0,2).map(skill => (
                               <span key={skill} className="text-[9px] font-medium px-1.5 py-0.5 bg-brand-gray/20 text-brand-navy/70 rounded">
                                 {skill}
@@ -361,7 +361,7 @@ export default function RecruiterDashboard() {
                           </div>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/recruiter/candidates/${match.id}`)} className="opacity-0 group-hover:opacity-100 transition-opacity h-8 text-xs text-brand-indigo">
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/recruiter/candidates/${match.id}`)} className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 text-xs text-brand-indigo shrink-0">
                         View
                       </Button>
                     </div>
@@ -383,7 +383,7 @@ export default function RecruiterDashboard() {
             </PremiumCardHeader>
             <PremiumCardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
+                <table className="w-full text-sm text-left whitespace-nowrap">
                   <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold">
                     <tr>
                       <th className="px-6 py-3">Candidate</th>
@@ -449,21 +449,21 @@ export default function RecruiterDashboard() {
         {/* 9. QUICK ACTIONS */}
         <motion.div variants={slideUp}>
           <h2 className="text-sm font-semibold text-brand-navy/60 uppercase tracking-wider mb-4 px-1">Quick Actions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold" onClick={() => navigate("/recruiter/jobs/create")}>
-              <Briefcase className="w-4 h-4 mr-2 text-brand-indigo" /> Create Job
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold w-full" onClick={() => navigate("/recruiter/jobs/create")}>
+              <Briefcase className="w-4 h-4 mr-2 text-brand-indigo shrink-0" /> <span className="truncate">Create Job</span>
             </Button>
-            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold" onClick={() => navigate("/recruiter/candidates")}>
-              <Users className="w-4 h-4 mr-2 text-brand-blue" /> View Candidates
+            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold w-full" onClick={() => navigate("/recruiter/candidates")}>
+              <Users className="w-4 h-4 mr-2 text-brand-blue shrink-0" /> <span className="truncate">View Candidates</span>
             </Button>
-            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold" onClick={() => navigate("/recruiter/screening")}>
-              <Sparkles className="w-4 h-4 mr-2 text-semantic-warning" /> Run Screening
+            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold w-full" onClick={() => navigate("/recruiter/screening")}>
+              <Sparkles className="w-4 h-4 mr-2 text-semantic-warning shrink-0" /> <span className="truncate">Run Screening</span>
             </Button>
-            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold" onClick={() => navigate("/recruiter/shortlist")}>
-              <CheckCircle2 className="w-4 h-4 mr-2 text-semantic-success" /> View Shortlist
+            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold w-full" onClick={() => navigate("/recruiter/shortlist")}>
+              <CheckCircle2 className="w-4 h-4 mr-2 text-semantic-success shrink-0" /> <span className="truncate">View Shortlist</span>
             </Button>
-            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold" onClick={() => navigate("/recruiter/interviews")}>
-              <Calendar className="w-4 h-4 mr-2 text-semantic-info" /> Schedule Interview
+            <Button variant="outline" className="h-12 bg-white hover:bg-brand-light/50 border-brand-gray/40 justify-start px-4 text-xs font-semibold w-full" onClick={() => navigate("/recruiter/interviews")}>
+              <Calendar className="w-4 h-4 mr-2 text-semantic-info shrink-0" /> <span className="truncate">Schedule Interview</span>
             </Button>
           </div>
         </motion.div>

@@ -137,9 +137,9 @@ export default function ComplaintPage() {
         
         {/* MAIN FORM AREA */}
         <div className="flex-1 max-w-3xl">
-          <motion.div variants={slideUp} initial="initial" animate="animate" className="mb-8">
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">Report an Issue</h1>
-            <p className="text-brand-navy/60 mt-2">Help us keep HireSmart AI safe, reliable, and useful for candidates.</p>
+          <motion.div variants={slideUp} initial="initial" animate="animate" className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy">Report an Issue</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-2">Help us keep HireSmart AI safe, reliable, and useful for candidates.</p>
           </motion.div>
 
           <AnimatePresence mode="wait">
@@ -148,24 +148,24 @@ export default function ComplaintPage() {
                 key="success"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="glass-card p-8 sm:p-12 text-center space-y-6"
+                className="glass-card p-6 sm:p-12 text-center space-y-6"
               >
-                <div className="w-20 h-20 bg-semantic-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle2 className="w-10 h-10 text-semantic-success" />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-semantic-success/10 rounded-full flex items-center justify-center mx-auto mb-6 shrink-0">
+                  <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-semantic-success" />
                 </div>
-                <h2 className="text-2xl font-display font-bold text-brand-navy">Report Submitted</h2>
-                <p className="text-brand-navy/70 max-w-md mx-auto">
+                <h2 className="text-xl sm:text-2xl font-display font-bold text-brand-navy">Report Submitted</h2>
+                <p className="text-sm sm:text-base text-brand-navy/70 max-w-md mx-auto">
                   Thank you for helping us improve HireSmart AI. Your report has been recorded and will be reviewed by our team shortly.
                 </p>
                 <div className="bg-brand-light p-4 rounded-xl border border-brand-gray/50 inline-block">
-                  <span className="text-sm text-brand-navy/50 block mb-1 uppercase tracking-wider font-semibold">Report ID</span>
-                  <span className="font-mono font-bold text-brand-indigo text-lg">{generatedId}</span>
+                  <span className="text-xs sm:text-sm text-brand-navy/50 block mb-1 uppercase tracking-wider font-semibold">Report ID</span>
+                  <span className="font-mono font-bold text-brand-indigo text-base sm:text-lg">{generatedId}</span>
                 </div>
-                <div className="pt-8 flex flex-col sm:flex-row justify-center gap-4">
-                  <Button variant="outline" onClick={() => navigate("/candidate/help")} className="flex items-center gap-2">
+                <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+                  <Button variant="outline" onClick={() => navigate("/candidate/help")} className="flex items-center justify-center gap-2 w-full sm:w-auto">
                     <ArrowLeft className="w-4 h-4" /> Back to Help Center
                   </Button>
-                  <Button onClick={() => navigate("/candidate/dashboard")} className="flex items-center gap-2">
+                  <Button onClick={() => navigate("/candidate/dashboard")} className="flex items-center justify-center gap-2 w-full sm:w-auto">
                     <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
                   </Button>
                 </div>

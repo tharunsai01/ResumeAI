@@ -148,14 +148,14 @@ export default function AdminAuditLogs() {
           description="Track administrative, platform, AI, and security-related activity."
           statusIndicator={{ label: "Audit Logging Active", isHealthy: true }}
           action={
-            <Button onClick={handleExport} className="bg-brand-indigo hover:bg-brand-blue text-white">
+            <Button onClick={handleExport} className="bg-brand-indigo hover:bg-brand-blue text-white w-full sm:w-auto justify-center">
               <Download className="w-4 h-4 mr-2" /> Export Logs
             </Button>
           }
         />
 
         {/* STATS */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
           <AdminStatCard title="Total Events" value={auditLogs.length} icon={FileText} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
           <AdminStatCard title="Today" value={todayCount} icon={Activity} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
           <AdminStatCard title="Admin Actions" value={adminActionsCount} icon={Users} color={{ bg: "bg-brand-purple/10", text: "text-brand-purple" }} />
@@ -246,45 +246,45 @@ export default function AdminAuditLogs() {
         {/* TABLE */}
         <motion.div variants={slideUp}>
           <PremiumCard>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto w-full">
               <table className="w-full text-sm text-left">
                 <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
                   <tr>
-                    <th className="px-5 py-4">Event</th>
-                    <th className="px-5 py-4">Actor</th>
-                    <th className="px-5 py-4 hidden md:table-cell">Role</th>
-                    <th className="px-5 py-4 hidden sm:table-cell">Resource</th>
-                    <th className="px-5 py-4 text-center">Severity</th>
-                    <th className="px-5 py-4">Timestamp</th>
-                    <th className="px-5 py-4 text-right">Actions</th>
+                    <th className="px-3 sm:px-5 py-3 sm:py-4 whitespace-nowrap">Event</th>
+                    <th className="px-3 sm:px-5 py-3 sm:py-4 whitespace-nowrap">Actor</th>
+                    <th className="px-3 sm:px-5 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">Role</th>
+                    <th className="px-3 sm:px-5 py-3 sm:py-4 hidden sm:table-cell whitespace-nowrap">Resource</th>
+                    <th className="px-3 sm:px-5 py-3 sm:py-4 text-center whitespace-nowrap">Severity</th>
+                    <th className="px-3 sm:px-5 py-3 sm:py-4 whitespace-nowrap">Timestamp</th>
+                    <th className="px-3 sm:px-5 py-3 sm:py-4 text-right whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-gray/20">
                   {paginatedLogs.length > 0 ? (
                     paginatedLogs.map(log => (
                       <tr key={log.id} className="hover:bg-brand-light/30 transition-colors group">
-                        <td className="px-5 py-3">
-                          <div className="font-semibold text-brand-navy max-w-[200px] sm:max-w-[300px] truncate" title={log.description}>{log.description}</div>
+                        <td className="px-3 sm:px-5 py-3 whitespace-nowrap">
+                          <div className="font-semibold text-brand-navy max-w-[180px] sm:max-w-[300px] truncate" title={log.description}>{log.description}</div>
                           <div className="text-[10px] text-brand-navy/50 mt-0.5">{log.eventType}</div>
                         </td>
-                        <td className="px-5 py-3">
+                        <td className="px-3 sm:px-5 py-3 whitespace-nowrap">
                           <div className="font-medium text-brand-navy">{log.actorName}</div>
                           <div className="text-[10px] text-brand-navy/40 mt-0.5 md:hidden">{log.actorRole}</div>
                         </td>
-                        <td className="px-5 py-3 hidden md:table-cell">
+                        <td className="px-3 sm:px-5 py-3 hidden md:table-cell whitespace-nowrap">
                           <span className="text-brand-navy/80 text-xs bg-brand-light px-2 py-1 rounded-md border border-brand-gray/20">{log.actorRole}</span>
                         </td>
-                        <td className="px-5 py-3 hidden sm:table-cell">
+                        <td className="px-3 sm:px-5 py-3 hidden sm:table-cell whitespace-nowrap">
                           {renderResourceLink(log.resourceType, log.resourceId)}
                         </td>
-                        <td className="px-5 py-3 text-center">
+                        <td className="px-3 sm:px-5 py-3 text-center whitespace-nowrap">
                           {getSeverityBadge(log.severity)}
                         </td>
-                        <td className="px-5 py-3">
+                        <td className="px-3 sm:px-5 py-3 whitespace-nowrap">
                           <div className="text-brand-navy/80 whitespace-nowrap">{log.timestamp.split(' ')[0] + ' ' + log.timestamp.split(' ')[1] + ' ' + log.timestamp.split(' ')[2]}</div>
-                          <div className="text-[10px] text-brand-navy/40">{log.timestamp.split(' ')[3] + ' ' + log.timestamp.split(' ')[4]}</div>
+                          <div className="text-[10px] text-brand-navy/40 whitespace-nowrap">{log.timestamp.split(' ')[3] + ' ' + log.timestamp.split(' ')[4]}</div>
                         </td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-3 sm:px-5 py-3 text-right whitespace-nowrap">
                           <Button 
                             variant="outline" 
                             onClick={() => handleOpenView(log)}
@@ -315,15 +315,15 @@ export default function AdminAuditLogs() {
             
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="p-4 border-t border-brand-gray/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-sm text-brand-navy/60">
+              <div className="p-4 border-t border-brand-gray/20 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                <div className="text-sm text-brand-navy/60 text-center sm:text-left">
                   Showing <span className="font-medium text-brand-navy">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-brand-navy">{Math.min(currentPage * itemsPerPage, filteredLogs.length)}</span> of <span className="font-medium text-brand-navy">{filteredLogs.length}</span> events
                 </div>
-                <div className="flex items-center gap-1">
-                  <Button variant="outline" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="px-3 h-8 text-xs">
+                <div className="flex flex-wrap items-center justify-center gap-1">
+                  <Button variant="outline" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="px-3 h-8 text-xs shrink-0">
                     Previous
                   </Button>
-                  <div className="flex gap-1 px-2 hidden sm:flex">
+                  <div className="flex gap-1 px-1 overflow-x-auto max-w-[180px] sm:max-w-none py-1">
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum = currentPage
                       if (currentPage < 3) pageNum = i + 1

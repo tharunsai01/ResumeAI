@@ -66,7 +66,7 @@ export default function AdminAiEvaluation() {
           description="Monitor AI quality, stability, security, and fairness across HireSmart AI."
           statusIndicator={{ label: "Evaluation Monitoring Active", isHealthy: true }}
           action={
-            <Button onClick={() => setIsConfirmModalOpen(true)} className="bg-brand-indigo hover:bg-brand-blue text-white shadow-sm">
+            <Button onClick={() => setIsConfirmModalOpen(true)} className="bg-brand-indigo hover:bg-brand-blue text-white shadow-sm w-full sm:w-auto justify-center">
               <Play className="w-4 h-4 mr-2" /> Run Evaluation
             </Button>
           }
@@ -81,7 +81,7 @@ export default function AdminAiEvaluation() {
         </motion.div>
 
         {/* STATS */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
           <AdminStatCard title="Skill Extraction Accuracy" value={evaluationData.summary.skillExtractionAccuracy} icon={Target} color={{ bg: "bg-emerald-500/10", text: "text-emerald-500" }} />
           <AdminStatCard title="Score Stability" value={evaluationData.summary.scoreStability} icon={Activity} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
           <AdminStatCard title="Fairness Test" value={evaluationData.summary.fairnessTest} icon={Scale} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
@@ -234,30 +234,30 @@ export default function AdminAiEvaluation() {
                   </PremiumCardTitle>
                 </PremiumCardHeader>
                 <PremiumCardContent>
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto w-full">
                     <table className="w-full text-sm text-left">
                       <thead className="text-xs text-brand-navy/50 uppercase bg-brand-light/50 border-b border-brand-gray/30">
                         <tr>
-                          <th className="px-4 py-3 font-semibold rounded-tl-lg">ID / Model</th>
-                          <th className="px-4 py-3 font-semibold hidden sm:table-cell">Dataset</th>
-                          <th className="px-4 py-3 font-semibold hidden md:table-cell">Components</th>
-                          <th className="px-4 py-3 font-semibold">Date</th>
-                          <th className="px-4 py-3 font-semibold text-right rounded-tr-lg">Action</th>
+                          <th className="px-3 sm:px-4 py-3 font-semibold rounded-tl-lg whitespace-nowrap">ID / Model</th>
+                          <th className="px-3 sm:px-4 py-3 font-semibold hidden sm:table-cell whitespace-nowrap">Dataset</th>
+                          <th className="px-3 sm:px-4 py-3 font-semibold hidden md:table-cell whitespace-nowrap">Components</th>
+                          <th className="px-3 sm:px-4 py-3 font-semibold whitespace-nowrap">Date</th>
+                          <th className="px-3 sm:px-4 py-3 font-semibold text-right rounded-tr-lg whitespace-nowrap">Action</th>
                         </tr>
                       </thead>
                       <tbody>
                         {evaluationData.evaluationHistory.map((record) => (
                           <tr key={record.id} className="border-b border-brand-gray/10 hover:bg-brand-light/30 transition-colors last:border-b-0">
-                            <td className="px-4 py-3">
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                               <div className="font-medium text-brand-navy">{record.id}</div>
                               <div className="text-[10px] text-brand-navy/50">{record.modelVersion}</div>
                             </td>
-                            <td className="px-4 py-3 text-brand-navy/70 hidden sm:table-cell">{record.dataset}</td>
-                            <td className="px-4 py-3 text-brand-navy/70 hidden md:table-cell">
+                            <td className="px-3 sm:px-4 py-3 text-brand-navy/70 hidden sm:table-cell whitespace-nowrap">{record.dataset}</td>
+                            <td className="px-3 sm:px-4 py-3 text-brand-navy/70 hidden md:table-cell whitespace-nowrap">
                               <div className="max-w-[200px] truncate" title={record.components}>{record.components}</div>
                             </td>
-                            <td className="px-4 py-3 text-brand-navy/70">{record.date}</td>
-                            <td className="px-4 py-3 text-right">
+                            <td className="px-3 sm:px-4 py-3 text-brand-navy/70 whitespace-nowrap">{record.date}</td>
+                            <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
                               <Button variant="outline" size="sm" onClick={() => handleViewRecord(record)} className="h-8 px-2.5 text-xs text-brand-indigo border-brand-indigo/20 hover:bg-brand-indigo/10">
                                 View
                               </Button>

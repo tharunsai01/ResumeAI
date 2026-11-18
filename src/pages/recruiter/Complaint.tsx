@@ -43,12 +43,12 @@ export default function RecruiterComplaint() {
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-3xl mx-auto space-y-8 pb-16">
         
         {/* HEADER */}
-        <motion.div variants={slideUp} className="text-center space-y-4 pt-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-semantic-error/10 text-semantic-error mb-2">
-            <AlertCircle className="w-8 h-8" />
+        <motion.div variants={slideUp} className="text-center space-y-3 sm:space-y-4 pt-6 sm:pt-12">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-semantic-error/10 text-semantic-error mb-2">
+            <AlertCircle className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <h1 className="text-4xl font-display font-bold text-brand-navy">Report a Complaint</h1>
-          <p className="text-lg text-brand-navy/60 max-w-xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-display font-bold text-brand-navy break-words">Report a Complaint</h1>
+          <p className="text-sm sm:text-lg text-brand-navy/60 max-w-xl mx-auto">
             Tell us about an issue related to your account, job posting, candidate, interview, or HireSmart AI experience.
           </p>
         </motion.div>
@@ -80,13 +80,13 @@ export default function RecruiterComplaint() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <div className="bg-brand-light/30 px-8 py-6 border-b border-brand-gray/20">
-                    <p className="text-sm text-brand-navy/70 leading-relaxed font-medium">
+                  <div className="bg-brand-light/30 px-4 sm:px-8 py-4 sm:py-6 border-b border-brand-gray/20">
+                    <p className="text-xs sm:text-sm text-brand-navy/70 leading-relaxed font-medium">
                       We take platform safety, fairness, privacy, and user experience seriously. Use this form to report an issue that requires attention.
                     </p>
                   </div>
                   
-                  <PremiumCardContent className="p-8">
+                  <PremiumCardContent className="p-4 sm:p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -161,9 +161,9 @@ export default function RecruiterComplaint() {
                         </div>
                       </div>
 
-                      <div className="pt-4 flex justify-end gap-3">
-                        <Button type="button" variant="outline" onClick={() => window.history.back()}>Cancel</Button>
-                        <Button type="submit" className="bg-brand-indigo hover:bg-brand-indigo/90">
+                      <div className="pt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+                        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => window.history.back()}>Cancel</Button>
+                        <Button type="submit" className="w-full sm:w-auto bg-brand-indigo hover:bg-brand-indigo/90">
                           <Send className="w-4 h-4 mr-2" /> Submit Complaint
                         </Button>
                       </div>
