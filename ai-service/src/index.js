@@ -16,6 +16,11 @@ export {
   screenCandidatesSemantic,
   cosine,
 } from "./semantic/semanticScore.js";
+export { semanticSimilaritiesToJobs } from "./semantic/semanticJobs.js";
+export { fromBoardJob, toMatchJob } from "./matching/jobAdapters.js";
+export { buildResumeReport } from "./report/resumeReport.js";
+export { buildSkillGap } from "./skillgap/skillGap.js";
+export { recommendJobs, recommendJobsSemantic } from "./recommend/recommendJobs.js";
 
 /**
  * Phase 1 pipeline: file -> parsed text -> cleaned -> security-scanned.

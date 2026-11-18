@@ -23,7 +23,7 @@ export function resolveWeights(input = {}) {
 }
 
 /** Years to use: the lower of "stated" and "computed from dates", so inflated claims do not help. */
-function effectiveYears({ stated, computed }) {
+export function effectiveYears({ stated, computed }) {
   if (computed > 0 && stated != null) return Math.min(stated, computed);
   if (computed > 0) return computed;
   return stated ?? 0;
