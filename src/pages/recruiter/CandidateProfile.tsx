@@ -84,41 +84,41 @@ export default function RecruiterCandidateProfile() {
         <motion.div variants={slideUp}>
           <PremiumCard className="overflow-hidden border-none shadow-md">
             <div className="h-24 w-full bg-gradient-to-r from-brand-indigo via-brand-blue to-brand-navy/80" />
-            <PremiumCardContent className="px-6 pb-6 pt-0 relative sm:flex justify-between items-end gap-6">
-              <div className="flex flex-col sm:flex-row sm:items-end gap-5 -mt-10 mb-4 sm:mb-0 relative z-10">
-                <div className="w-24 h-24 rounded-2xl bg-white p-1.5 shadow-lg shrink-0">
+            <PremiumCardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 relative flex flex-col md:flex-row justify-between md:items-end gap-4 sm:gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-5 -mt-10 mb-2 sm:mb-0 relative z-10 min-w-0">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white p-1.5 shadow-lg shrink-0">
                   <div className="w-full h-full bg-gradient-to-br from-brand-indigo/10 to-brand-blue/10 rounded-xl flex items-center justify-center border border-brand-gray/30">
-                    <span className="text-3xl font-display font-bold text-brand-indigo">
+                    <span className="text-2xl sm:text-3xl font-display font-bold text-brand-indigo">
                       {candidate.name.split(" ").map(n => n[0]).join("")}
                     </span>
                   </div>
                 </div>
-                <div className="pb-1 space-y-1">
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl sm:text-3xl font-display font-bold text-brand-navy">{candidate.name}</h1>
+                <div className="pb-1 space-y-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-bold text-brand-navy break-words">{candidate.name}</h1>
                     <CandidateStatusBadge status={candidate.status} />
                   </div>
-                  <div className="text-base font-medium text-brand-navy/80">{candidate.title}</div>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-brand-navy/60 pt-1">
-                    <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {candidate.location}</span>
-                    <span className="flex items-center gap-1.5"><Mail className="w-4 h-4" /> {candidate.email}</span>
-                    <span className="flex items-center gap-1.5"><Briefcase className="w-4 h-4" /> {candidate.experience} exp.</span>
+                  <div className="text-sm sm:text-base font-medium text-brand-navy/80 break-words">{candidate.title}</div>
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-brand-navy/60 pt-1">
+                    <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> {candidate.location}</span>
+                    <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> {candidate.email}</span>
+                    <span className="flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> {candidate.experience} exp.</span>
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0">
                 {candidate.status !== "Rejected" && candidate.status !== "Shortlisted" && (
-                  <Button variant="outline" className="text-semantic-error hover:bg-semantic-error/5 hover:text-semantic-error border-brand-gray/40 bg-white" onClick={() => setCandidateToReject(true)}>
+                  <Button variant="outline" className="w-full sm:w-auto text-semantic-error hover:bg-semantic-error/5 hover:text-semantic-error border-brand-gray/40 bg-white" onClick={() => setCandidateToReject(true)}>
                     Reject
                   </Button>
                 )}
                 {candidate.status !== "Shortlisted" && (
-                  <Button variant="outline" className="bg-white border-brand-gray/40 hover:bg-brand-light text-brand-navy" onClick={handleShortlist}>
+                  <Button variant="outline" className="w-full sm:w-auto bg-white border-brand-gray/40 hover:bg-brand-light text-brand-navy" onClick={handleShortlist}>
                     Shortlist
                   </Button>
                 )}
-                <Button onClick={() => navigate("/recruiter/interviews")} className="bg-gradient-to-r from-brand-indigo to-brand-blue shadow-sm">
+                <Button onClick={() => navigate("/recruiter/interviews")} className="w-full sm:w-auto bg-gradient-to-r from-brand-indigo to-brand-blue shadow-sm">
                   <Calendar className="w-4 h-4 mr-2" /> Schedule Interview
                 </Button>
               </div>
@@ -135,7 +135,7 @@ export default function RecruiterCandidateProfile() {
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Professional Summary</PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-6">
+              <PremiumCardContent className="p-4 sm:p-6">
                 <p className="text-brand-navy/80 leading-relaxed text-sm">
                   Results-driven {candidate.title} with {candidate.experience} of experience specializing in {candidate.skills.slice(0,2).map(s => s.name).join(" and ")}. 
                   Proven track record in delivering high-quality software solutions and collaborating effectively with cross-functional teams.
@@ -149,7 +149,7 @@ export default function RecruiterCandidateProfile() {
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Experience</PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-6">
+              <PremiumCardContent className="p-4 sm:p-6">
                 {candidate.experience === "Fresher" ? (
                   <div className="text-sm text-brand-navy/60 italic">No professional experience listed.</div>
                 ) : (
@@ -178,7 +178,7 @@ export default function RecruiterCandidateProfile() {
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Projects</PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-6 space-y-4">
+              <PremiumCardContent className="p-4 sm:p-6 space-y-4">
                 {candidate.projects.map((proj, idx) => (
                   <div key={idx} className="bg-brand-light/50 p-4 rounded-xl border border-brand-gray/30">
                     <h4 className="font-semibold text-brand-navy text-sm mb-1">{proj.title}</h4>
@@ -200,7 +200,7 @@ export default function RecruiterCandidateProfile() {
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Education</PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-6 space-y-4">
+              <PremiumCardContent className="p-4 sm:p-6 space-y-4">
                 {candidate.education.map((edu, idx) => (
                   <div key={idx} className="flex justify-between items-start">
                     <div>

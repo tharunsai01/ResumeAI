@@ -157,17 +157,17 @@ export default function RecruiterHiringPipeline() {
         {/* HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 shrink-0">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">Hiring Pipeline</h1>
-            <p className="text-brand-navy/60 mt-1">Track candidates from shortlist through final hiring decisions.</p>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Hiring Pipeline</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Track candidates from shortlist through final hiring decisions.</p>
           </div>
           <SpotlightCard className="glass-card flex items-center px-4 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all w-full sm:w-72 shrink-0">
-            <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-brand-navy/40 mr-2.5 sm:mr-3 shrink-0" />
             <input
               type="text"
               placeholder="Search pipeline..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11 text-sm"
+              className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-10 sm:h-11 text-xs sm:text-sm"
             />
           </SpotlightCard>
         </motion.div>
@@ -183,7 +183,7 @@ export default function RecruiterHiringPipeline() {
               const columnCandidates = filteredCandidates.filter(c => c.stage === column.id)
               
               return (
-                <div key={column.id} className="w-[320px] flex flex-col bg-brand-gray/5 rounded-2xl border border-brand-gray/20 shrink-0 h-full">
+                <div key={column.id} className="w-[280px] sm:w-[320px] flex flex-col bg-brand-gray/5 rounded-2xl border border-brand-gray/20 shrink-0 h-full">
                   {/* Column Header */}
                   <div className={cn("p-4 border-b rounded-t-2xl flex items-center justify-between", column.bg)}>
                     <div className="flex items-center gap-2">
@@ -407,9 +407,9 @@ export default function RecruiterHiringPipeline() {
               </p>
             </div>
           )}
-          <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" onClick={() => { setHireModalOpen(false); setActiveCandidate(null); }} className="border-brand-gray/40 text-brand-navy">Cancel</Button>
-            <Button onClick={handleHire} className="bg-semantic-success hover:bg-semantic-success/90 text-white">Confirm Hire</Button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <Button variant="outline" onClick={() => { setHireModalOpen(false); setActiveCandidate(null); }} className="w-full sm:w-auto border-brand-gray/40 text-brand-navy">Cancel</Button>
+            <Button onClick={handleHire} className="w-full sm:w-auto bg-semantic-success hover:bg-semantic-success/90 text-white">Confirm Hire</Button>
           </div>
       </Modal>
 
@@ -433,9 +433,9 @@ export default function RecruiterHiringPipeline() {
               </p>
             </div>
           )}
-          <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" onClick={() => { setRejectModalOpen(false); setActiveCandidate(null); }} className="border-brand-gray/40 text-brand-navy">Cancel</Button>
-            <Button onClick={handleReject} className="bg-semantic-error hover:bg-semantic-error/90 text-white">Reject Candidate</Button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <Button variant="outline" onClick={() => { setRejectModalOpen(false); setActiveCandidate(null); }} className="w-full sm:w-auto border-brand-gray/40 text-brand-navy">Cancel</Button>
+            <Button onClick={handleReject} className="w-full sm:w-auto bg-semantic-error hover:bg-semantic-error/90 text-white">Reject Candidate</Button>
           </div>
       </Modal>
 

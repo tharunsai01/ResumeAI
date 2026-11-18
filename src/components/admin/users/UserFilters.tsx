@@ -25,8 +25,8 @@ export function UserFilters({
   const hasActiveFilters = searchQuery !== "" || selectedRole !== "All Roles" || selectedStatus !== "All Status" || selectedVerification !== "All"
 
   return (
-    <SpotlightCard className="glass-card p-4 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
-      <div className="relative w-full md:w-96">
+    <SpotlightCard className="glass-card p-3.5 sm:p-4 mb-6 flex flex-col md:flex-row gap-3 sm:gap-4 items-stretch md:items-center justify-between">
+      <div className="relative w-full md:w-80 lg:w-96">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-navy/40" />
         <input 
           type="text" 
@@ -37,13 +37,13 @@ export function UserFilters({
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-        <div className="flex items-center gap-2 px-3 py-2 bg-brand-light border border-brand-gray/50 rounded-lg text-sm">
-          <Filter className="w-4 h-4 text-brand-navy/40" />
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
+        <div className="flex items-center gap-2 px-3 py-2 bg-brand-light border border-brand-gray/50 rounded-lg text-sm flex-1 sm:flex-initial min-w-[130px]">
+          <Filter className="w-4 h-4 text-brand-navy/40 shrink-0" />
           <select 
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value as any)}
-            className="bg-transparent border-none outline-none text-brand-navy font-medium cursor-pointer"
+            className="bg-transparent border-none outline-none text-brand-navy font-medium cursor-pointer w-full text-xs sm:text-sm"
           >
             <option value="All Roles">All Roles</option>
             <option value="Candidate">Candidate</option>
@@ -55,7 +55,7 @@ export function UserFilters({
         <select 
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value as any)}
-          className="px-3 py-2 bg-brand-light border border-brand-gray/50 rounded-lg text-sm text-brand-navy font-medium outline-none focus:border-brand-indigo cursor-pointer"
+          className="px-3 py-2 bg-brand-light border border-brand-gray/50 rounded-lg text-xs sm:text-sm text-brand-navy font-medium outline-none focus:border-brand-indigo cursor-pointer flex-1 sm:flex-initial min-w-[120px]"
         >
           <option value="All Status">All Status</option>
           <option value="Active">Active</option>
@@ -66,7 +66,7 @@ export function UserFilters({
         <select 
           value={selectedVerification}
           onChange={(e) => setSelectedVerification(e.target.value as any)}
-          className="px-3 py-2 bg-brand-light border border-brand-gray/50 rounded-lg text-sm text-brand-navy font-medium outline-none focus:border-brand-indigo cursor-pointer"
+          className="px-3 py-2 bg-brand-light border border-brand-gray/50 rounded-lg text-xs sm:text-sm text-brand-navy font-medium outline-none focus:border-brand-indigo cursor-pointer flex-1 sm:flex-initial min-w-[130px]"
         >
           <option value="All">All Verification</option>
           <option value="Verified">Verified</option>
@@ -76,7 +76,7 @@ export function UserFilters({
         {hasActiveFilters && (
           <button 
             onClick={onReset}
-            className="flex items-center gap-1 px-3 py-2 text-sm text-semantic-error hover:bg-semantic-error/10 rounded-lg transition-colors font-medium"
+            className="flex items-center justify-center gap-1 px-3 py-2 text-xs sm:text-sm text-semantic-error hover:bg-semantic-error/10 rounded-lg transition-colors font-medium w-full sm:w-auto"
           >
             <X className="w-4 h-4" /> Reset Filters
           </button>

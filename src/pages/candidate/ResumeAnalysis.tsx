@@ -70,7 +70,7 @@ export default function CandidateResumeAnalysis() {
           {/* Main Score Card */}
           <motion.div variants={slideUp} className="md:col-span-4">
             <Card className="h-full bg-gradient-to-br from-brand-indigo to-brand-violet text-white border-none shadow-lg shadow-brand-indigo/20">
-              <CardContent className="p-8 flex flex-col items-center justify-center text-center h-full relative overflow-hidden">
+              <CardContent className="p-5 sm:p-8 flex flex-col items-center justify-center text-center h-full relative overflow-hidden">
                 {/* Decorative background shapes */}
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
                 <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
@@ -89,7 +89,7 @@ export default function CandidateResumeAnalysis() {
           </motion.div>
 
           {/* Breakdown Cards */}
-          <motion.div variants={slideUp} className="md:col-span-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <motion.div variants={slideUp} className="md:col-span-8 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[
               { label: "Skills", score: data.breakdown.skills, icon: Code2, color: "text-brand-blue" },
               { label: "Experience", score: data.breakdown.experience, icon: Briefcase, color: "text-brand-indigo" },
@@ -97,13 +97,13 @@ export default function CandidateResumeAnalysis() {
               { label: "Projects", score: data.breakdown.projects, icon: FolderDot, color: "text-semantic-warning" },
             ].map((item) => (
               <Card key={item.label} className="flex flex-col justify-between">
-                <CardContent className="p-5">
+                <CardContent className="p-3.5 sm:p-5">
                   <div className="flex items-center gap-2 mb-4 text-brand-navy/60">
                     <item.icon className={cn("w-4 h-4", item.color)} />
-                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-xs sm:text-sm font-medium">{item.label}</span>
                   </div>
                   <div className="flex items-end justify-between mb-2">
-                    <span className="text-3xl font-display font-bold text-brand-navy">{item.score}%</span>
+                    <span className="text-2xl sm:text-3xl font-display font-bold text-brand-navy">{item.score}%</span>
                   </div>
                   <div className="w-full bg-brand-gray/50 h-1.5 rounded-full overflow-hidden">
                     <motion.div 
@@ -128,7 +128,7 @@ export default function CandidateResumeAnalysis() {
             {/* AI Candidate Summary */}
             <motion.div variants={slideUp}>
               <Card className="border-brand-indigo/30 bg-brand-indigo/5">
-                <CardHeader className="pb-3 border-b border-brand-indigo/10 flex flex-row items-center justify-between">
+                <CardHeader className="pb-3 border-b border-brand-indigo/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <CardTitle className="flex items-center gap-2 text-brand-indigo">
                     <BrainCircuit className="w-5 h-5" />
                     AI Candidate Summary

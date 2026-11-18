@@ -96,14 +96,14 @@ export default function AdminSystemHealth() {
             isHealthy: healthData.summary.overallStatus === "Operational" 
           }}
           action={
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto justify-end">
               <span className="text-sm text-brand-navy/50 font-medium hidden sm:inline-block">
                 Last checked: {healthData.summary.lastChecked}
               </span>
               <Button 
                 onClick={handleRefresh} 
                 variant="outline"
-                className="bg-white border-brand-gray/20 text-brand-navy hover:bg-brand-light"
+                className="bg-white border-brand-gray/20 text-brand-navy hover:bg-brand-light w-full sm:w-auto justify-center"
               >
                 <RefreshCw className="w-4 h-4 mr-2" /> 
                 Refresh Status
@@ -113,47 +113,47 @@ export default function AdminSystemHealth() {
         />
 
         {/* TOP SUMMARY */}
-        <motion.div variants={slideUp} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <motion.div variants={slideUp} className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4">
           <PremiumCard className="md:col-span-2 bg-gradient-to-br from-brand-navy to-brand-indigo text-white border-none shadow-md relative overflow-hidden">
             <div className="absolute top-0 right-0 p-6 opacity-10">
               <Activity className="w-32 h-32" />
             </div>
-            <PremiumCardContent className="p-6 relative z-10 flex items-center justify-between">
+            <PremiumCardContent className="p-4 sm:p-6 relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <p className="text-white/70 font-medium uppercase tracking-wider text-xs mb-1">Overall System Health</p>
-                <div className="flex items-end gap-3">
-                  <h3 className="text-4xl font-display font-bold text-white">{healthData.summary.uptime}</h3>
-                  <span className="text-emerald-400 font-medium pb-1.5 flex items-center gap-1">
+                <div className="flex flex-wrap items-end gap-2 sm:gap-3">
+                  <h3 className="text-3xl sm:text-4xl font-display font-bold text-white">{healthData.summary.uptime}</h3>
+                  <span className="text-emerald-400 font-medium pb-1 flex items-center gap-1 text-sm">
                     <CheckCircle2 className="w-4 h-4" /> {healthData.summary.overallStatus}
                   </span>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-white/70 font-medium text-sm mb-1">Services Operational</p>
-                <p className="text-2xl font-bold text-white">{servicesOperational} / {healthData.services.length}</p>
+              <div className="text-left sm:text-right">
+                <p className="text-white/70 font-medium text-xs sm:text-sm mb-1">Services Operational</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">{servicesOperational} / {healthData.services.length}</p>
               </div>
             </PremiumCardContent>
           </PremiumCard>
           
           <PremiumCard className="flex flex-col justify-center bg-brand-light/30 border-brand-gray/20">
-            <PremiumCardContent className="p-5 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-1">Degraded</p>
-                <h3 className="text-2xl font-display font-bold text-brand-navy">{servicesDegraded}</h3>
+            <PremiumCardContent className="p-4 sm:p-5 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-1 truncate">Degraded</p>
+                <h3 className="text-2xl font-display font-bold text-brand-navy truncate">{servicesDegraded}</h3>
               </div>
-              <div className="p-3 bg-semantic-warning/10 rounded-xl">
+              <div className="p-2.5 sm:p-3 bg-semantic-warning/10 rounded-xl shrink-0">
                 <AlertTriangle className="w-5 h-5 text-semantic-warning" />
               </div>
             </PremiumCardContent>
           </PremiumCard>
 
           <PremiumCard className="flex flex-col justify-center bg-brand-light/30 border-brand-gray/20">
-            <PremiumCardContent className="p-5 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-1">Unavailable</p>
-                <h3 className="text-2xl font-display font-bold text-brand-navy">{servicesUnavailable}</h3>
+            <PremiumCardContent className="p-4 sm:p-5 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-1 truncate">Unavailable</p>
+                <h3 className="text-2xl font-display font-bold text-brand-navy truncate">{servicesUnavailable}</h3>
               </div>
-              <div className="p-3 bg-semantic-error/10 rounded-xl">
+              <div className="p-2.5 sm:p-3 bg-semantic-error/10 rounded-xl shrink-0">
                 <XCircle className="w-5 h-5 text-semantic-error" />
               </div>
             </PremiumCardContent>

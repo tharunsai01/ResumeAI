@@ -30,34 +30,34 @@ export function CandidateCard({
 }: CandidateCardProps) {
   return (
     <motion.div variants={hoverElevation} whileHover="whileHover">
-      <Card className="flex flex-col sm:flex-row p-6 gap-6 hover:border-brand-indigo/30 transition-colors">
+      <Card className="flex flex-col sm:flex-row p-4 sm:p-6 gap-4 sm:gap-6 hover:border-brand-indigo/30 transition-colors">
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-            <div>
-              <h3 className="font-display font-semibold text-xl text-brand-navy">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-display font-semibold text-xl text-brand-navy break-words">
                 {name}
               </h3>
               <p className="text-brand-indigo font-medium">{role}</p>
               
               <div className="flex flex-wrap gap-4 mt-3 text-sm text-brand-navy/70">
                 <div className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-1 opacity-70" />
-                  {location}
+                  <MapPin className="w-4 h-4 mr-1 opacity-70 shrink-0" />
+                  <span className="truncate">{location}</span>
                 </div>
                 <div className="flex items-center">
-                  <Briefcase className="w-4 h-4 mr-1 opacity-70" />
-                  {experience}
+                  <Briefcase className="w-4 h-4 mr-1 opacity-70 shrink-0" />
+                  <span>{experience}</span>
                 </div>
                 <div className="flex items-center">
-                  <GraduationCap className="w-4 h-4 mr-1 opacity-70" />
-                  {education}
+                  <GraduationCap className="w-4 h-4 mr-1 opacity-70 shrink-0" />
+                  <span>{education}</span>
                 </div>
               </div>
             </div>
             
-            <div className="flex items-center sm:flex-col gap-3 sm:items-end">
+            <div className="flex items-center justify-between sm:justify-start sm:flex-col gap-3 sm:items-end flex-wrap">
               <MatchScore score={matchScore} size="sm" />
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2 shrink-0">
                 <Button size="sm" variant="outline">
                   <FileText className="w-4 h-4 mr-1" />
                   Resume

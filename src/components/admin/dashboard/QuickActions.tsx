@@ -25,15 +25,15 @@ export function QuickActions() {
             <button
               key={idx}
               onClick={() => navigate(action.path)}
-              className="flex items-center justify-between p-3 rounded-xl border border-brand-gray/30 hover:border-brand-gray/60 hover:bg-brand-light transition-all group text-left"
+              className="flex items-center justify-between p-3 rounded-xl border border-brand-gray/30 hover:border-brand-gray/60 hover:bg-brand-light transition-all group text-left gap-3"
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${action.bg} ${action.color}`}>
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${action.bg} ${action.color}`}>
                   <action.icon className="w-5 h-5" />
                 </div>
-                <span className="font-medium text-brand-navy text-sm">{action.title}</span>
+                <span className="font-medium text-brand-navy text-sm truncate">{action.title}</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-brand-navy/30 group-hover:text-brand-navy/60 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-brand-navy/30 group-hover:text-brand-navy/60 group-hover:translate-x-1 transition-all shrink-0" />
             </button>
           ))}
         </div>

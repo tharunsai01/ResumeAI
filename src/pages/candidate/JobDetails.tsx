@@ -110,10 +110,10 @@ export default function CandidateJobDetails() {
         <motion.div variants={slideUp}>
           <Card className="overflow-hidden border-brand-gray/50 shadow-sm relative">
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-indigo to-brand-blue" />
-            <CardContent className="p-6 sm:p-8">
+            <CardContent className="p-4 sm:p-8">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                 <div className="flex-1">
-                  <h1 className="text-2xl sm:text-3xl font-display font-bold text-brand-navy mb-2">{job.title}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-display font-bold text-brand-navy mb-2 break-words">{job.title}</h1>
                   
                   <div className="flex flex-wrap items-center gap-4 text-sm text-brand-navy/70 mb-6">
                     <div className="flex items-center font-medium text-brand-indigo">
@@ -154,7 +154,7 @@ export default function CandidateJobDetails() {
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center p-4 bg-brand-light rounded-xl border border-brand-gray/50 shrink-0 min-w-[160px]">
+                <div className="flex flex-col items-center justify-center p-4 bg-brand-light rounded-xl border border-brand-gray/50 shrink-0 w-full md:w-auto min-w-[160px]">
                   <MatchScore score={matchData.overallMatch} size="lg" />
                   <p className={cn(
                     "font-semibold text-sm mt-3",
@@ -328,7 +328,7 @@ export default function CandidateJobDetails() {
       {/* Application Modal */}
       <AnimatePresence>
         {isApplyModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
@@ -340,43 +340,43 @@ export default function CandidateJobDetails() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               exit={{ opacity: 0, scale: 0.95, y: 20 }} 
-              className="glass-card relative w-full max-w-lg overflow-hidden z-10"
+              className="glass-card relative w-full max-w-lg overflow-hidden z-10 my-auto max-h-[calc(100dvh-2rem)] flex flex-col"
             >
               {isSuccess ? (
-                <div className="p-10 text-center flex flex-col items-center">
-                  <div className="w-16 h-16 bg-semantic-success/10 rounded-full flex items-center justify-center mb-6">
+                <div className="p-6 sm:p-10 text-center flex flex-col items-center overflow-y-auto">
+                  <div className="w-16 h-16 bg-semantic-success/10 rounded-full flex items-center justify-center mb-6 shrink-0">
                     <CheckCircle2 className="w-8 h-8 text-semantic-success" />
                   </div>
-                  <h3 className="text-2xl font-display font-semibold text-brand-navy mb-2">Application Submitted ✓</h3>
-                  <p className="text-brand-navy/60 mb-8">Your application for {job.title} at {job.company} has been successfully submitted.</p>
+                  <h3 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy mb-2 break-words">Application Submitted ✓</h3>
+                  <p className="text-sm sm:text-base text-brand-navy/60 mb-6 sm:mb-8">Your application for {job.title} at {job.company} has been successfully submitted.</p>
                   <Button className="w-full" onClick={() => navigate("/candidate/applications")}>
                     View Applications
                   </Button>
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center justify-between p-6 border-b border-brand-gray/50">
-                    <h3 className="text-lg font-display font-semibold text-brand-navy">Apply for {job.title}</h3>
-                    <button onClick={closeApplyModal} className="text-brand-navy/40 hover:text-brand-navy transition-colors">
+                  <div className="flex items-center justify-between p-4 sm:p-6 border-b border-brand-gray/50 shrink-0">
+                    <h3 className="text-base sm:text-lg font-display font-semibold text-brand-navy truncate pr-2">Apply for {job.title}</h3>
+                    <button onClick={closeApplyModal} className="text-brand-navy/40 hover:text-brand-navy transition-colors shrink-0">
                       <X className="w-5 h-5" />
                     </button>
                   </div>
                   
-                  <div className="p-6 space-y-6">
+                  <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto flex-1">
                     {/* Resume Info */}
                     <div className="p-4 bg-brand-light rounded-xl border border-brand-gray/50">
                       <p className="text-xs font-semibold text-brand-navy/50 uppercase tracking-wider mb-3">Primary Resume</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-brand-indigo/10 rounded-lg">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="p-2 bg-brand-indigo/10 rounded-lg shrink-0">
                             <UploadCloud className="w-5 h-5 text-brand-indigo" />
                           </div>
-                          <div>
-                            <p className="text-sm font-medium text-brand-navy">Rahul_Kumar_Resume.pdf</p>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-brand-navy truncate">Rahul_Kumar_Resume.pdf</p>
                             <p className="text-xs text-brand-navy/60">Parsed by HireSmart AI</p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left sm:text-right shrink-0">
                           <p className="text-sm font-semibold text-brand-indigo">{mockResumeAnalysis.score}% Profile Score</p>
                           <p className="text-xs font-semibold text-semantic-success">{matchData.overallMatch}% Job Match</p>
                         </div>
@@ -394,13 +394,13 @@ export default function CandidateJobDetails() {
                     </div>
                   </div>
 
-                  <div className="p-6 border-t border-brand-gray/50 bg-brand-light/50 flex gap-3 justify-end">
-                    <Button variant="outline" onClick={closeApplyModal} disabled={isSubmitting}>
+                  <div className="p-4 sm:p-6 border-t border-brand-gray/50 bg-brand-light/50 flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 justify-end shrink-0">
+                    <Button variant="outline" onClick={closeApplyModal} disabled={isSubmitting} className="w-full sm:w-auto">
                       Cancel
                     </Button>
-                    <Button onClick={handleApply} disabled={isSubmitting} className="min-w-[140px]">
+                    <Button onClick={handleApply} disabled={isSubmitting} className="w-full sm:w-auto min-w-[140px]">
                       {isSubmitting ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center gap-2">
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Submitting...
                         </div>

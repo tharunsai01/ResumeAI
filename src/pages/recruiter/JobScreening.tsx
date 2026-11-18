@@ -133,17 +133,17 @@ export default function RecruiterJobScreening() {
         
         {/* HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <button onClick={() => navigate("/recruiter/screening")} className="flex items-center text-sm font-medium text-brand-navy/60 hover:text-brand-indigo transition-colors mb-2">
-              <ChevronLeft className="w-4 h-4 mr-1" /> Back to Jobs
+              <ChevronLeft className="w-4 h-4 mr-1 shrink-0" /> Back to Jobs
             </button>
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">{job.title} — AI Screening</h1>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">{job.title} — AI Screening</h1>
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right shrink-0">
             <div className="text-sm font-medium text-brand-navy/60">
               <span className="text-brand-navy font-bold">{job.screened}</span> / {job.applications} Screened
             </div>
-            <div className="w-32 h-2 bg-brand-gray/20 rounded-full mt-1.5 ml-auto overflow-hidden">
+            <div className="w-32 h-2 bg-brand-gray/20 rounded-full mt-1.5 sm:ml-auto overflow-hidden">
               <div 
                 className={cn("h-full bg-brand-indigo rounded-full transition-all duration-500")}
                 style={{ width: `${(job.screened / job.applications) * 100}%` }}
@@ -156,7 +156,7 @@ export default function RecruiterJobScreening() {
         <motion.div variants={slideUp}>
           <PremiumCard className="overflow-hidden border-brand-indigo/10 shadow-sm relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-indigo/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
-            <PremiumCardContent className="p-6">
+            <PremiumCardContent className="p-4 sm:p-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 
                 {/* PIPELINE */}
@@ -188,17 +188,17 @@ export default function RecruiterJobScreening() {
                 {/* ACTION BUTTON */}
                 <div className="shrink-0 w-full md:w-auto">
                   {!screeningComplete && !isScreening ? (
-                    <Button onClick={runScreening} className="w-full md:w-auto bg-gradient-to-r from-brand-indigo to-brand-blue py-6 px-8 text-base shadow-lg shadow-brand-indigo/20 hover:shadow-xl hover:shadow-brand-indigo/30 transition-all hover:-translate-y-0.5 group">
+                    <Button onClick={runScreening} className="w-full md:w-auto bg-gradient-to-r from-brand-indigo to-brand-blue py-5 sm:py-6 px-6 sm:px-8 text-sm sm:text-base shadow-lg shadow-brand-indigo/20 hover:shadow-xl hover:shadow-brand-indigo/30 transition-all hover:-translate-y-0.5 group">
                       <Zap className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" /> 
                       Run AI Screening
                     </Button>
                   ) : isScreening ? (
-                    <Button disabled className="w-full md:w-auto bg-brand-indigo/10 text-brand-indigo border border-brand-indigo/20 py-6 px-8 text-base cursor-wait">
+                    <Button disabled className="w-full md:w-auto bg-brand-indigo/10 text-brand-indigo border border-brand-indigo/20 py-5 sm:py-6 px-6 sm:px-8 text-sm sm:text-base cursor-wait">
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                       Analyzing Resumes...
                     </Button>
                   ) : (
-                    <Button disabled className="w-full md:w-auto bg-semantic-success/10 text-semantic-success border border-semantic-success/20 py-6 px-8 text-base">
+                    <Button disabled className="w-full md:w-auto bg-semantic-success/10 text-semantic-success border border-semantic-success/20 py-5 sm:py-6 px-6 sm:px-8 text-sm sm:text-base">
                       <CheckCircle2 className="w-5 h-5 mr-2" />
                       Screening Complete
                     </Button>
@@ -234,38 +234,38 @@ export default function RecruiterJobScreening() {
         </motion.div>
 
         {/* FILTERS & SEARCH */}
-        <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-4">
-          <SpotlightCard className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
-            <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
+        <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-3 sm:gap-4">
+          <SpotlightCard className="glass-card flex-1 flex items-center px-3 sm:px-4 focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all min-w-0">
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-brand-navy/40 mr-2.5 sm:mr-3 shrink-0" />
             <input
               type="text"
               placeholder="Search candidates by name, role, skill..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
+              className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-10 sm:h-11 text-xs sm:text-sm min-w-0"
             />
           </SpotlightCard>
-          <div className="flex flex-col sm:flex-row gap-3 lg:flex">
-            <select value={qualFilter} onChange={(e) => setQualFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 lg:flex">
+            <select value={qualFilter} onChange={(e) => setQualFilter(e.target.value)} className="w-full sm:w-auto bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Qualifications</option>
               <option value="Qualified">Qualified ({AI_SCREENING_THRESHOLD}%+)</option>
               <option value="Below Threshold">Below Threshold</option>
             </select>
-            <select value={scoreFilter} onChange={(e) => setScoreFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+            <select value={scoreFilter} onChange={(e) => setScoreFilter(e.target.value)} className="w-full sm:w-auto bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Match Scores</option>
               <option value="90+">90%+ Match</option>
               <option value="80+">80%+ Match</option>
               <option value="70+">70%+ Match</option>
               <option value="Below 70">Below 70% Match</option>
             </select>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full sm:w-auto bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Statuses</option>
               <option value="Applied">Applied</option>
               <option value="Screening">Screening</option>
               <option value="Shortlisted">Shortlisted</option>
               <option value="Rejected">Rejected</option>
             </select>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full sm:w-auto bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-xs sm:text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="Highest Match">Sort: Highest Match</option>
               <option value="Lowest Match">Sort: Lowest Match</option>
               <option value="Name">Sort: Name A-Z</option>
@@ -281,25 +281,25 @@ export default function RecruiterJobScreening() {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="bg-white text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
+                <thead className="bg-white text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30 whitespace-nowrap">
                   <tr>
-                    <th className="px-6 py-4">Rank</th>
-                    <th className="px-6 py-4">Candidate</th>
-                    <th className="px-6 py-4 text-center">Overall Match</th>
-                    <th className="px-6 py-4 text-center">AI Qualification</th>
-                    <th className="px-6 py-4 text-center">Status</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">Rank</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">Candidate</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-center">Overall Match</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-center">AI Qualification</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-center">Status</th>
+                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-gray/20">
                   {loading ? (
-                    <tr><td colSpan={6} className="px-6 py-12 text-center text-brand-navy/40"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></td></tr>
+                    <tr><td colSpan={6} className="px-4 sm:px-6 py-12 text-center text-brand-navy/40"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></td></tr>
                   ) : filteredAndSorted.length > 0 ? (
                     filteredAndSorted.map((cand, index) => {
                       const isQualified = cand.overallMatch >= AI_SCREENING_THRESHOLD
                       return (
                       <tr key={cand.id} className="hover:bg-brand-light/50 transition-colors group cursor-pointer" onClick={() => navigate(`/recruiter/screening/${jobId}/${cand.id}`)}>
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 whitespace-nowrap">
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm",
                             index === 0 ? "bg-[#FFD700]/20 text-[#B8860B]" :
@@ -310,14 +310,14 @@ export default function RecruiterJobScreening() {
                             #{index + 1}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors">{cand.name}</div>
-                          <div className="text-xs text-brand-navy/60 mt-0.5">{cand.role}</div>
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 min-w-[180px]">
+                          <div className="font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors truncate">{cand.name}</div>
+                          <div className="text-xs text-brand-navy/60 mt-0.5 truncate">{cand.role}</div>
                         </td>
-                        <td className="px-6 py-4 text-center bg-brand-indigo/[0.01]">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center bg-brand-indigo/[0.01] whitespace-nowrap">
                           <CandidateMatchScore score={cand.overallMatch} size="sm" showLabel={false} className="mx-auto" />
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
                           <span className={cn(
                             "text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border",
                             isQualified ? "bg-semantic-success/10 text-semantic-success border-semantic-success/20" : "bg-brand-gray/10 text-brand-navy/50 border-brand-gray/20"
@@ -325,10 +325,10 @@ export default function RecruiterJobScreening() {
                             {isQualified ? "QUALIFIED" : "BELOW THRESHOLD"}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
                           <CandidateStatusBadge status={cand.status} />
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-2">
                             {cand.status === "Shortlisted" ? (
                               <Button variant="outline" disabled size="sm" className="bg-brand-light text-brand-navy/40 border-brand-gray/30 text-xs">Shortlisted</Button>

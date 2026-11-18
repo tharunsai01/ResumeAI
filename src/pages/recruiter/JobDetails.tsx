@@ -16,15 +16,15 @@ const SummaryCard = ({ title, value, icon: Icon, color, route }: any) => {
       onClick={() => navigate(route)}
       className="cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200 group border-brand-gray/40 bg-white"
     >
-      <PremiumCardContent className="p-4 flex flex-col justify-between h-full">
-        <div className="flex justify-between items-start mb-3">
-          <div className={cn("p-2 rounded-xl border", color.bg, color.text, color.border)}>
-            <Icon className="w-4 h-4" />
+      <PremiumCardContent className="p-3.5 sm:p-4 flex flex-col justify-between h-full">
+        <div className="flex justify-between items-start mb-2 sm:mb-3">
+          <div className={cn("p-1.5 sm:p-2 rounded-xl border shrink-0", color.bg, color.text, color.border)}>
+            <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
-        <div>
-          <h3 className="text-2xl font-display font-bold text-brand-navy group-hover:text-brand-indigo transition-colors">{value}</h3>
-          <p className="text-xs font-medium text-brand-navy/60">{title}</p>
+        <div className="min-w-0">
+          <h3 className="text-xl sm:text-2xl font-display font-bold text-brand-navy group-hover:text-brand-indigo transition-colors truncate">{value}</h3>
+          <p className="text-[11px] sm:text-xs font-medium text-brand-navy/60 truncate">{title}</p>
         </div>
       </PremiumCardContent>
     </PremiumCard>
@@ -134,35 +134,35 @@ export default function RecruiterJobDetails() {
         {/* HEADER */}
         <motion.div variants={slideUp}>
           <button onClick={() => navigate("/recruiter/jobs")} className="flex items-center text-sm font-medium text-brand-navy/60 hover:text-brand-indigo transition-colors mb-4">
-            <ChevronLeft className="w-4 h-4 mr-1" /> Back to Jobs
+            <ChevronLeft className="w-4 h-4 mr-1 shrink-0" /> Back to Jobs
           </button>
           
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-display font-bold text-brand-navy">{job.title}</h1>
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 sm:gap-6">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                <h1 className="text-2xl sm:text-3xl font-display font-bold text-brand-navy break-words">{job.title}</h1>
                 <span className={cn(
-                  "inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border",
+                  "inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border shrink-0",
                   getStatusStyle(job.status)
                 )}>
                   {job.status}
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-brand-navy/70">
-                <span className="flex items-center"><Building className="w-4 h-4 mr-1.5" /> {job.company}</span>
-                <span className="flex items-center"><MapPin className="w-4 h-4 mr-1.5" /> {job.location} ({job.workMode})</span>
-                <span className="flex items-center"><Clock className="w-4 h-4 mr-1.5" /> {job.postedDate}</span>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-brand-navy/70">
+                <span className="flex items-center"><Building className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 shrink-0" /> {job.company}</span>
+                <span className="flex items-center"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 shrink-0" /> {job.location} ({job.workMode})</span>
+                <span className="flex items-center"><Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 shrink-0" /> {job.postedDate}</span>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 shrink-0">
-              <Button variant="outline" onClick={() => navigate(`/recruiter/jobs/${job.id}/edit`)}>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0">
+              <Button variant="outline" className="w-full sm:w-auto" onClick={() => navigate(`/recruiter/jobs/${job.id}/edit`)}>
                 <Edit className="w-4 h-4 mr-2" /> Edit Job
               </Button>
-              <Button variant="outline" className="text-semantic-error hover:bg-semantic-error/5 hover:text-semantic-error border-brand-gray/40" onClick={handleCloseJob}>
+              <Button variant="outline" className="w-full sm:w-auto text-semantic-error hover:bg-semantic-error/5 hover:text-semantic-error border-brand-gray/40" onClick={handleCloseJob}>
                 <XCircle className="w-4 h-4 mr-2" /> Close Job
               </Button>
-              <Button onClick={() => navigate("/recruiter/candidates")} className="bg-gradient-to-r from-brand-indigo to-brand-blue">
+              <Button onClick={() => navigate("/recruiter/candidates")} className="w-full sm:w-auto bg-gradient-to-r from-brand-indigo to-brand-blue">
                 <Users className="w-4 h-4 mr-2" /> View Candidates
               </Button>
             </div>
@@ -171,8 +171,8 @@ export default function RecruiterJobDetails() {
 
         {/* APPLICATION SUMMARY */}
         <motion.div variants={slideUp}>
-          <h2 className="text-sm font-semibold text-brand-navy/60 uppercase tracking-wider mb-3 px-1">Application Pipeline</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <h2 className="text-xs sm:text-sm font-semibold text-brand-navy/60 uppercase tracking-wider mb-2.5 sm:mb-3 px-1">Application Pipeline</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             <SummaryCard title="Total Applications" value={appSummary.total} icon={Users} route="/recruiter/candidates" color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo", border: "border-brand-indigo/20" }} />
             <SummaryCard title="AI Screened" value={appSummary.screened} icon={Search} route="/recruiter/screening" color={{ bg: "bg-brand-blue/10", text: "text-brand-blue", border: "border-brand-blue/20" }} />
             <SummaryCard title="Shortlisted" value={appSummary.shortlisted} icon={CheckCircle2} route="/recruiter/shortlist" color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning", border: "border-semantic-warning/20" }} />
@@ -188,7 +188,7 @@ export default function RecruiterJobDetails() {
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Job Description</PremiumCardTitle>
               </PremiumCardHeader>
-              <PremiumCardContent className="p-6">
+              <PremiumCardContent className="p-4 sm:p-6">
                 <div className="prose prose-sm prose-slate max-w-none">
                   <p className="text-brand-navy/80 leading-relaxed whitespace-pre-wrap">{job.description}</p>
                   

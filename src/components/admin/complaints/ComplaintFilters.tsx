@@ -23,8 +23,8 @@ export function ComplaintFilters({
   onReset
 }: ComplaintFiltersProps) {
   return (
-    <div className="bg-brand-light p-4 rounded-xl border border-brand-gray/20 mb-6 space-y-4">
-      <div className="flex flex-col md:flex-row gap-4">
+    <div className="bg-brand-light p-3.5 sm:p-4 rounded-xl border border-brand-gray/20 mb-6 space-y-3 sm:space-y-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-navy/40" />
           <input 
@@ -37,7 +37,7 @@ export function ComplaintFilters({
         </div>
         <button 
           onClick={onReset}
-          className="px-4 py-2 bg-brand-gray/10 text-brand-navy border border-brand-gray/30 rounded-lg text-sm font-medium hover:bg-brand-gray/20 transition-colors whitespace-nowrap"
+          className="w-full sm:w-auto px-4 py-2 bg-brand-gray/10 text-brand-navy border border-brand-gray/30 rounded-lg text-sm font-medium hover:bg-brand-gray/20 transition-colors whitespace-nowrap justify-center"
         >
           Reset Filters
         </button>

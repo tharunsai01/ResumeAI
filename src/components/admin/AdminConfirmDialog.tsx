@@ -50,7 +50,7 @@ export function AdminConfirmDialog({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -62,7 +62,7 @@ export function AdminConfirmDialog({
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="glass-card relative w-full max-w-md overflow-hidden flex flex-col p-6 z-10"
+          className="glass-card relative w-full max-w-md overflow-hidden flex flex-col p-4 sm:p-6 z-10 max-h-[calc(100dvh-2rem)] overflow-y-auto my-auto"
         >
           <button 
             onClick={onCancel}
@@ -75,11 +75,11 @@ export function AdminConfirmDialog({
             <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${getIconColor()}`}>
               <AlertTriangle className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-display font-semibold text-brand-navy mb-2">{title}</h3>
-            <div className="text-brand-navy/70 text-sm mb-8">{message}</div>
+            <h3 className="text-xl font-display font-semibold text-brand-navy mb-2 break-words">{title}</h3>
+            <div className="text-brand-navy/70 text-sm mb-6 break-words">{message}</div>
           </div>
 
-          <div className="flex gap-3 w-full">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 w-full mt-auto">
             <button 
               onClick={onCancel}
               className="flex-1 py-2.5 px-4 rounded-lg font-medium text-brand-navy/70 hover:bg-brand-gray/30 transition-colors border border-brand-gray/50"

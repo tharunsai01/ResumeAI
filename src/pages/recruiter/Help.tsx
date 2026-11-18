@@ -134,14 +134,14 @@ export default function RecruiterHelp() {
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-4xl mx-auto space-y-8 pb-16">
         
         {/* HEADER */}
-        <motion.div variants={slideUp} className="text-center space-y-4 pt-12 pb-6">
-          <h1 className="text-4xl font-display font-bold text-brand-navy">Help Center</h1>
-          <p className="text-lg text-brand-navy/60 max-w-2xl mx-auto">
+        <motion.div variants={slideUp} className="text-center space-y-4 pt-6 sm:pt-12 pb-4 sm:pb-6">
+          <h1 className="text-3xl sm:text-4xl font-display font-bold text-brand-navy break-words">Help Center</h1>
+          <p className="text-sm sm:text-lg text-brand-navy/60 max-w-2xl mx-auto">
             Find answers and guidance for managing jobs, reviewing candidates, and using HireSmart AI.
           </p>
           
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold text-brand-navy mb-4">How can we help you?</h2>
+          <div className="mt-6 sm:mt-8">
+            <h2 className="text-lg sm:text-xl font-semibold text-brand-navy mb-3 sm:mb-4">How can we help you?</h2>
             <div className="relative max-w-xl mx-auto">
               <Search className="absolute left-4 top-3.5 w-5 h-5 text-brand-navy/40" />
               <input
@@ -149,14 +149,14 @@ export default function RecruiterHelp() {
                 placeholder="Search help articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-brand-gray/40 rounded-full h-12 pl-12 pr-4 text-sm focus:border-brand-indigo outline-none shadow-sm transition-all focus:shadow-md"
+                className="w-full bg-white border border-brand-gray/40 rounded-full h-11 sm:h-12 pl-12 pr-4 text-xs sm:text-sm focus:border-brand-indigo outline-none shadow-sm transition-all focus:shadow-md"
               />
             </div>
           </div>
         </motion.div>
 
         {/* CONTENT SECTIONS */}
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {filteredCategories.length === 0 ? (
             <div className="text-center py-12 text-brand-navy/60 bg-white rounded-2xl border border-brand-gray/20">
               No help topics found matching "{searchQuery}". Try a different term.
@@ -165,26 +165,26 @@ export default function RecruiterHelp() {
             filteredCategories.map((category) => (
               <motion.div key={category.id} variants={slideUp}>
                 <PremiumCard className="overflow-hidden border-brand-gray/30 shadow-sm">
-                  <div className="bg-brand-light/30 px-6 py-5 border-b border-brand-gray/20 flex items-start gap-4">
-                    <SpotlightCard className="glass-card p-3 shrink-0">
-                      <category.icon className="w-6 h-6 text-brand-indigo" />
+                  <div className="bg-brand-light/30 p-4 sm:px-6 sm:py-5 border-b border-brand-gray/20 flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                    <SpotlightCard className="glass-card p-2.5 sm:p-3 shrink-0">
+                      <category.icon className="w-5 h-5 sm:w-6 sm:h-6 text-brand-indigo" />
                     </SpotlightCard>
-                    <div>
-                      <h3 className="text-xl font-bold text-brand-navy">{category.title}</h3>
-                      <p className="text-sm text-brand-navy/70 mt-1 leading-relaxed">{category.description}</p>
+                    <div className="min-w-0">
+                      <h3 className="text-lg sm:text-xl font-bold text-brand-navy break-words">{category.title}</h3>
+                      <p className="text-xs sm:text-sm text-brand-navy/70 mt-1 leading-relaxed">{category.description}</p>
                     </div>
                   </div>
                   
                   <PremiumCardContent className="p-0">
                     {category.workflow && (
-                      <div className="px-6 py-5 bg-brand-indigo/5 border-b border-brand-indigo/10">
+                      <div className="p-4 sm:px-6 sm:py-5 bg-brand-indigo/5 border-b border-brand-indigo/10">
                         <h4 className="text-xs font-bold text-brand-indigo uppercase tracking-wider mb-2">Workflow</h4>
-                        <div className="text-sm text-brand-navy/80 whitespace-pre-line font-medium">
+                        <div className="text-xs sm:text-sm text-brand-navy/80 whitespace-pre-line font-medium">
                           {category.workflow.includes("→") ? (
                             <div className="flex flex-wrap items-center gap-2">
                               {category.workflow.split("→").map((step, i, arr) => (
                                 <React.Fragment key={i}>
-                                  <span className="bg-white px-3 py-1.5 rounded-lg border border-brand-indigo/20 shadow-sm">{step.trim()}</span>
+                                  <span className="bg-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-brand-indigo/20 shadow-sm text-xs sm:text-sm">{step.trim()}</span>
                                   {i < arr.length - 1 && <span className="text-brand-indigo/40">→</span>}
                                 </React.Fragment>
                               ))}
@@ -197,7 +197,7 @@ export default function RecruiterHelp() {
                     )}
                     
                     {category.note && (
-                      <div className="px-6 py-4 bg-semantic-warning/5 border-b border-semantic-warning/10 text-sm text-brand-navy/80 italic">
+                      <div className="p-4 sm:px-6 sm:py-4 bg-semantic-warning/5 border-b border-semantic-warning/10 text-xs sm:text-sm text-brand-navy/80 italic">
                         {category.note}
                       </div>
                     )}
@@ -209,10 +209,10 @@ export default function RecruiterHelp() {
                           <div key={aIdx} className="group">
                             <button
                               onClick={() => toggleArticle(`${category.id}-${aIdx}`)}
-                              className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-brand-gray/5 transition-colors"
+                              className="w-full p-4 sm:px-6 sm:py-4 flex items-center justify-between text-left hover:bg-brand-gray/5 transition-colors"
                             >
-                              <span className="font-medium text-brand-navy group-hover:text-brand-indigo transition-colors">{article.q}</span>
-                              <ChevronDown className={cn("w-5 h-5 text-brand-navy/40 transition-transform shrink-0 ml-4", isExpanded && "rotate-180")} />
+                              <span className="font-medium text-xs sm:text-sm text-brand-navy group-hover:text-brand-indigo transition-colors">{article.q}</span>
+                              <ChevronDown className={cn("w-4 h-4 sm:w-5 sm:h-5 text-brand-navy/40 transition-transform shrink-0 ml-3 sm:ml-4", isExpanded && "rotate-180")} />
                             </button>
                             <AnimatePresence>
                               {isExpanded && (
@@ -221,7 +221,7 @@ export default function RecruiterHelp() {
                                   animate={{ height: "auto", opacity: 1 }}
                                   exit={{ height: 0, opacity: 0 }}
                                 >
-                                  <div className="px-6 pb-5 text-sm text-brand-navy/70 leading-relaxed whitespace-pre-line">
+                                  <div className="p-4 sm:px-6 sm:pb-5 pt-0 text-xs sm:text-sm text-brand-navy/70 leading-relaxed whitespace-pre-line">
                                     {article.a}
                                   </div>
                                 </motion.div>

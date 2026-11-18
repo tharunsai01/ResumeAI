@@ -206,21 +206,21 @@ export default function AdminHelp() {
 
         {/* QUICK NAVIGATION SHORTCUTS */}
         <motion.div variants={slideUp}>
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
             <h3 className="text-base font-semibold text-brand-navy">Administrator Quick Navigation</h3>
             <span className="text-xs text-brand-navy/50">Direct links to management portals</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {ADMIN_HELP_CATEGORIES.map(cat => {
               const Icon = cat.icon
               return (
                 <button
                   key={cat.id}
                   onClick={() => navigate(cat.route)}
-                  className="p-4 rounded-xl bg-white border border-brand-gray/30 hover:border-brand-indigo/40 hover:shadow-md transition-all text-left flex flex-col justify-between group"
+                  className="p-3.5 sm:p-4 rounded-xl bg-white border border-brand-gray/30 hover:border-brand-indigo/40 hover:shadow-md transition-all text-left flex flex-col justify-between group"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-brand-indigo/10 flex items-center justify-center text-brand-indigo group-hover:bg-brand-indigo group-hover:text-white transition-colors mb-3">
+                  <div className="w-9 h-9 rounded-lg bg-brand-indigo/10 flex items-center justify-center text-brand-indigo group-hover:bg-brand-indigo group-hover:text-white transition-colors mb-3 shrink-0">
                     <Icon className="w-5 h-5" />
                   </div>
                   <div>

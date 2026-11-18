@@ -15,8 +15,8 @@ export function AdminPageHeader({ title, description, action, statusIndicator }:
       className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
     >
       <div>
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-display font-semibold text-brand-navy">{title}</h1>
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">{title}</h1>
           {statusIndicator && (
             <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
               statusIndicator.isHealthy 
@@ -29,11 +29,11 @@ export function AdminPageHeader({ title, description, action, statusIndicator }:
           )}
         </div>
         {description && (
-          <p className="text-brand-navy/60 mt-1">{description}</p>
+          <p className="text-brand-navy/60 mt-1 text-sm sm:text-base break-words">{description}</p>
         )}
       </div>
       {action && (
-        <div className="shrink-0">
+        <div className="shrink-0 w-full sm:w-auto flex flex-wrap items-center gap-2">
           {action}
         </div>
       )}

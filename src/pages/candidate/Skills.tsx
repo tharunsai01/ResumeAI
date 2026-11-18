@@ -134,7 +134,7 @@ export default function CandidateSkills() {
             innerClassName="bg-gradient-to-br from-brand-navy to-brand-indigo"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20" />
-            <PremiumCardContent className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 relative z-10">
+            <PremiumCardContent className="p-5 sm:p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 sm:gap-8 relative z-10">
               <div className="shrink-0 bg-white rounded-full p-2 shadow-xl text-brand-navy">
                 <MatchScore score={data.overallScore} size="lg" />
               </div>

@@ -42,18 +42,20 @@ export function JobCard({
   return (
     <motion.div variants={hoverElevation} whileHover="whileHover" onClick={onClick} className={onClick ? "cursor-pointer" : ""}>
       <PremiumCard className="h-full flex flex-col group transition-colors">
-        <CardHeader className="pb-3 flex-row items-start justify-between">
-          <div>
+        <CardHeader className="pb-3 flex-row items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
             <h3 className="premium-card-text font-display font-semibold text-lg text-slate-800 dark:text-slate-200 transition-colors line-clamp-1">
               {title}
             </h3>
-            <div className="premium-card-text flex items-center text-sm text-slate-600 dark:text-slate-400 mt-1">
-              <Building className="w-4 h-4 mr-1" />
-              {company}
+            <div className="premium-card-text flex items-center text-sm text-slate-600 dark:text-slate-400 mt-1 truncate">
+              <Building className="w-4 h-4 mr-1 shrink-0" />
+              <span className="truncate">{company}</span>
             </div>
           </div>
           {matchScore !== undefined && (
-            <MatchScore score={matchScore} size="sm" />
+            <div className="shrink-0">
+              <MatchScore score={matchScore} size="sm" />
+            </div>
           )}
         </CardHeader>
         <CardContent className="flex-1 pb-4">

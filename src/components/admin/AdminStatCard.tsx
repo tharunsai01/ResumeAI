@@ -18,19 +18,19 @@ export function AdminStatCard({ title, value, icon: Icon, delay = 0, color = { b
       transition={{ delay: delay * 0.1 }}
     >
       <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200">
-        <PremiumCardContent className="p-5 flex items-start justify-between">
-          <div>
-            <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-            <h3 className="text-2xl font-display font-bold text-brand-navy">
+        <PremiumCardContent className="p-3.5 sm:p-5 flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs sm:text-sm font-medium text-brand-navy/60 mb-1 truncate">{title}</p>
+            <h3 className="text-xl sm:text-2xl font-display font-bold text-brand-navy truncate">
               {value}
             </h3>
             {trend && (
-              <p className={`text-xs mt-2 font-medium ${trend.isPositive ? "text-semantic-success" : "text-semantic-error"}`}>
+              <p className={`text-xs mt-2 font-medium truncate ${trend.isPositive ? "text-semantic-success" : "text-semantic-error"}`}>
                 {trend.isPositive ? "+" : "-"}{trend.value} <span className="text-brand-navy/40 font-normal">vs last month</span>
               </p>
             )}
           </div>
-          <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
+          <div className={`p-2.5 sm:p-3 rounded-xl shrink-0 ${color.bg} ${color.text}`}>
             <Icon className="w-5 h-5" />
           </div>
         </PremiumCardContent>

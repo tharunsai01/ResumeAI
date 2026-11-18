@@ -74,32 +74,32 @@ export default function CandidateDashboard() {
         className="space-y-6 pb-12"
       >
         {/* Welcome Section */}
-        <MotionSpotlightCard variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
+        <MotionSpotlightCard variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 sm:p-6">
           <div>
-            <h1 className="text-2xl font-display font-semibold text-brand-navy">
+            <h1 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy break-words">
               Welcome back, {mockResumeAnalysis.personalInfo.name.split(' ')[0]} <span className="inline-block animate-bounce">👋</span>
             </h1>
-            <p className="text-brand-navy/60 mt-1">
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-1">
               Discover opportunities that match your skills and career goals.
             </p>
           </div>
-          <div className="flex items-center gap-2 text-sm font-medium text-brand-indigo bg-brand-indigo/10 px-4 py-2 rounded-lg">
-            <TrendingUp className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-brand-indigo bg-brand-indigo/10 px-3 sm:px-4 py-2 rounded-lg shrink-0 self-start md:self-auto">
+            <TrendingUp className="w-4 h-4 shrink-0" />
             Profile Strength: {profileCompletion}%
           </div>
         </MotionSpotlightCard>
 
         {/* Stats Grid */}
-        <motion.div variants={slideUp} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div variants={slideUp} className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {stats.map((stat, i) => (
             <Card key={i}>
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${stat.bg}`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              <CardContent className="p-3.5 sm:p-6 flex items-center gap-2.5 sm:gap-4 min-w-0">
+                <div className={`p-2 sm:p-3 rounded-xl ${stat.bg} shrink-0`}>
+                  <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                 </div>
-                <div>
-                  <p className="text-sm text-brand-navy/60 font-medium">{stat.label}</p>
-                  <p className="text-2xl font-display font-semibold text-brand-navy">{stat.value}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm text-brand-navy/60 font-medium truncate">{stat.label}</p>
+                  <p className="text-lg sm:text-2xl font-display font-semibold text-brand-navy truncate">{stat.value}</p>
                 </div>
               </CardContent>
             </Card>
@@ -129,18 +129,18 @@ export default function CandidateDashboard() {
                       <div 
                         key={app.applicationId}
                         onClick={() => navigate(`/candidate/applications/${app.applicationId}`)}
-                        className="p-4 flex items-center justify-between hover:bg-brand-light/50 transition-colors cursor-pointer group"
+                        className="p-3 sm:p-4 flex items-center justify-between gap-3 hover:bg-brand-light/50 transition-colors cursor-pointer group"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-lg bg-brand-gray/30 flex items-center justify-center shrink-0">
-                            <Briefcase className="w-5 h-5 text-brand-navy/40" />
+                        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-brand-gray/30 flex items-center justify-center shrink-0">
+                            <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-brand-navy/40" />
                           </div>
-                          <div>
-                            <p className="font-semibold text-sm text-brand-navy group-hover:text-brand-indigo transition-colors">{app.title}</p>
-                            <p className="text-xs text-brand-navy/60 mt-0.5">{app.company} • {new Date(app.appliedDate).toLocaleDateString()}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-sm text-brand-navy group-hover:text-brand-indigo transition-colors truncate">{app.title}</p>
+                            <p className="text-xs text-brand-navy/60 mt-0.5 truncate">{app.company} • {new Date(app.appliedDate).toLocaleDateString()}</p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-1.5">
+                        <div className="flex flex-col items-end gap-1.5 shrink-0">
                           {getStatusBadge(app.status)}
                           <span className="text-xs font-medium text-brand-indigo">{app.matchScore}% Match</span>
                         </div>
@@ -226,13 +226,13 @@ export default function CandidateDashboard() {
                       <div 
                         key={job.id} 
                         onClick={() => navigate(`/candidate/jobs/${job.id}`)}
-                        className="flex items-center justify-between p-3 rounded-lg hover:bg-brand-light transition-colors border border-transparent hover:border-brand-gray/50 cursor-pointer"
+                        className="flex items-center justify-between gap-2 p-3 rounded-lg hover:bg-brand-light transition-colors border border-transparent hover:border-brand-gray/50 cursor-pointer"
                       >
-                        <div>
-                          <p className="font-medium text-brand-navy text-sm line-clamp-1">{job.title}</p>
-                          <p className="text-xs text-brand-navy/60">{job.company}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-brand-navy text-sm truncate">{job.title}</p>
+                          <p className="text-xs text-brand-navy/60 truncate">{job.company}</p>
                         </div>
-                        <div className="text-sm font-semibold text-semantic-success bg-semantic-success/10 px-2 py-1 rounded">
+                        <div className="text-sm font-semibold text-semantic-success bg-semantic-success/10 px-2 py-1 rounded shrink-0">
                           {overallMatch}%
                         </div>
                       </div>

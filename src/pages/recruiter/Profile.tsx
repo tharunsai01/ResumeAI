@@ -172,30 +172,30 @@ export default function RecruiterProfilePage() {
         {/* TOP ACTION HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-brand-navy">Recruiter Profile</h1>
-            <p className="text-brand-navy/60 mt-1">Manage your recruitment identity, professional details, and company information.</p>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Recruiter Profile</h1>
+            <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Manage your recruitment identity, professional details, and company information.</p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto shrink-0">
             {!isEditing ? (
               <Button 
                 onClick={() => setIsEditing(true)} 
-                className="bg-brand-indigo hover:bg-brand-indigo/90 text-white flex items-center gap-2 shadow-sm"
+                className="w-full sm:w-auto bg-brand-indigo hover:bg-brand-indigo/90 text-white flex items-center justify-center gap-2 shadow-sm"
               >
                 <Pencil className="w-4 h-4" /> Edit Profile
               </Button>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                 <Button 
                   variant="outline" 
                   onClick={handleCancel} 
-                  className="border-brand-gray/40 text-brand-navy flex items-center gap-1.5"
+                  className="w-full sm:w-auto border-brand-gray/40 text-brand-navy flex items-center justify-center gap-1.5"
                 >
                   <X className="w-4 h-4" /> Cancel
                 </Button>
                 <Button 
                   onClick={handleSave} 
-                  className="bg-brand-indigo hover:bg-brand-indigo/90 text-white flex items-center gap-1.5 shadow-sm"
+                  className="w-full sm:w-auto bg-brand-indigo hover:bg-brand-indigo/90 text-white flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <Check className="w-4 h-4" /> Save Changes
                 </Button>
@@ -208,8 +208,8 @@ export default function RecruiterProfilePage() {
         <motion.div variants={slideUp}>
           <PremiumCard className="overflow-hidden border border-brand-gray/30 shadow-md">
             <div className="h-28 sm:h-36 w-full bg-gradient-to-r from-brand-indigo via-brand-blue to-brand-navy/80 relative" />
-            <PremiumCardContent className="px-6 pb-6 pt-0 relative">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-14 sm:-mt-16 mb-4 gap-4">
+            <PremiumCardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 relative">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-12 sm:-mt-16 mb-4 gap-4">
                 
                 {/* Avatar with Camera upload trigger */}
                 <div className="flex items-end gap-4">
@@ -286,7 +286,7 @@ export default function RecruiterProfilePage() {
             
             {/* PERSONAL & PROFESSIONAL INFORMATION */}
             <motion.div variants={slideUp}>
-              <SpotlightCard className="glass-card p-6 shadow-sm">
+              <SpotlightCard className="glass-card p-4 sm:p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-5 pb-3 border-b border-brand-gray/20">
                   <h3 className="text-lg font-semibold text-brand-navy flex items-center gap-2">
                     <Briefcase className="w-5 h-5 text-brand-indigo" /> Professional Information

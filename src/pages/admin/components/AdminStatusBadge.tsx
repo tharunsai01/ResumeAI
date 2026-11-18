@@ -8,7 +8,7 @@ interface AdminStatusBadgeProps {
 export function AdminStatusBadge({ status, className }: AdminStatusBadgeProps) {
   return (
     <span className={cn(
-      "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md border inline-flex items-center justify-center",
+      "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md border inline-flex items-center justify-center whitespace-nowrap shrink-0",
       status === "Active" || status === "Resolved"
         ? "bg-semantic-success/10 text-semantic-success border-semantic-success/20"
         : status === "High" || status === "Open"

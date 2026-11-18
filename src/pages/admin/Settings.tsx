@@ -200,7 +200,7 @@ export default function AdminSettings() {
           
           {/* SIDEBAR NAVIGATION */}
           <div className="w-full md:w-64 shrink-0">
-            <div className="flex md:flex-col overflow-x-auto md:overflow-visible pb-2 md:pb-0 gap-1 md:gap-1 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+            <div className="flex md:flex-col overflow-x-auto md:overflow-visible pb-2 md:pb-0 gap-1 md:gap-1 scrollbar-hide -mx-2 px-2 sm:-mx-4 sm:px-4 md:mx-0 md:px-0">
               {tabs.map((tab, idx) => {
                 if (tab.isHeading) {
                   return (
@@ -214,13 +214,13 @@ export default function AdminSettings() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id!)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap md:whitespace-normal",
+                      "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap md:whitespace-normal shrink-0 md:shrink",
                       activeTab === tab.id 
                         ? "bg-brand-indigo text-white shadow-sm" 
                         : "text-brand-navy/70 hover:bg-brand-light/50"
                     )}
                   >
-                    {tab.icon && <tab.icon className={cn("w-4 h-4", activeTab === tab.id ? "text-white" : "text-brand-navy/50")} />}
+                    {tab.icon && <tab.icon className={cn("w-4 h-4 shrink-0", activeTab === tab.id ? "text-white" : "text-brand-navy/50")} />}
                     {tab.label}
                   </button>
                 )
@@ -263,18 +263,18 @@ export default function AdminSettings() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                             <Button 
                               variant="outline" 
                               onClick={() => photoInputRef.current?.click()}
-                              className="h-8 text-xs bg-white text-brand-navy hover:bg-brand-light"
+                              className="h-8 text-xs bg-white text-brand-navy hover:bg-brand-light flex-1 sm:flex-initial justify-center"
                             >
                               Change Photo
                             </Button>
                             <Button 
                               variant="outline" 
                               onClick={handleRemovePhoto}
-                              className="h-8 text-xs bg-white text-semantic-error border-semantic-error/30 hover:bg-semantic-error/5"
+                              className="h-8 text-xs bg-white text-semantic-error border-semantic-error/30 hover:bg-semantic-error/5 flex-1 sm:flex-initial justify-center"
                             >
                               Remove
                             </Button>
@@ -311,9 +311,9 @@ export default function AdminSettings() {
                           </div>
                         </div>
 
-                        <div className="flex justify-end pt-4 border-t border-brand-gray/10 gap-3">
-                          <Button variant="outline" onClick={() => setProfile(settings.profile)}>Cancel</Button>
-                          <Button onClick={handleSaveProfile} className="bg-brand-indigo hover:bg-brand-blue">
+                        <div className="flex flex-col-reverse sm:flex-row justify-end pt-4 border-t border-brand-gray/10 gap-2 sm:gap-3">
+                          <Button variant="outline" onClick={() => setProfile(settings.profile)} className="w-full sm:w-auto">Cancel</Button>
+                          <Button onClick={handleSaveProfile} className="bg-brand-indigo hover:bg-brand-blue w-full sm:w-auto">
                             Save Changes
                           </Button>
                         </div>
@@ -433,8 +433,8 @@ export default function AdminSettings() {
                             <option value={60}>60 minutes</option>
                           </select>
                         </div>
-                        <div className="mt-4 pt-4 border-t border-brand-gray/10 flex justify-end">
-                          <Button onClick={handleSaveSessionPrefs} className="bg-brand-indigo hover:bg-brand-blue">
+                        <div className="mt-4 pt-4 border-t border-brand-gray/10 flex sm:justify-end">
+                          <Button onClick={handleSaveSessionPrefs} className="bg-brand-indigo hover:bg-brand-blue w-full sm:w-auto">
                             Save Changes
                           </Button>
                         </div>
@@ -563,8 +563,8 @@ export default function AdminSettings() {
                             Email Notifications
                           </label>
                         </div>
-                        <div className="flex justify-end pt-6 mt-4 border-t border-brand-gray/10">
-                          <Button onClick={handleSaveNotifications} className="bg-brand-indigo hover:bg-brand-blue">Save Changes</Button>
+                        <div className="flex sm:justify-end pt-6 mt-4 border-t border-brand-gray/10">
+                          <Button onClick={handleSaveNotifications} className="bg-brand-indigo hover:bg-brand-blue w-full sm:w-auto">Save Changes</Button>
                         </div>
                       </PremiumCardContent>
                     </PremiumCard>
@@ -634,8 +634,8 @@ export default function AdminSettings() {
                         />
                       </div>
                       
-                      <div className="flex justify-end pt-2">
-                        <Button onClick={handleSaveAppearance} className="bg-brand-indigo hover:bg-brand-blue">Save Changes</Button>
+                      <div className="flex sm:justify-end pt-2">
+                        <Button onClick={handleSaveAppearance} className="bg-brand-indigo hover:bg-brand-blue w-full sm:w-auto">Save Changes</Button>
                       </div>
                     </PremiumCardContent>
                   </PremiumCard>
@@ -679,8 +679,8 @@ export default function AdminSettings() {
                           onChange={(v: boolean) => setPrivacy({...privacy, showEmailInProfile: v})}
                         />
                       </div>
-                      <div className="flex justify-end pt-2">
-                        <Button onClick={handleSavePrivacy} className="bg-brand-indigo hover:bg-brand-blue">Save Changes</Button>
+                      <div className="flex sm:justify-end pt-2">
+                        <Button onClick={handleSavePrivacy} className="bg-brand-indigo hover:bg-brand-blue w-full sm:w-auto">Save Changes</Button>
                       </div>
                     </PremiumCardContent>
                   </PremiumCard>
@@ -723,9 +723,9 @@ export default function AdminSettings() {
         isOpen={passwordModalOpen}
         onClose={() => setPasswordModalOpen(false)}
         title="Change Password"
-        className="max-w-md"
+        className="max-w-md w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] flex flex-col"
       >
-        <div className="py-2 space-y-4">
+        <div className="py-2 space-y-4 max-h-[calc(100dvh-10rem)] overflow-y-auto">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-brand-navy">Current Password</label>
             <Input type="password" value={pwdForm.current} onChange={e => setPwdForm({...pwdForm, current: e.target.value})} />
@@ -747,9 +747,9 @@ export default function AdminSettings() {
             <div className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-brand-gray/60"/> At least one special character</div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 mt-2 border-t border-brand-gray/10">
-            <Button variant="outline" onClick={() => setPasswordModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleChangePassword} disabled={!pwdValid} className="bg-brand-indigo hover:bg-brand-blue">Update Password</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-4 mt-2 border-t border-brand-gray/10">
+            <Button variant="outline" onClick={() => setPasswordModalOpen(false)} className="w-full sm:w-auto">Cancel</Button>
+            <Button onClick={handleChangePassword} disabled={!pwdValid} className="bg-brand-indigo hover:bg-brand-blue w-full sm:w-auto">Update Password</Button>
           </div>
         </div>
       </Modal>
@@ -759,39 +759,39 @@ export default function AdminSettings() {
         isOpen={twoFactorModalOpen}
         onClose={() => setTwoFactorModalOpen(false)}
         title="Two-Factor Authentication"
-        className="max-w-md"
+        className="max-w-md w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] flex flex-col"
       >
-        <div className="py-2 space-y-6">
+        <div className="py-2 space-y-4 sm:space-y-6 max-h-[calc(100dvh-10rem)] overflow-y-auto">
           {settings.security.twoFactorEnabled ? (
-            <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
               <div className="flex items-center gap-3">
-                <ShieldCheck className="w-8 h-8 text-emerald-600" />
+                <ShieldCheck className="w-8 h-8 text-emerald-600 shrink-0" />
                 <div>
-                  <div className="font-bold text-emerald-900">2FA is Enabled (Demo)</div>
+                  <div className="font-bold text-emerald-900 text-sm">2FA is Enabled (Demo)</div>
                   <div className="text-xs text-emerald-700/80 mt-0.5">Frontend security preference enabled.</div>
                 </div>
               </div>
               <Button 
                 variant="outline" 
                 onClick={handleToggle2FA}
-                className="h-8 text-xs bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-50"
+                className="h-8 text-xs bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-50 w-full sm:w-auto"
               >
                 Disable
               </Button>
             </div>
           ) : (
-            <div className="flex items-center justify-between p-4 bg-brand-gray/10 rounded-xl border border-brand-gray/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-brand-gray/10 rounded-xl border border-brand-gray/20">
               <div className="flex items-center gap-3">
-                <ShieldAlert className="w-8 h-8 text-brand-navy/60" />
+                <ShieldAlert className="w-8 h-8 text-brand-navy/60 shrink-0" />
                 <div>
-                  <div className="font-bold text-brand-navy">2FA is Disabled</div>
+                  <div className="font-bold text-brand-navy text-sm">2FA is Disabled</div>
                   <div className="text-xs text-brand-navy/60 mt-0.5">Enable extra verification preference.</div>
                 </div>
               </div>
               <Button 
                 variant="outline" 
                 onClick={handleToggle2FA}
-                className="h-8 text-xs bg-white text-brand-indigo border-brand-indigo/30 hover:bg-brand-indigo/5"
+                className="h-8 text-xs bg-white text-brand-indigo border-brand-indigo/30 hover:bg-brand-indigo/5 w-full sm:w-auto"
               >
                 Enable
               </Button>
@@ -817,8 +817,8 @@ export default function AdminSettings() {
             </div>
           </div>
 
-          <div className="flex justify-end">
-            <Button onClick={() => setTwoFactorModalOpen(false)} className="bg-brand-indigo hover:bg-brand-blue">Done</Button>
+          <div className="flex sm:justify-end">
+            <Button onClick={() => setTwoFactorModalOpen(false)} className="bg-brand-indigo hover:bg-brand-blue w-full sm:w-auto">Done</Button>
           </div>
         </div>
       </Modal>
@@ -828,14 +828,15 @@ export default function AdminSettings() {
         isOpen={signoutModalOpen}
         onClose={() => setSignoutModalOpen(false)}
         title="Sign out other sessions?"
+        className="max-w-md w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] flex flex-col"
       >
         <div className="py-2">
           <p className="text-sm text-brand-navy/70 mb-6">
             All other administrator sessions will be signed out immediately. Your current session will remain active.
           </p>
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setSignoutModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleSignoutOther} className="bg-semantic-error hover:bg-red-600">Sign Out Sessions</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+            <Button variant="outline" onClick={() => setSignoutModalOpen(false)} className="w-full sm:w-auto">Cancel</Button>
+            <Button onClick={handleSignoutOther} className="bg-semantic-error hover:bg-red-600 w-full sm:w-auto">Sign Out Sessions</Button>
           </div>
         </div>
       </Modal>

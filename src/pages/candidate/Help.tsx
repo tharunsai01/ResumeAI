@@ -204,7 +204,7 @@ export default function HelpCenterPage() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-6 bg-brand-navy text-white rounded-3xl p-8 sm:p-16 shadow-xl relative overflow-hidden"
+          className="text-center space-y-6 bg-brand-navy text-white rounded-3xl p-6 sm:p-16 shadow-xl relative overflow-hidden"
         >
           {/* Decorative background circles */}
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
@@ -213,7 +213,7 @@ export default function HelpCenterPage() {
           </div>
 
           <div className="relative z-10 max-w-2xl mx-auto">
-            <h1 className="text-3xl sm:text-5xl font-display font-bold">How can we help you?</h1>
+            <h1 className="text-2xl sm:text-5xl font-display font-bold">How can we help you?</h1>
             <p className="text-white/80 mt-4 text-sm sm:text-lg">
               Find answers about resumes, AI analysis, job matching, applications, and your HireSmart AI profile.
             </p>
@@ -227,7 +227,7 @@ export default function HelpCenterPage() {
                 placeholder="Search Help Center..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-14 pl-12 pr-4 rounded-xl text-brand-navy bg-white border-2 border-transparent focus:border-brand-indigo focus:outline-none shadow-lg text-lg"
+                className="w-full h-12 sm:h-14 pl-11 sm:pl-12 pr-4 rounded-xl text-brand-navy bg-white border-2 border-transparent focus:border-brand-indigo focus:outline-none shadow-lg text-sm sm:text-lg"
               />
             </div>
           </div>
@@ -345,9 +345,9 @@ export default function HelpCenterPage() {
             placeholder="How can we help you?" 
             className="w-full h-32 p-3 text-sm rounded-xl border border-brand-gray/50 focus:outline-none focus:ring-2 focus:ring-brand-indigo/50 bg-white text-brand-navy resize-none"
           />
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" onClick={() => setIsSupportModalOpen(false)}>Cancel</Button>
-            <Button onClick={() => {
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-2">
+            <Button variant="outline" onClick={() => setIsSupportModalOpen(false)} className="w-full sm:w-auto">Cancel</Button>
+            <Button className="w-full sm:w-auto" onClick={() => {
               alert("Support request sent successfully!")
               setIsSupportModalOpen(false)
             }}>Send Message</Button>

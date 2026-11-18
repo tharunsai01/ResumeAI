@@ -17,17 +17,17 @@ export function SkillTaxonomyOverview() {
       <PremiumCardContent className="flex-1 flex flex-col justify-between mt-4">
         
         <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="bg-brand-light rounded-lg p-3 text-center border border-brand-gray/30">
-            <span className="block text-2xl font-bold text-brand-indigo">{skillTaxonomyOverview.totalSkills}</span>
-            <span className="text-[10px] uppercase font-semibold text-brand-navy/50 tracking-wider">Total</span>
+          <div className="bg-brand-light rounded-lg p-2.5 sm:p-3 text-center border border-brand-gray/30 min-w-0">
+            <span className="block text-xl sm:text-2xl font-bold text-brand-indigo truncate">{skillTaxonomyOverview.totalSkills}</span>
+            <span className="text-[10px] uppercase font-semibold text-brand-navy/50 tracking-wider truncate block">Total</span>
           </div>
-          <div className="bg-brand-light rounded-lg p-3 text-center border border-brand-gray/30">
-            <span className="block text-2xl font-bold text-brand-navy">{skillTaxonomyOverview.categories}</span>
-            <span className="text-[10px] uppercase font-semibold text-brand-navy/50 tracking-wider">Cats</span>
+          <div className="bg-brand-light rounded-lg p-2.5 sm:p-3 text-center border border-brand-gray/30 min-w-0">
+            <span className="block text-xl sm:text-2xl font-bold text-brand-navy truncate">{skillTaxonomyOverview.categories}</span>
+            <span className="text-[10px] uppercase font-semibold text-brand-navy/50 tracking-wider truncate block">Cats</span>
           </div>
-          <div className="bg-brand-light rounded-lg p-3 text-center border border-brand-gray/30">
-            <span className="block text-2xl font-bold text-brand-navy/70">{skillTaxonomyOverview.recentlyUpdated}</span>
-            <span className="text-[10px] uppercase font-semibold text-brand-navy/50 tracking-wider">Updated</span>
+          <div className="bg-brand-light rounded-lg p-2.5 sm:p-3 text-center border border-brand-gray/30 min-w-0">
+            <span className="block text-xl sm:text-2xl font-bold text-brand-navy/70 truncate">{skillTaxonomyOverview.recentlyUpdated}</span>
+            <span className="text-[10px] uppercase font-semibold text-brand-navy/50 tracking-wider truncate block">Updated</span>
           </div>
         </div>
 
