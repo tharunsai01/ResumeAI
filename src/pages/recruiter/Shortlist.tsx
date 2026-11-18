@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Search, Calendar, User, CheckCircle2, AlertCircle, Trash2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { Modal } from "../../components/ui/Modal"
 import { staggerContainer, slideUp } from "../../lib/animations"
@@ -11,6 +11,7 @@ import { initialPipelineCandidates } from "../../data/pipelineMockData"
 import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 export default function RecruiterShortlist() {
   const navigate = useNavigate()
@@ -32,8 +33,8 @@ export default function RecruiterShortlist() {
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
   const showToast = (msg: string) => {
@@ -78,8 +79,8 @@ export default function RecruiterShortlist() {
 
   const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
     <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 transition-all duration-200">
-        <CardContent className="p-5 flex items-center justify-between">
+      <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200">
+        <PremiumCardContent className="p-5 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
             <h3 className="text-2xl font-display font-bold text-brand-navy">
@@ -89,8 +90,8 @@ export default function RecruiterShortlist() {
           <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
             <Icon className="w-5 h-5" />
           </div>
-        </CardContent>
-      </Card>
+        </PremiumCardContent>
+      </PremiumCard>
     </motion.div>
   )
 
@@ -142,7 +143,7 @@ export default function RecruiterShortlist() {
 
         {/* FILTERS */}
         <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-4">
-          <div className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
+          <SpotlightCard className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"
@@ -151,7 +152,7 @@ export default function RecruiterShortlist() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
             />
-          </div>
+          </SpotlightCard>
           <div className="flex flex-col sm:flex-row gap-3 lg:flex">
             <select value={jobFilter} onChange={(e) => setJobFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Jobs</option>
@@ -174,7 +175,7 @@ export default function RecruiterShortlist() {
 
         {/* SHORTLIST TABLE */}
         <motion.div variants={slideUp}>
-          <Card className="shadow-sm overflow-hidden">
+          <PremiumCard className="shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
@@ -290,7 +291,7 @@ export default function RecruiterShortlist() {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </PremiumCard>
         </motion.div>
       </motion.div>
 

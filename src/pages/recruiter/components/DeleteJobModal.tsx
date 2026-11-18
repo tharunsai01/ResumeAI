@@ -2,6 +2,9 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { AlertTriangle, X } from "lucide-react"
 import { Button } from "../../../components/ui/Button"
+import SpotlightCard from "../../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 interface DeleteJobModalProps {
   isOpen: boolean
@@ -25,7 +28,7 @@ export function DeleteJobModal({ isOpen, onClose, onConfirm, jobTitle }: DeleteJ
             className="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-50"
             onClick={onClose}
           />
-          <motion.div
+          <MotionSpotlightCard
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -61,7 +64,7 @@ export function DeleteJobModal({ isOpen, onClose, onConfirm, jobTitle }: DeleteJ
                 Delete Job
               </Button>
             </div>
-          </motion.div>
+          </MotionSpotlightCard>
         </>
       )}
     </AnimatePresence>

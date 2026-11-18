@@ -15,6 +15,9 @@ import { mockSkills } from "../../data/mockSkills"
 import { profileService } from "../../services/profileService"
 import { Badge } from "../../components/ui/Badge"
 import { SkillBadge } from "../../components/shared/SkillBadge"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 export default function CandidateDashboard() {
   const navigate = useNavigate()
@@ -71,7 +74,7 @@ export default function CandidateDashboard() {
         className="space-y-6 pb-12"
       >
         {/* Welcome Section */}
-        <motion.div variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
+        <MotionSpotlightCard variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
           <div>
             <h1 className="text-2xl font-display font-semibold text-brand-navy">
               Welcome back, {mockResumeAnalysis.personalInfo.name.split(' ')[0]} <span className="inline-block animate-bounce">👋</span>
@@ -84,7 +87,7 @@ export default function CandidateDashboard() {
             <TrendingUp className="w-4 h-4" />
             Profile Strength: {profileCompletion}%
           </div>
-        </motion.div>
+        </MotionSpotlightCard>
 
         {/* Stats Grid */}
         <motion.div variants={slideUp} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -157,7 +160,7 @@ export default function CandidateDashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {loading ? (
-                  [1, 2].map(i => <div key={i} className="glass-card shadow-sm overflow-hidden" />)
+                  [1, 2].map(i => <SpotlightCard key={i} className="glass-card shadow-sm overflow-hidden" />)
                 ) : (
                   recommendedJobs.slice(0, 2).map(({ job, overallMatch }) => (
                     <JobCard 

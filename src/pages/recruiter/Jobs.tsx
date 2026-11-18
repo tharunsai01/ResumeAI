@@ -3,13 +3,33 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Briefcase, Search, Plus, Users, FileText, CheckCircle2, MoreHorizontal, Edit, Copy, XCircle, Trash2, Eye, Filter } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { initialRecruiterJobs } from "../../data/recruiterMockData"
 import type { RecruiterJob, JobStatus, JobType, WorkMode } from "../../data/recruiterMockData"
 import { DeleteJobModal } from "./components/DeleteJobModal"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
+const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
+  <motion.div variants={slideUp} custom={delay}>
+    <PremiumCard className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
+      <PremiumCardContent className="p-5 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
+          <h3 className="text-2xl font-display font-bold text-brand-navy">
+            {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
+          </h3>
+        </div>
+        <div className={cn("p-3 rounded-xl", color.bg, color.text)}>
+          <Icon className="w-5 h-5" />
+        </div>
+      </PremiumCardContent>
+    </PremiumCard>
+  </motion.div>
+)
 
 export default function RecruiterJobs() {
   const navigate = useNavigate()
@@ -30,11 +50,8 @@ export default function RecruiterJobs() {
 
   React.useEffect(() => {
     // Simulate initial data loading
-    const timer = setTimeout(() => {
-      setJobs([...initialRecruiterJobs])
-      setLoading(false)
-    }, 400)
-    return () => clearTimeout(timer)
+    setJobs([...initialRecruiterJobs])
+    setLoading(false)
   }, [])
 
   // Close dropdown on outside click
@@ -97,23 +114,6 @@ export default function RecruiterJobs() {
     }
   }
 
-  const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
-    <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group cursor-default">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-            <h3 className="text-2xl font-display font-bold text-brand-navy">
-              {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
-            </h3>
-          </div>
-          <div className={cn("p-3 rounded-xl", color.bg, color.text)}>
-            <Icon className="w-5 h-5" />
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
 
   const getStatusStyle = (status: JobStatus) => {
     switch (status) {
@@ -140,14 +140,14 @@ export default function RecruiterJobs() {
 
         {/* SUMMARY CARDS */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Active Jobs" value={stats.active} icon={Briefcase} delay={0} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
-          <StatCard title="Drafts" value={stats.drafts} icon={FileText} delay={1} color={{ bg: "bg-brand-gray/20", text: "text-brand-navy/70" }} />
-          <StatCard title="Closed Jobs" value={stats.closed} icon={CheckCircle2} delay={2} color={{ bg: "bg-semantic-error/10", text: "text-semantic-error" }} />
-          <StatCard title="Total Applications" value={stats.totalApps} icon={Users} delay={3} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
+          <StatCard title="Active Jobs" value={stats.active} icon={Briefcase} delay={0} loading={loading} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
+          <StatCard title="Drafts" value={stats.drafts} icon={FileText} delay={1} loading={loading} color={{ bg: "bg-brand-gray/20", text: "text-brand-navy/70" }} />
+          <StatCard title="Closed Jobs" value={stats.closed} icon={CheckCircle2} delay={2} loading={loading} color={{ bg: "bg-semantic-error/10", text: "text-semantic-error" }} />
+          <StatCard title="Total Applications" value={stats.totalApps} icon={Users} delay={3} loading={loading} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
         </div>
 
         {/* FILTERS */}
-        <motion.div variants={slideUp} className="glass-card p-4 space-y-4">
+        <MotionSpotlightCard variants={slideUp} className="glass-card p-4 space-y-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center px-4 bg-brand-light/50 border border-brand-gray/40 rounded-xl">
               <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
@@ -189,11 +189,11 @@ export default function RecruiterJobs() {
               </select>
             </div>
           </div>
-        </motion.div>
+        </MotionSpotlightCard>
 
         {/* JOB LIST */}
         <motion.div variants={slideUp}>
-          <Card>
+          <PremiumCard>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-brand-light text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
@@ -263,7 +263,7 @@ export default function RecruiterJobs() {
                             {/* Actions Dropdown */}
                             <AnimatePresence>
                               {openDropdownId === job.id && (
-                                <motion.div
+                                <MotionSpotlightCard
                                   initial={{ opacity: 0, scale: 0.95, y: 5 }}
                                   animate={{ opacity: 1, scale: 1, y: 0 }}
                                   exit={{ opacity: 0, scale: 0.95, y: 5 }}
@@ -287,7 +287,7 @@ export default function RecruiterJobs() {
                                   <button onClick={() => setJobToDelete({id: job.id, title: job.title})} className="w-full px-4 py-2 text-sm text-semantic-error hover:bg-semantic-error/5 flex items-center font-medium">
                                     <Trash2 className="w-4 h-4 mr-2" /> Delete Job
                                   </button>
-                                </motion.div>
+                                </MotionSpotlightCard>
                               )}
                             </AnimatePresence>
                           </div>
@@ -311,7 +311,7 @@ export default function RecruiterJobs() {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </PremiumCard>
         </motion.div>
       </motion.div>
 

@@ -7,6 +7,9 @@ import { Badge } from "../../components/ui/Badge"
 import { Button } from "../../components/ui/Button"
 import { api } from "../../services/api"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 type UploadState = "empty" | "selected" | "uploading" | "analyzing" | "complete" | "error"
 
@@ -126,7 +129,7 @@ export default function CandidateResume() {
         <AnimatePresence mode="wait">
           {/* EMPTY / ERROR STATE */}
           {(uploadState === "empty" || uploadState === "error") && (
-            <motion.div
+            <MotionSpotlightCard
               key="empty"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -196,12 +199,12 @@ export default function CandidateResume() {
                   </motion.div>
                 )}
               </div>
-            </motion.div>
+            </MotionSpotlightCard>
           )}
 
           {/* SELECTED STATE */}
           {uploadState === "selected" && file && (
-            <motion.div
+            <MotionSpotlightCard
               key="selected"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -246,12 +249,12 @@ export default function CandidateResume() {
                   Analyze Resume <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
-            </motion.div>
+            </MotionSpotlightCard>
           )}
 
           {/* ANALYZING & COMPLETE STATE */}
           {(uploadState === "uploading" || uploadState === "analyzing" || uploadState === "complete") && (
-            <motion.div
+            <MotionSpotlightCard
               key="analyzing"
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -390,7 +393,7 @@ export default function CandidateResume() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </MotionSpotlightCard>
           )}
         </AnimatePresence>
       </div>

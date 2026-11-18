@@ -2,18 +2,31 @@
 # ResumeAI / HireSmart AI - Git Ignore
 # ==========================================
 
+
 # ------------------------------------------
 # Dependencies
 # ------------------------------------------
 node_modules/
+**/node_modules/
 
 
 # ------------------------------------------
 # Build / Production Output
 # ------------------------------------------
 dist/
+**/dist/
+
 build/
+**/build/
+
+.next/
+**/.next/
+
+out/
+**/out/
+
 .vite/
+**/.vite/
 
 
 # ------------------------------------------
@@ -35,7 +48,7 @@ pnpm-debug.log*
 
 
 # ------------------------------------------
-# Generated Output / Temporary Files
+# Generated / Temporary Project Files
 # ------------------------------------------
 build_output.txt
 lint_output.txt
@@ -44,15 +57,16 @@ search_results.txt
 placeholders.txt
 buttons.txt
 
-# Temporary development scripts/folders
 scratch/
 
 
 # ------------------------------------------
-# Coverage
+# Testing / Coverage
 # ------------------------------------------
 coverage/
 .nyc_output/
+playwright-report/
+test-results/
 
 
 # ------------------------------------------
@@ -98,7 +112,47 @@ Desktop.ini
 
 
 # ------------------------------------------
-# Tooling / Cache
+# Cache
 # ------------------------------------------
 .cache/
-.eslintcache
+.eslintcache/
+.parcel-cache/
+.turbo/
+
+
+# ------------------------------------------
+# Local Uploads / Generated Files
+# ------------------------------------------
+uploads/
+**/uploads/
+
+generated/
+**/generated/
+
+
+# ------------------------------------------
+# Local Database Files
+# ------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+
+
+# ------------------------------------------
+# Vite Temporary Files
+# ------------------------------------------
+vite.config.*.timestamp-*
+
+
+# ------------------------------------------
+# Debug / Profiling
+# ------------------------------------------
+*.cpuprofile
+*.heapprofile
+
+
+# ------------------------------------------
+# OS / Tool Temporary Files
+# ------------------------------------------
+*.orig
+*.rej

@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { AlertCircle, Paperclip, Send, CheckCircle2 } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Input } from "../../components/ui/Input"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
@@ -55,7 +55,7 @@ export default function RecruiterComplaint() {
 
         {/* CONTENT */}
         <motion.div variants={slideUp}>
-          <Card className="border-brand-gray/30 shadow-sm overflow-hidden">
+          <PremiumCard className="border-brand-gray/30 shadow-sm overflow-hidden">
             <AnimatePresence mode="wait">
               {isSubmitted ? (
                 <motion.div 
@@ -86,7 +86,7 @@ export default function RecruiterComplaint() {
                     </p>
                   </div>
                   
-                  <CardContent className="p-8">
+                  <PremiumCardContent className="p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -169,11 +169,11 @@ export default function RecruiterComplaint() {
                       </div>
 
                     </form>
-                  </CardContent>
+                  </PremiumCardContent>
                 </motion.div>
               )}
             </AnimatePresence>
-          </Card>
+          </PremiumCard>
         </motion.div>
 
       </motion.div>

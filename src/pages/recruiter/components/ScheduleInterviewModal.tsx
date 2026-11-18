@@ -22,13 +22,12 @@ export function ScheduleInterviewModal({ isOpen, onClose, onSchedule, initialCan
   
   const [errors, setErrors] = React.useState<Record<string, string>>({})
 
-  // Auto-fill candidate and job if initialCandidate is provided
-  React.useEffect(() => {
-    if (initialCandidate) {
-      setCandidate(initialCandidate.id)
-      setJob(initialCandidate.role) // Simplified mock
-    }
-  }, [initialCandidate, isOpen])
+  const [prevCandidateId, setPrevCandidateId] = React.useState(initialCandidate?.id)
+  if (initialCandidate?.id !== prevCandidateId) {
+    setPrevCandidateId(initialCandidate?.id)
+    setCandidate(initialCandidate?.id || "")
+    setJob(initialCandidate?.role || "")
+  }
 
   const handleSubmit = () => {
     const newErrors: Record<string, string> = {}

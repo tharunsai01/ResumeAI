@@ -12,6 +12,9 @@ import { useJobActions } from "../../hooks/useJobActions"
 import { mockResumeAnalysis } from "../../data/mockResume"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 export default function CandidateJobs() {
   const navigate = useNavigate()
@@ -19,7 +22,6 @@ export default function CandidateJobs() {
 
   const [loading, setLoading] = React.useState(true)
   const [allJobs, setAllJobs] = React.useState<JobMatchResult[]>([])
-  const [filteredJobs, setFilteredJobs] = React.useState<JobMatchResult[]>([])
 
   const [searchTerm, setSearchTerm] = React.useState("")
   const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState("")
@@ -89,7 +91,6 @@ export default function CandidateJobs() {
         // Score all jobs against candidate
         const scored = jobs.map(j => jobService.calculateJobMatch(mockResumeAnalysis, j))
         setAllJobs(scored)
-        setFilteredJobs(scored.sort((a, b) => b.overallMatch - a.overallMatch))
       } finally {
         setLoading(false)
       }
@@ -97,8 +98,8 @@ export default function CandidateJobs() {
     fetchJobs()
   }, [])
 
-  // Apply filters and sort whenever dependencies change
-  React.useEffect(() => {
+  // Apply filters and sort using useMemo
+  const filteredJobs = React.useMemo(() => {
     let result = [...allJobs]
 
     // Search (Debounced)
@@ -140,7 +141,7 @@ export default function CandidateJobs() {
       result.sort((a, b) => a.job.salary.localeCompare(b.job.salary))
     }
 
-    setFilteredJobs(result)
+    return result
   }, [allJobs, debouncedSearchTerm, filters, sortBy])
 
   const clearFilters = () => {
@@ -168,7 +169,7 @@ export default function CandidateJobs() {
         </motion.div>
 
         {/* Search Bar */}
-        <motion.div variants={slideUp} className="glass-card p-2 flex items-center relative z-10">
+        <MotionSpotlightCard variants={slideUp} className="glass-card p-2 flex items-center relative z-10">
           <div className="flex-1 flex items-center px-4">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
@@ -183,7 +184,7 @@ export default function CandidateJobs() {
           <Button variant="outline" className="sm:hidden mr-2" onClick={(e) => { e.preventDefault(); setIsMobileFiltersOpen(!isMobileFiltersOpen); }}>
             <SlidersHorizontal className="w-5 h-5" />
           </Button>
-        </motion.div>
+        </MotionSpotlightCard>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Desktop Filters Sidebar */}

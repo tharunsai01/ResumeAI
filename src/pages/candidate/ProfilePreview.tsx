@@ -11,11 +11,7 @@ import { ArrowLeft, Mail, MapPin, Phone, Globe, ExternalLink } from "lucide-reac
 
 export default function CandidateProfilePreview() {
   const navigate = useNavigate()
-  const [profile, setProfile] = React.useState<CandidateProfile | null>(null)
-
-  React.useEffect(() => {
-    setProfile(profileService.getCandidateProfile())
-  }, [])
+  const [profile] = React.useState<CandidateProfile | null>(profileService.getCandidateProfile())
 
   if (!profile) return null
 
@@ -70,9 +66,9 @@ export default function CandidateProfilePreview() {
                     <div className="flex items-center gap-1.5"><Phone className="w-4 h-4" />{profile.phone}</div>
                   </div>
                   <div className="flex gap-4 mt-4">
-                    <a href="#" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><Globe className="w-4 h-4" /> LinkedIn</a>
-                    <a href="#" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><Globe className="w-4 h-4" /> GitHub</a>
-                    <a href="#" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><ExternalLink className="w-4 h-4" /> Portfolio</a>
+                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><Globe className="w-4 h-4" /> LinkedIn</a>
+                    <a href="https://github.com" target="_blank" rel="noreferrer" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><Globe className="w-4 h-4" /> GitHub</a>
+                    <a href="https://example.com" target="_blank" rel="noreferrer" className="text-brand-navy/50 hover:text-brand-indigo transition-colors flex items-center gap-1 text-sm"><ExternalLink className="w-4 h-4" /> Portfolio</a>
                   </div>
                 </div>
 

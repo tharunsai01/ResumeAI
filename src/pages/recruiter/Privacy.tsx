@@ -1,7 +1,7 @@
 import { motion } from "framer-motion"
 import { ShieldCheck, Info, FileText, CheckCircle2 } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { staggerContainer, slideUp } from "../../lib/animations"
 
 const PRIVACY_SECTIONS = [
@@ -127,14 +127,14 @@ export default function RecruiterPrivacy() {
 
         {/* CONTENT */}
         <motion.div variants={slideUp}>
-          <Card className="border-brand-gray/30 shadow-sm overflow-hidden">
+          <PremiumCard className="border-brand-gray/30 shadow-sm overflow-hidden">
             <div className="bg-brand-light/30 px-8 py-6 border-b border-brand-gray/20">
               <div className="flex items-center gap-3">
                 <FileText className="w-5 h-5 text-brand-indigo" />
                 <h2 className="text-lg font-bold text-brand-navy">HireSmart AI Privacy Overview</h2>
               </div>
             </div>
-            <CardContent className="p-8">
+            <PremiumCardContent className="p-8">
               <div className="space-y-12">
                 {PRIVACY_SECTIONS.map((section) => (
                   <div key={section.id}>
@@ -184,8 +184,8 @@ export default function RecruiterPrivacy() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
       </motion.div>

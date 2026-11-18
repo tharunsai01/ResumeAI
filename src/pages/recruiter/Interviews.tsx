@@ -3,12 +3,31 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Calendar as CalendarIcon, Clock, User, Video, Users, CheckCircle2, Search } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { initialInterviews } from "../../data/pipelineMockData"
 import type { MockInterview } from "../../data/pipelineMockData"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
+import SpotlightCard from "../../components/ui/SpotlightCard";
+
+const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
+  <motion.div variants={slideUp} custom={delay}>
+    <PremiumCard className="hover:-translate-y-0.5 transition-all duration-200">
+      <PremiumCardContent className="p-5 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
+          <h3 className="text-2xl font-display font-bold text-brand-navy">
+            {value}
+          </h3>
+        </div>
+        <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
+          <Icon className="w-5 h-5" />
+        </div>
+      </PremiumCardContent>
+    </PremiumCard>
+  </motion.div>
+)
 
 export default function RecruiterInterviews() {
   const navigate = useNavigate()
@@ -24,8 +43,8 @@ export default function RecruiterInterviews() {
   const [statusFilter, setStatusFilter] = React.useState("All")
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
   const showToast = (msg: string) => {
@@ -70,23 +89,6 @@ export default function RecruiterInterviews() {
   const completedCount = interviews.filter(i => i.status === "Completed").length
   const needsDecisionCount = interviews.filter(i => i.status === "Needs Decision").length
 
-  const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
-    <motion.div variants={slideUp} custom={delay}>
-      <Card className="hover:-translate-y-0.5 transition-all duration-200">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-brand-navy/60 mb-1">{title}</p>
-            <h3 className="text-2xl font-display font-bold text-brand-navy">
-              {loading ? <div className="h-8 w-12 bg-brand-gray/20 rounded animate-pulse" /> : value}
-            </h3>
-          </div>
-          <div className={`p-3 rounded-xl ${color.bg} ${color.text}`}>
-            <Icon className="w-5 h-5" />
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -139,7 +141,7 @@ export default function RecruiterInterviews() {
 
         {/* FILTERS */}
         <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-4">
-          <div className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
+          <SpotlightCard className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"
@@ -148,7 +150,7 @@ export default function RecruiterInterviews() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
             />
-          </div>
+          </SpotlightCard>
           <div className="flex flex-col sm:flex-row gap-3 lg:flex">
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Statuses</option>
@@ -162,7 +164,7 @@ export default function RecruiterInterviews() {
 
         {/* INTERVIEW LIST */}
         <motion.div variants={slideUp}>
-          <Card className="shadow-sm overflow-hidden">
+          <PremiumCard className="shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead className="bg-brand-light/50 text-brand-navy/60 uppercase text-[10px] tracking-wider font-semibold border-b border-brand-gray/30">
@@ -244,7 +246,7 @@ export default function RecruiterInterviews() {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </PremiumCard>
         </motion.div>
       </motion.div>
 

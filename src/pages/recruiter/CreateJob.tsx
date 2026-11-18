@@ -1,4 +1,3 @@
-import * as React from "react"
 import { motion } from "framer-motion"
 import { ChevronLeft } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -9,18 +8,11 @@ import { staggerContainer, slideUp } from "../../lib/animations"
 
 export default function CreateJob() {
   const navigate = useNavigate()
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const handleSubmit = (_data: JobFormData, _status: "Active" | "Draft") => {
-    setIsSubmitting(true)
-    
     // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      // Displaying success toast would go here.
-      // We route back to the jobs list to mimic completion.
-      navigate("/recruiter/jobs")
-    }, 600)
+    // Displaying success toast "Job created successfully." would go here.
+    navigate("/recruiter/jobs")
   }
 
   const handleCancel = () => {
@@ -46,7 +38,7 @@ export default function CreateJob() {
         <JobForm 
           onSubmit={handleSubmit}
           onCancel={handleCancel}
-          isSubmitting={isSubmitting}
+          isSubmitting={false}
         />
       </motion.div>
     </DashboardShell>

@@ -1,4 +1,4 @@
-export type UserRole = "candidate" | "recruiter"
+export type UserRole = "candidate" | "recruiter" | "admin"
 
 export interface User {
   id: string
@@ -32,6 +32,20 @@ export const authService = {
 
   async login(email: string, password: string):Promise<User> {
     await delay(800) // Mock network delay
+
+    // Hardcode an admin login for testing the frontend admin portal
+    if (email === "admin@hiresmart.ai" || email === "admin") {
+      const sessionUser: User = { 
+        id: "mock_admin_123", 
+        email: "admin@hiresmart.ai", 
+        name: "Admin User", 
+        role: "admin" 
+      }
+      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+      window.dispatchEvent(new Event('hiresmart_auth_changed'))
+      return sessionUser
+    }
+
     const users = this.getUsers()
     const user = users.find(u => u.email === email && u.password === password)
     if (!user) throw new Error("Invalid email or password.")

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, Calendar as CalendarIcon, User, Briefcase, Video, FileText, CheckCircle2, AlertCircle, Star } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { Modal } from "../../components/ui/Modal"
 import { staggerContainer, slideUp } from "../../lib/animations"
@@ -11,6 +11,26 @@ import { initialInterviews } from "../../data/pipelineMockData"
 import type { MockInterview } from "../../data/pipelineMockData"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import { cn } from "../../lib/utils"
+
+const RatingStars = ({ value, onChange, readonly }: { value: number, onChange?: (val: number) => void, readonly?: boolean }) => (
+  <div className="flex items-center gap-1">
+    {[1, 2, 3, 4, 5].map(star => (
+      <button
+        key={star}
+        type="button"
+        disabled={readonly}
+        onClick={() => onChange && onChange(star)}
+        className={cn(
+          "p-1 transition-colors focus:outline-none",
+          readonly ? "cursor-default" : "cursor-pointer hover:scale-110",
+          star <= value ? "text-semantic-warning" : "text-brand-gray/40"
+        )}
+      >
+        <Star className={cn("w-5 h-5", star <= value ? "fill-current" : "")} />
+      </button>
+    ))}
+  </div>
+)
 
 export default function RecruiterInterviewDetails() {
   const navigate = useNavigate()
@@ -34,8 +54,8 @@ export default function RecruiterInterviewDetails() {
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
+    
   }, [])
 
   const showToast = (msg: string) => {
@@ -110,25 +130,6 @@ export default function RecruiterInterviewDetails() {
     }
   }
 
-  const RatingStars = ({ value, onChange, readonly }: { value: number, onChange?: (val: number) => void, readonly?: boolean }) => (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map(star => (
-        <button
-          key={star}
-          type="button"
-          disabled={readonly}
-          onClick={() => onChange && onChange(star)}
-          className={cn(
-            "p-1 transition-colors focus:outline-none",
-            readonly ? "cursor-default" : "cursor-pointer hover:scale-110",
-            star <= value ? "text-semantic-warning" : "text-brand-gray/40"
-          )}
-        >
-          <Star className={cn("w-5 h-5", star <= value ? "fill-current" : "")} />
-        </button>
-      ))}
-    </div>
-  )
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
@@ -178,9 +179,9 @@ export default function RecruiterInterviewDetails() {
 
         {/* DETAILS CARD */}
         <motion.div variants={slideUp}>
-          <Card className="overflow-hidden border-none shadow-md ">
+          <PremiumCard className="overflow-hidden border-none shadow-md ">
             <div className="h-2 bg-gradient-to-r from-brand-indigo to-brand-blue" />
-            <CardContent className="p-0">
+            <PremiumCardContent className="p-0">
               <div className="p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-brand-gray/20">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-2xl bg-brand-indigo/10 flex items-center justify-center border border-brand-indigo/20 shrink-0">
@@ -232,21 +233,21 @@ export default function RecruiterInterviewDetails() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* FEEDBACK SECTION */}
         <AnimatePresence>
           {(interview.status === "Completed" || interview.status === "Needs Decision") && (
             <motion.div variants={slideUp} initial="initial" animate="animate" exit={{ opacity: 0, height: 0 }}>
-              <Card>
-                <CardHeader className="border-b border-brand-gray/20 bg-brand-light/30">
-                  <CardTitle className="flex items-center gap-2">
+              <PremiumCard>
+                <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30">
+                  <PremiumCardTitle className="flex items-center gap-2">
                     <FileText className="w-5 h-5 text-brand-indigo" /> Interview Feedback
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
+                  </PremiumCardTitle>
+                </PremiumCardHeader>
+                <PremiumCardContent className="p-6">
                   {interview.feedback ? (
                     // Display saved feedback
                     <div className="space-y-6">
@@ -350,8 +351,8 @@ export default function RecruiterInterviewDetails() {
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </PremiumCardContent>
+              </PremiumCard>
             </motion.div>
           )}
         </AnimatePresence>

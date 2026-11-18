@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { ChevronLeft, Brain, Search, CheckCircle2, Zap, Loader2 } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
-import { Card, CardContent } from "../../components/ui/Card"
+import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { screeningJobs, initialScreeningCandidates, AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
@@ -11,6 +11,8 @@ import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
 import { cn } from "../../lib/utils"
+import { AnimatePresence } from "framer-motion"
+import SpotlightCard from "../../components/ui/SpotlightCard";
 
 const PIPELINE_STEPS = [
   "Applications",
@@ -42,32 +44,25 @@ export default function RecruiterJobScreening() {
   // Actions
   const [candidateToReject, setCandidateToReject] = React.useState<{id: string, name: string} | null>(null)
 
+  // Toast
+  const [toastMsg, setToastMsg] = React.useState<string | null>(null)
+  const showToast = (msg: string) => {
+    setToastMsg(msg)
+    setTimeout(() => setToastMsg(null), 3000)
+  }
+
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
+    setLoading(false)
   }, [])
 
   const runScreening = () => {
     setIsScreening(true)
-    setScreeningProgress(0)
-    
-    // Simulate fast progressive AI screening
-    const interval = setInterval(() => {
-      setScreeningProgress(p => {
-        if (p >= 100) {
-          clearInterval(interval)
-          setTimeout(() => {
-            setIsScreening(false)
-            setScreeningComplete(true)
-            // mock update to reflect 0 pending
-            job.pending = 0
-            job.screened = job.applications
-          }, 300)
-          return 100
-        }
-        return p + 25
-      })
-    }, 300)
+    setScreeningProgress(100)
+    setScreeningComplete(true)
+    job.pending = 0
+    job.screened = job.applications
+    setIsScreening(false)
+    showToast("AI Screening completed instantly.")
   }
 
   const filteredAndSorted = React.useMemo(() => {
@@ -106,17 +101,34 @@ export default function RecruiterJobScreening() {
   const handleShortlist = (e: React.MouseEvent, id: string) => {
     e.stopPropagation()
     setCandidates(candidates.map(c => c.id === id ? { ...c, status: "Shortlisted" } : c))
+    showToast("Candidate shortlisted.")
   }
 
   const handleReject = () => {
     if (candidateToReject) {
       setCandidates(candidates.map(c => c.id === candidateToReject.id ? { ...c, status: "Rejected" } : c))
+      showToast("Candidate rejected.")
       setCandidateToReject(null)
     }
   }
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
+      {/* TOAST */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 right-6 z-[100] bg-emerald-50 text-emerald-600 px-4 py-3 rounded-lg border border-emerald-200 flex items-center gap-2 shadow-lg"
+          >
+            <CheckCircle2 className="w-5 h-5" />
+            <span className="text-sm font-medium">{toastMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-7xl mx-auto space-y-6 pb-12">
         
         {/* HEADER */}
@@ -142,9 +154,9 @@ export default function RecruiterJobScreening() {
 
         {/* OVERVIEW & PIPELINE CARD */}
         <motion.div variants={slideUp}>
-          <Card className="overflow-hidden border-brand-indigo/10 shadow-sm relative">
+          <PremiumCard className="overflow-hidden border-brand-indigo/10 shadow-sm relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-indigo/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
-            <CardContent className="p-6">
+            <PremiumCardContent className="p-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 
                 {/* PIPELINE */}
@@ -194,8 +206,8 @@ export default function RecruiterJobScreening() {
                 </div>
 
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </motion.div>
 
         {/* INFO BANNER */}
@@ -223,7 +235,7 @@ export default function RecruiterJobScreening() {
 
         {/* FILTERS & SEARCH */}
         <motion.div variants={slideUp} className="flex flex-col lg:flex-row gap-4">
-          <div className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
+          <SpotlightCard className="glass-card flex-1 flex items-center px-4 focus-within: focus-within:ring-2 focus-within:ring-brand-indigo/10 transition-all">
             <Search className="w-5 h-5 text-brand-navy/40 mr-3" />
             <input
               type="text"
@@ -232,7 +244,7 @@ export default function RecruiterJobScreening() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-none outline-none text-brand-navy placeholder:text-brand-navy/40 h-11"
             />
-          </div>
+          </SpotlightCard>
           <div className="flex flex-col sm:flex-row gap-3 lg:flex">
             <select value={qualFilter} onChange={(e) => setQualFilter(e.target.value)} className="bg-white border border-brand-gray/40 shadow-sm rounded-xl px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-indigo/50">
               <option value="All">All Qualifications</option>
@@ -263,7 +275,7 @@ export default function RecruiterJobScreening() {
 
         {/* CANDIDATE RANKING TABLE */}
         <motion.div variants={slideUp}>
-          <Card className="shadow-sm">
+          <PremiumCard className="shadow-sm">
             <div className="p-4 border-b border-brand-gray/20 flex justify-between items-center bg-brand-light/30">
               <h3 className="font-display font-semibold text-brand-navy">AI Candidate Ranking</h3>
             </div>
@@ -360,7 +372,7 @@ export default function RecruiterJobScreening() {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </PremiumCard>
         </motion.div>
       </motion.div>
 

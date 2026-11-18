@@ -4,6 +4,9 @@ import { X, Mail, Lock, User as UserIcon, Building2, AlertCircle } from "lucide-
 import { Button } from "../ui/Button"
 import { authService, type UserRole } from "../../services/authService"
 import { cn } from "../../lib/utils"
+import SpotlightCard from "../ui/SpotlightCard";
+
+let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 interface AuthModalProps {
   isOpen: boolean
@@ -83,7 +86,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
           className="absolute inset-0 bg-brand-navy/60 backdrop-blur-sm"
         />
         
-        <motion.div
+        <MotionSpotlightCard
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -98,7 +101,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
           <div className="p-8">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-display font-semibold text-brand-navy">
-                {mode === "login" ? "Welcome back" : `Create ${role === 'candidate' ? 'Candidate' : 'Recruiter'} Account`}
+                {mode === "login" ? "Welcome back" : `Create ${role === 'candidate' ? 'Candidate' : role === 'admin' ? 'Admin' : 'Recruiter'} Account`}
               </h2>
               <p className="text-brand-navy/60 mt-2 text-sm">
                 {mode === "login" 
@@ -107,29 +110,39 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
               </p>
             </div>
 
-            {/* Role Tabs for Login */}
-            {mode === "login" && (
-              <div className="flex p-1 bg-brand-light rounded-xl mb-6">
-                <button
-                  onClick={() => setRole("candidate")}
-                  className={cn(
-                    "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
-                    role === "candidate" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
-                  )}
-                >
-                  Candidate
-                </button>
-                <button
-                  onClick={() => setRole("recruiter")}
-                  className={cn(
-                    "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
-                    role === "recruiter" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
-                  )}
-                >
-                  Recruiter
-                </button>
-              </div>
-            )}
+            {/* Role Tabs */}
+            <div className="flex p-1 bg-brand-light rounded-xl mb-6">
+              <button
+                type="button"
+                onClick={() => setRole("candidate")}
+                className={cn(
+                  "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                  role === "candidate" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
+                )}
+              >
+                Candidate
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("recruiter")}
+                className={cn(
+                  "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                  role === "recruiter" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
+                )}
+              >
+                Recruiter
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("admin")}
+                className={cn(
+                  "flex-1 py-2 text-sm font-semibold rounded-lg transition-all",
+                  role === "admin" ? "bg-white text-brand-indigo shadow-sm" : "text-brand-navy/60 hover:text-brand-navy"
+                )}
+              >
+                Admin
+              </button>
+            </div>
 
             {error && (
               <div className="mb-6 p-3 bg-semantic-error/10 border border-semantic-error/20 rounded-xl flex items-start gap-3">
@@ -245,7 +258,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
               </p>
             </div>
           </div>
-        </motion.div>
+        </MotionSpotlightCard>
       </div>
     </AnimatePresence>
   )

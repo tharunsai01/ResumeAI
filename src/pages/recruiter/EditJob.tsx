@@ -18,37 +18,30 @@ export default function EditJob() {
 
   React.useEffect(() => {
     // Simulate fetching job data
-    const timer = setTimeout(() => {
-      const job = initialRecruiterJobs.find(j => j.id === jobId)
-      if (job) {
-        setInitialData({
-          title: job.title,
-          company: job.company,
-          location: job.location,
-          type: job.jobType,
-          workMode: job.workMode,
-          experience: job.experience,
-          salary: job.salary === "Salary not disclosed" ? "" : job.salary,
-          salaryNotDisclosed: job.salary === "Salary not disclosed",
-          description: job.description,
-          requiredSkills: job.skills,
-          preferredSkills: [] // Mocking preferred as empty for edit since it's not in the simple interface
-        })
-      }
-      setLoading(false)
-    }, 400)
-    return () => clearTimeout(timer)
+    const job = initialRecruiterJobs.find(j => j.id === jobId)
+    if (job) {
+      setInitialData({
+        title: job.title,
+        company: job.company,
+        location: job.location,
+        type: job.jobType,
+        workMode: job.workMode,
+        experience: job.experience,
+        salary: job.salary === "Salary not disclosed" ? "" : job.salary,
+        salaryNotDisclosed: job.salary === "Salary not disclosed",
+        description: job.description,
+        requiredSkills: job.skills,
+        preferredSkills: [] // Mocking preferred as empty for edit since it's not in the simple interface
+      })
+    }
+    setLoading(false)
   }, [jobId])
 
   const handleSubmit = (_data: JobFormData, _status: "Active" | "Draft") => {
     setIsSubmitting(true)
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      // Displaying success toast "Job updated successfully." would go here.
-      navigate(`/recruiter/jobs/${jobId}`)
-    }, 600)
+    setIsSubmitting(false)
+    // Displaying success toast "Job updated successfully." would go here.
+    navigate(`/recruiter/jobs/${jobId}`)
   }
 
   const handleCancel = () => {
