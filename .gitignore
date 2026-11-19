@@ -1,14 +1,13 @@
+
 # ==========================================
 # ResumeAI / HireSmart AI - Git Ignore
 # ==========================================
-
 
 # ------------------------------------------
 # Dependencies
 # ------------------------------------------
 node_modules/
 **/node_modules/
-
 
 # ------------------------------------------
 # Build / Production Output
@@ -28,14 +27,12 @@ out/
 .vite/
 **/.vite/
 
-
 # ------------------------------------------
 # Environment Variables / Secrets
 # ------------------------------------------
 .env
 .env.*
 !.env.example
-
 
 # ------------------------------------------
 # Logs
@@ -45,7 +42,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
 
 # ------------------------------------------
 # Generated / Temporary Project Files
@@ -59,7 +55,6 @@ buttons.txt
 
 scratch/
 
-
 # ------------------------------------------
 # Testing / Coverage
 # ------------------------------------------
@@ -68,12 +63,10 @@ coverage/
 playwright-report/
 test-results/
 
-
 # ------------------------------------------
 # TypeScript Build Information
 # ------------------------------------------
 *.tsbuildinfo
-
 
 # ------------------------------------------
 # OS Generated Files
@@ -84,7 +77,6 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-
 # ------------------------------------------
 # IDE / Editor Files
 # ------------------------------------------
@@ -92,8 +84,6 @@ Desktop.ini
 
 .vscode/*
 !.vscode/extensions.json
-!.vscode/settings.json
-
 
 # ------------------------------------------
 # Temporary / Editor Files
@@ -104,12 +94,10 @@ Desktop.ini
 *.swo
 *~
 
-
 # ------------------------------------------
 # Local Development Files
 # ------------------------------------------
 *.local
-
 
 # ------------------------------------------
 # Cache
@@ -118,7 +106,6 @@ Desktop.ini
 .eslintcache/
 .parcel-cache/
 .turbo/
-
 
 # ------------------------------------------
 # Local Uploads / Generated Files
@@ -129,7 +116,6 @@ uploads/
 generated/
 **/generated/
 
-
 # ------------------------------------------
 # Local Database Files
 # ------------------------------------------
@@ -137,12 +123,10 @@ generated/
 *.sqlite3
 *.db
 
-
 # ------------------------------------------
 # Vite Temporary Files
 # ------------------------------------------
 vite.config.*.timestamp-*
-
 
 # ------------------------------------------
 # Debug / Profiling
@@ -150,9 +134,16 @@ vite.config.*.timestamp-*
 *.cpuprofile
 *.heapprofile
 
-
 # ------------------------------------------
 # OS / Tool Temporary Files
 # ------------------------------------------
 *.orig
 *.rej
+
+# ------------------------------------------
+# Python Environment / Cache (if used)
+# ------------------------------------------
+venv/
+.venv/
+__pycache__/
+*.py[cod]
