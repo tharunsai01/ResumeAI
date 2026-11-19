@@ -5,7 +5,7 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
+import { AI_SCREENING_THRESHOLD } from "../../services/aiScreeningService"
 
 const MOCK_STATS = {
   totalApplications: 245,

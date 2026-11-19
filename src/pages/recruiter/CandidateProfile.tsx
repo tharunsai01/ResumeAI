@@ -6,8 +6,8 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialRecruiterCandidates } from "../../data/recruiterMockData"
-import type { RecruiterCandidate } from "../../data/recruiterMockData"
+import { recruiterCandidateService } from "../../services/recruiterCandidateService"
+import type { RecruiterCandidate } from "../../services/recruiterCandidateService"
 import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
@@ -23,7 +23,7 @@ export default function RecruiterCandidateProfile() {
   const [shortlistMsg, setShortlistMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const found = initialRecruiterCandidates.find(c => c.id === candidateId)
+    const found = recruiterCandidateService.getCandidateById(candidateId || "")
     if (found) setCandidate(found)
     setLoading(false)
   }, [candidateId])

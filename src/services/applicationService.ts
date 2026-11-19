@@ -1,30 +1,8 @@
+import { env } from "../config/env"
 import { mockJobs } from "../data/mockJobs"
+import type { ApplicationStatus, TimelineEvent, Application, ApplicationAiScreening } from "../types/application"
 
-export type ApplicationStatus = "Applied" | "AI Screened" | "Under Review" | "Shortlisted" | "Interview" | "Offer" | "Rejected" | "Withdrawn" | "Hired"
-
-export interface TimelineEvent {
-  status: ApplicationStatus
-  date: string
-}
-
-export interface Application {
-  id: string
-  jobId: string
-  candidateId: string
-  status: ApplicationStatus
-  matchScore: number
-  appliedDate: string
-  timeline: TimelineEvent[]
-  notes: string
-  aiScreening?: {
-    skillMatch: number
-    experienceMatch: number
-    educationMatch: number
-    roleMatch: number
-    strengths: string[]
-    missingSkills: string[]
-  }
-}
+export type { ApplicationStatus, TimelineEvent, Application, ApplicationAiScreening }
 
 const STORAGE_KEY = "hiresmart_all_applications"
 
@@ -147,6 +125,9 @@ export const applicationService = {
   },
 
   createApplication(app: Omit<Application, "id">): Application {
+    if (!env.useMock) {
+      throw new Error("Live API mode is not yet configured for applicationService.")
+    }
     const apps = this.getApplications()
     const newApp = { ...app, id: Math.random().toString(36).substr(2, 9) }
     apps.unshift(newApp)

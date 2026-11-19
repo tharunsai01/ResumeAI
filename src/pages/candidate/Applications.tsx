@@ -8,7 +8,7 @@ import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard
 import { Badge } from "../../components/ui/Badge"
 import { MatchScore } from "../../components/shared/MatchScore"
 import { useJobActions } from "../../hooks/useJobActions"
-import { mockResumeAnalysis } from "../../data/mockResume"
+import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import SpotlightCard from "../../components/ui/SpotlightCard";
@@ -16,6 +16,7 @@ import SpotlightCard from "../../components/ui/SpotlightCard";
 export default function CandidateApplications() {
   const navigate = useNavigate()
   const { appliedJobs } = useJobActions()
+  const activeResume = resumeService.getActiveResumeAnalysis()
   
   const [searchTerm, setSearchTerm] = React.useState("")
   const [statusFilter, setStatusFilter] = React.useState("All")
@@ -105,7 +106,7 @@ export default function CandidateApplications() {
   }
 
   return (
-    <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+    <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-7xl mx-auto space-y-6 pb-12">
         {/* Header */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

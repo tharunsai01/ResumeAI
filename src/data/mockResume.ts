@@ -1,52 +1,21 @@
-export interface SkillStrength {
-  name: string
-  score: number
-  category: "Programming" | "Frontend" | "Backend" | "Database" | "Cloud & DevOps"
-}
+import type {
+  SkillStrength,
+  ResumeExperience,
+  ResumeEducation,
+  ResumeProject,
+  ResumeAnalysisResult
+} from "../types/resume"
 
-export interface Experience {
-  title: string
-  company: string
-  duration: string
-  description: string[]
-}
+export type Experience = ResumeExperience
+export type Education = ResumeEducation
+export type Project = ResumeProject
 
-export interface Education {
-  degree: string
-  institution: string
-  duration: string
-}
-
-export interface Project {
-  name: string
-  techStack: string[]
-  description: string
-}
-
-export interface ResumeAnalysisResult {
-  score: number
-  breakdown: {
-    skills: number
-    experience: number
-    education: number
-    projects: number
-  }
-  personalInfo: {
-    name: string
-    email: string
-    experience: string
-    education: string
-    location: string
-  }
-  skills: SkillStrength[]
-  experience: Experience[]
-  education: Education[]
-  projects: Project[]
-  insights: {
-    strengths: string[]
-    improvements: string[]
-    summary: string
-  }
+export type {
+  SkillStrength,
+  ResumeExperience,
+  ResumeEducation,
+  ResumeProject,
+  ResumeAnalysisResult
 }
 
 export const mockResumeAnalysis: ResumeAnalysisResult = {

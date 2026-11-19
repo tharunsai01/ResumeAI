@@ -1,11 +1,12 @@
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
-import { platformActivityData } from "../../../data/mockAdminDashboard"
+import { adminDashboardService } from "../../../services/adminDashboardService"
 import { useState } from "react"
 
 export function PlatformActivityChart() {
   const [timeRange, setTimeRange] = useState("30 Days")
+  const platformActivityData = adminDashboardService.getPlatformActivity()
 
   return (
     <PremiumCard className="col-span-1 lg:col-span-2">

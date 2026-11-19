@@ -1,30 +1,17 @@
-export type HealthStatus = "Operational" | "Degraded" | "Unavailable"
+import type { 
+  HealthStatus, 
+  ServiceEvent, 
+  ServiceHealth, 
+  SystemEvent, 
+  HealthHistoryPoint 
+} from "../types/admin"
 
-export interface ServiceEvent {
-  message: string
-  severity: "Info" | "Warning" | "Critical"
-  time: string
-}
-
-export interface ServiceHealth {
-  id: string
-  name: string
-  status: HealthStatus
-  responseTime: string
-  lastChecked: string
-  details?: Record<string, string | number>
-  recentEvents: ServiceEvent[]
-}
-
-export interface SystemEvent {
-  event: string
-  severity: "Info" | "Warning" | "Critical"
-  time: string
-}
-
-export interface HealthHistoryPoint {
-  time: string
-  value: number
+export type { 
+  HealthStatus, 
+  ServiceEvent, 
+  ServiceHealth, 
+  SystemEvent, 
+  HealthHistoryPoint 
 }
 
 export const mockSystemHealthData = {

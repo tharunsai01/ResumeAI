@@ -6,7 +6,7 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { screeningJobs, initialScreeningCandidates, AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
+import { aiScreeningService, AI_SCREENING_THRESHOLD } from "../../services/aiScreeningService"
 import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
@@ -27,9 +27,9 @@ export default function RecruiterJobScreening() {
   const navigate = useNavigate()
   const { jobId } = useParams()
   
-  const job = screeningJobs.find(j => j.id === jobId) || screeningJobs[0] // fallback for mock
+  const job = aiScreeningService.getScreeningJobById(jobId || "") || aiScreeningService.getScreeningJobs()[0]
   const [loading, setLoading] = React.useState(true)
-  const [candidates, setCandidates] = React.useState(initialScreeningCandidates)
+  const [candidates, setCandidates] = React.useState(() => aiScreeningService.getScreeningCandidates(jobId))
   const [isScreening, setIsScreening] = React.useState(false)
   const [screeningProgress, setScreeningProgress] = React.useState(0)
   const [screeningComplete, setScreeningComplete] = React.useState(job.pending === 0)

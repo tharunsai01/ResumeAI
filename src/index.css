@@ -42,6 +42,28 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
   }
+
+  /* Headings inside dark background containers or with text-white must always be pure white in both Light and Dark mode */
+  .text-white h1,
+  .text-white h2,
+  .text-white h3,
+  .text-white h4,
+  .text-white h5,
+  .text-white h6,
+  .bg-brand-navy h1,
+  .bg-brand-navy h2,
+  .bg-brand-navy h3,
+  .bg-brand-navy h4,
+  .bg-brand-navy h5,
+  .bg-brand-navy h6,
+  .glass-dark h1,
+  .glass-dark h2,
+  .glass-dark h3,
+  .glass-dark h4,
+  .glass-dark h5,
+  .glass-dark h6 {
+    color: #ffffff;
+  }
 }
 
 @utility table-responsive {
@@ -168,6 +190,7 @@
     background: rgba(15, 23, 42, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    color: #F8FAFC;
   }
 
   .dark .glass-card::before {
@@ -408,6 +431,14 @@
 
   .dark .text-brand-navy {
     color: #FFFFFF !important;
+  }
+
+  .dark .text-brand-navy\/90 {
+    color: #F8FAFC !important;
+  }
+
+  .dark .text-brand-navy\/85 {
+    color: #F8FAFC !important;
   }
 
   .dark .text-brand-navy\/80 {

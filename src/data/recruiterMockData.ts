@@ -1,21 +1,24 @@
-export type JobStatus = "Active" | "Draft" | "Closed"
-export type JobType = "Full-time" | "Part-time" | "Contract" | "Internship"
-export type WorkMode = "Remote" | "Hybrid" | "On-site"
+import type { JobStatus, JobType, WorkMode, RecruiterJob } from "../types/job"
+import type { 
+  AppStatus, 
+  AIScreeningStatus, 
+  CandidateExperience, 
+  CandidateEducation, 
+  CandidateProject, 
+  RecruiterCandidate 
+} from "../types/recruiter"
 
-export interface RecruiterJob {
-  id: string
-  title: string
-  company: string
-  location: string
-  workMode: WorkMode
-  jobType: JobType
-  experience: string
-  salary: string
-  skills: string[]
-  description: string
-  status: JobStatus
-  applications: number
-  postedDate: string
+export type { 
+  JobStatus, 
+  JobType, 
+  WorkMode, 
+  RecruiterJob,
+  AppStatus, 
+  AIScreeningStatus, 
+  CandidateExperience, 
+  CandidateEducation, 
+  CandidateProject, 
+  RecruiterCandidate 
 }
 
 export const initialRecruiterJobs: RecruiterJob[] = [
@@ -95,46 +98,6 @@ export const initialRecruiterJobs: RecruiterJob[] = [
     postedDate: "1 month ago"
   }
 ]
-
-export type AppStatus = "Applied" | "Screening" | "Shortlisted" | "Interview" | "Rejected" | "Hired"
-export type AIScreeningStatus = "Not Screened" | "Screened" | "Strong Match" | "Potential Match" | "Low Match"
-
-export interface CandidateExperience {
-  role: string
-  company: string
-  duration: string
-  description: string
-}
-
-export interface CandidateEducation {
-  degree: string
-  institution: string
-  year: string
-}
-
-export interface CandidateProject {
-  title: string
-  technologies: string[]
-  description: string
-}
-
-export interface RecruiterCandidate {
-  id: string
-  name: string
-  title: string
-  location: string
-  email: string
-  experience: string
-  skills: { name: string; proficiency: "Strong" | "Intermediate" | "Basic" }[]
-  education: CandidateEducation[]
-  projects: CandidateProject[]
-  matchScore: number
-  status: AppStatus
-  appliedRole: string
-  appliedDate: string
-  screeningStatus: AIScreeningStatus
-  applicationHistory: { role: string; date: string; status: AppStatus }[]
-}
 
 export const initialRecruiterCandidates: RecruiterCandidate[] = [
   {

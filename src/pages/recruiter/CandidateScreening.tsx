@@ -6,7 +6,7 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialScreeningCandidates, jobRequirements, AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
+import { aiScreeningService, AI_SCREENING_THRESHOLD } from "../../services/aiScreeningService"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
 import { cn } from "../../lib/utils"
@@ -15,12 +15,12 @@ export default function RecruiterCandidateScreening() {
   const navigate = useNavigate()
   const { jobId, candidateId } = useParams()
   
-  const [candidate, setCandidate] = React.useState(initialScreeningCandidates.find(c => c.id === candidateId))
+  const [candidate, setCandidate] = React.useState(() => aiScreeningService.getScreeningCandidateById(candidateId || ""))
   const [loading, setLoading] = React.useState(true)
   const [candidateToReject, setCandidateToReject] = React.useState(false)
   const [shortlistMsg, setShortlistMsg] = React.useState<string | null>(null)
 
-  const reqs = jobRequirements[jobId as keyof typeof jobRequirements] || jobRequirements["job_101"]
+  const reqs = aiScreeningService.getJobRequirements(jobId || "")
 
   React.useEffect(() => {
     setLoading(false)

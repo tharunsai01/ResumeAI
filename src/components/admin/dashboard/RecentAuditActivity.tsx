@@ -1,10 +1,11 @@
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
-import { auditActivities } from "../../../data/mockAdminDashboard"
+import { adminDashboardService } from "../../../services/adminDashboardService"
 import { ScrollText, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export function RecentAuditActivity() {
   const navigate = useNavigate()
+  const auditActivities = adminDashboardService.getAuditActivities()
 
   return (
     <PremiumCard className="col-span-1 lg:col-span-2 flex flex-col">

@@ -9,7 +9,7 @@ import { Card, CardContent } from "../../components/ui/Card"
 import { jobService } from "../../services/jobService"
 import type { JobMatchResult } from "../../services/jobService"
 import { useJobActions } from "../../hooks/useJobActions"
-import { mockResumeAnalysis } from "../../data/mockResume"
+import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import SpotlightCard from "../../components/ui/SpotlightCard";
@@ -19,6 +19,7 @@ let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(
 export default function CandidateJobs() {
   const navigate = useNavigate()
   const { savedJobs, toggleSaveJob, hasApplied } = useJobActions()
+  const activeResume = resumeService.getActiveResumeAnalysis()
 
   const [loading, setLoading] = React.useState(true)
   const [allJobs, setAllJobs] = React.useState<JobMatchResult[]>([])
@@ -89,7 +90,7 @@ export default function CandidateJobs() {
       try {
         const jobs = await jobService.getJobs()
         // Score all jobs against candidate
-        const scored = jobs.map(j => jobService.calculateJobMatch(mockResumeAnalysis, j))
+        const scored = jobs.map(j => jobService.calculateJobMatch(activeResume, j))
         setAllJobs(scored)
       } finally {
         setLoading(false)
@@ -160,7 +161,7 @@ export default function CandidateJobs() {
   }
 
   return (
-    <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+    <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-7xl mx-auto space-y-6 pb-12">
         {/* Header */}
         <motion.div variants={slideUp}>

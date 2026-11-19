@@ -10,8 +10,8 @@ import { ResumeUploader } from "../../components/shared/ResumeUploader"
 import { jobService } from "../../services/jobService"
 import type { JobMatchResult } from "../../services/jobService"
 import { useJobActions } from "../../hooks/useJobActions"
-import { mockResumeAnalysis } from "../../data/mockResume"
-import { mockSkills } from "../../data/mockSkills"
+import { resumeService } from "../../services/resumeService"
+import { skillService } from "../../services/skillService"
 import { profileService } from "../../services/profileService"
 import { Badge } from "../../components/ui/Badge"
 import { SkillBadge } from "../../components/shared/SkillBadge"
@@ -43,6 +43,7 @@ export default function CandidateDashboard() {
   const totalInterviews = appliedJobs.filter(a => a.status === "Interview").length
   const totalOffers = appliedJobs.filter(a => a.status === "Offer").length
   
+  const activeResume = resumeService.getActiveResumeAnalysis()
   const profileCompletion = profileService.getCandidateProfile().profileCompletion
 
   const stats = [
@@ -66,7 +67,7 @@ export default function CandidateDashboard() {
   }
 
   return (
-    <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+    <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
       <motion.div
         variants={staggerContainer}
         initial="initial"
@@ -77,7 +78,7 @@ export default function CandidateDashboard() {
         <MotionSpotlightCard variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 sm:p-6">
           <div>
             <h1 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy break-words">
-              Welcome back, {mockResumeAnalysis.personalInfo.name.split(' ')[0]} <span className="inline-block animate-bounce">👋</span>
+              Welcome back, {activeResume.personalInfo.name.split(' ')[0]} <span className="inline-block animate-bounce">👋</span>
             </h1>
             <p className="text-sm sm:text-base text-brand-navy/60 mt-1">
               Discover opportunities that match your skills and career goals.
@@ -202,7 +203,7 @@ export default function CandidateDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {mockSkills.filter(s => s.isDetected).slice(0, 5).map(skill => (
+                    {skillService.getDetectedSkills().slice(0, 5).map(skill => (
                       <SkillBadge key={skill.id} name={skill.name} level={skill.level} variant="default" />
                     ))}
                   </div>

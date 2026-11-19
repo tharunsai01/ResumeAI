@@ -7,12 +7,13 @@ import { JobCard } from "../../components/shared/JobCard"
 import { jobService } from "../../services/jobService"
 import type { JobMatchResult } from "../../services/jobService"
 import { useJobActions } from "../../hooks/useJobActions"
-import { mockResumeAnalysis } from "../../data/mockResume"
+import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 
 export default function CandidateRecommended() {
   const navigate = useNavigate()
   const { savedJobs, toggleSaveJob, hasApplied } = useJobActions()
+  const activeResume = resumeService.getActiveResumeAnalysis()
   
   const [loading, setLoading] = React.useState(true)
   const [recommendedJobs, setRecommendedJobs] = React.useState<JobMatchResult[]>([])
@@ -30,7 +31,7 @@ export default function CandidateRecommended() {
   }, [])
 
   return (
-    <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+    <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-6xl mx-auto space-y-8 pb-12">
         <motion.div variants={slideUp} className="flex items-center gap-3">
           <div className="p-2.5 sm:p-3 bg-brand-indigo/10 rounded-xl shrink-0">

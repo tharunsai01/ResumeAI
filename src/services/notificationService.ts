@@ -3,10 +3,10 @@ import {
   defaultRecruiterNotifications, 
   defaultAdminNotifications 
 } from "../data/mockNotifications"
-import type { AppNotification } from "../data/mockNotifications"
+import type { AppNotification, NotificationRole } from "../types/notifications"
 import { authService } from "./authService"
 
-export type NotificationRole = "candidate" | "recruiter" | "admin"
+export type { NotificationRole }
 
 const BASE_STORAGE_KEY = "hiresmart_notifications"
 

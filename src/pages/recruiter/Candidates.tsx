@@ -6,8 +6,8 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialRecruiterCandidates } from "../../data/recruiterMockData"
-import type { RecruiterCandidate, AppStatus, AIScreeningStatus } from "../../data/recruiterMockData"
+import { recruiterCandidateService } from "../../services/recruiterCandidateService"
+import type { RecruiterCandidate, AppStatus, AIScreeningStatus } from "../../services/recruiterCandidateService"
 import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
@@ -51,7 +51,7 @@ export default function RecruiterCandidates() {
   const [shortlistMsg, setShortlistMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    setCandidates([...initialRecruiterCandidates])
+    setCandidates(recruiterCandidateService.getCandidates())
     setLoading(false)
   }, [])
 

@@ -1,12 +1,77 @@
-import type { Job } from "../data/mockJobs"
+/**
+ * HireSmart AI - AI Screening Service
+ * Powers AI candidate screening, requirement extraction, match calculations,
+ * and recruiter screening workflows.
+ */
+
+import { env } from "../config/env"
+import type { Job } from "../types/job"
 import { jobService } from "./jobService"
 import { applicationService } from "./applicationService"
+import {
+  screeningJobs,
+  initialScreeningCandidates,
+  jobRequirements,
+  AI_SCREENING_THRESHOLD as DEFAULT_AI_SCREENING_THRESHOLD,
+} from "../data/screeningMockData"
+import type { ScreeningJob, DetailedScreeningCandidate } from "../types/screening"
+
+export const AI_SCREENING_THRESHOLD = DEFAULT_AI_SCREENING_THRESHOLD
+
+export type { ScreeningJob, DetailedScreeningCandidate }
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export const aiScreeningService = {
-  // Analyze a job description to extract requirements
+  /**
+   * Retrieves all jobs configured for AI screening.
+   */
+  getScreeningJobs(): ScreeningJob[] {
+    return screeningJobs
+  },
+
+  /**
+   * Retrieves a specific screening job by ID.
+   */
+  getScreeningJobById(jobId: string): ScreeningJob | undefined {
+    return screeningJobs.find(j => j.id === jobId)
+  },
+
+  /**
+   * Retrieves candidate screening profiles.
+   */
+  getScreeningCandidates(_jobId?: string): DetailedScreeningCandidate[] {
+    return [...initialScreeningCandidates]
+  },
+
+  /**
+   * Retrieves a single candidate screening profile by ID.
+   */
+  getScreeningCandidateById(candidateId: string): DetailedScreeningCandidate | undefined {
+    return initialScreeningCandidates.find(c => c.id === candidateId)
+  },
+
+  /**
+   * Retrieves job requirements configuration for a job ID.
+   */
+  getJobRequirements(jobId: string) {
+    return jobRequirements[jobId as keyof typeof jobRequirements] || jobRequirements["job_101"]
+  },
+
+  /**
+   * Returns the minimum threshold required for a strong AI match.
+   */
+  getScreeningThreshold(): number {
+    return AI_SCREENING_THRESHOLD
+  },
+
+  /**
+   * Analyze a job description to extract requirements
+   */
   async analyzeJob(job: Partial<Job>) {
+    if (!env.useMock) {
+      throw new Error("Live API mode is not yet configured for aiScreeningService.")
+    }
     await delay(800) // Mock AI processing delay
     
     // Naive mock extraction based on standard buzzwords
@@ -23,12 +88,17 @@ export const aiScreeningService = {
       requiredSkills,
       preferredSkills: ["Git", "Agile", "CI/CD"],
       experienceRequired: job.experience || "Entry Level",
-      keywords: ["scalable", "performance", "team", "architecture"]
+      keywords: ["scalable", "performance", "team", "architecture"],
     }
   },
 
-  // Calculate match for a single application
+  /**
+   * Calculate match for a single application
+   */
   async calculateMatch(appId: string) {
+    if (!env.useMock) {
+      throw new Error("Live API mode is not yet configured for aiScreeningService.")
+    }
     const app = applicationService.getApplication(appId)
     if (!app) throw new Error("Application not found")
     
@@ -56,7 +126,7 @@ export const aiScreeningService = {
       educationMatch,
       roleMatch,
       strengths,
-      missingSkills
+      missingSkills,
     }
 
     // Save to application service
@@ -65,8 +135,13 @@ export const aiScreeningService = {
     return overallScore
   },
 
-  // Screen all candidates for a specific job
+  /**
+   * Screen all candidates for a specific job
+   */
   async screenCandidatesForJob(jobId: string, onProgress?: (progress: number) => void) {
+    if (!env.useMock) {
+      throw new Error("Live API mode is not yet configured for aiScreeningService.")
+    }
     const apps = applicationService.getApplicationsByJob(jobId)
     const unscreenedApps = apps.filter(a => a.status === "Applied")
     
@@ -80,5 +155,5 @@ export const aiScreeningService = {
     }
     
     return applicationService.getApplicationsByJob(jobId)
-  }
+  },
 }

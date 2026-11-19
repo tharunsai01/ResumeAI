@@ -1,16 +1,7 @@
 import { authService } from "./authService"
+import type { RecruiterProfile } from "../types/recruiter"
 
-export interface RecruiterProfile {
-  id: string
-  fullName: string
-  email: string
-  phone: string
-  company: string
-  designation: string
-  location: string
-  about: string
-  avatar?: string
-}
+export type { RecruiterProfile }
 
 export const defaultRecruiterProfile: RecruiterProfile = {
   id: "recruiter_default",

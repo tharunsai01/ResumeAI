@@ -1,30 +1,15 @@
-export type AuditEventType = 
-  | "User Management"
-  | "Complaint"
-  | "Skill Taxonomy"
-  | "AI Processing"
-  | "AI Configuration"
-  | "Security"
-  | "Authentication"
-  | "System"
-  | "Recruitment Activity"
+import type { 
+  AuditEventType, 
+  ActorRole, 
+  AuditSeverity, 
+  AuditLog 
+} from "../types/admin"
 
-export type ActorRole = "Administrator" | "Recruiter" | "Candidate" | "System"
-
-export type AuditSeverity = "Info" | "Warning" | "Critical"
-
-export interface AuditLog {
-  id: string
-  eventType: AuditEventType
-  description: string
-  actorId: string
-  actorName: string
-  actorRole: ActorRole
-  resourceType: string
-  resourceId: string
-  severity: AuditSeverity
-  timestamp: string
-  metadata?: Record<string, string | number | boolean>
+export type { 
+  AuditEventType, 
+  ActorRole, 
+  AuditSeverity, 
+  AuditLog 
 }
 
 export const initialAuditLogs: AuditLog[] = [

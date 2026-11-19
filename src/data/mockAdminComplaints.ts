@@ -1,32 +1,17 @@
-export type ComplaintStatus = "Open" | "In Review" | "Resolved" | "Closed"
-export type ComplaintPriority = "Low" | "Medium" | "High" | "Critical"
-export type ComplaintCategory = "Account" | "Resume" | "AI & Matching" | "Job/Recruiter" | "Technical" | "Privacy & Security" | "Other"
+import type { 
+  ComplaintStatus, 
+  ComplaintPriority, 
+  ComplaintCategory, 
+  ComplaintActivity, 
+  AdminComplaint 
+} from "../types/admin"
 
-export interface ComplaintActivity {
-  action: string
-  time: string
-  admin?: string
-}
-
-export interface AdminComplaint {
-  id: string
-  subject: string
-  description: string
-  submittedBy: {
-    name: string
-    email: string
-    id: string
-  }
-  role: "Candidate" | "Recruiter"
-  category: ComplaintCategory
-  priority: ComplaintPriority
-  status: ComplaintStatus
-  createdAt: string
-  updatedAt: string
-  resolutionNotes?: string
-  resolvedBy?: string
-  resolvedAt?: string
-  activity: ComplaintActivity[]
+export type { 
+  ComplaintStatus, 
+  ComplaintPriority, 
+  ComplaintCategory, 
+  ComplaintActivity, 
+  AdminComplaint 
 }
 
 export const mockAdminComplaints: AdminComplaint[] = [

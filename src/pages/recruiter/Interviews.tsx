@@ -6,8 +6,8 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialInterviews } from "../../data/pipelineMockData"
-import type { MockInterview } from "../../data/pipelineMockData"
+import { interviewService } from "../../services/interviewService"
+import type { MockInterview } from "../../services/interviewService"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
@@ -32,7 +32,7 @@ const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
 export default function RecruiterInterviews() {
   const navigate = useNavigate()
   const [loading, setLoading] = React.useState(true)
-  const [interviews, setInterviews] = React.useState<MockInterview[]>(initialInterviews)
+  const [interviews, setInterviews] = React.useState<MockInterview[]>(() => interviewService.getRecruiterInterviews())
   
   // Modals
   const [scheduleModalOpen, setScheduleModalOpen] = React.useState(false)

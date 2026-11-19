@@ -7,10 +7,11 @@ import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { screeningJobs } from "../../data/screeningMockData"
+import { aiScreeningService } from "../../services/aiScreeningService"
 
 export default function RecruiterScreening() {
   const navigate = useNavigate()
+  const screeningJobs = aiScreeningService.getScreeningJobs()
   const [loading, setLoading] = React.useState(true)
 
   // Filter state
