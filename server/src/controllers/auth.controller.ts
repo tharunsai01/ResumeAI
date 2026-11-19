@@ -51,3 +51,30 @@ export async function me(req: Request, res: Response) {
   if (!user) throw ApiError.unauthorized('User no longer exists');
   sendSuccess(res, { user: authService.publicUser(user) });
 }
+
+export async function verifyEmail(req: Request, res: Response) {
+  await authService.verifyEmail(req.body.token);
+  sendSuccess(res, { message: 'Email verified' });
+}
+
+export async function resendVerification(req: Request, res: Response) {
+  await authService.resendVerification(req.user!.id);
+  sendSuccess(res, { message: 'If your email is not yet verified, a new link has been sent' });
+}
+
+export async function forgotPassword(req: Request, res: Response) {
+  authService.forgotPassword(req.body.email);
+  sendSuccess(res, { message: 'If an account exists for that email, a reset link has been sent' });
+}
+
+export async function resetPassword(req: Request, res: Response) {
+  await authService.resetPassword(req.body.token, req.body.password);
+  res.clearCookie(COOKIE_NAME, { path: cookieOptions.path });
+  sendSuccess(res, { message: 'Password updated. Please log in.' });
+}
+
+export async function google(req: Request, res: Response) {
+  const { user, accessToken, refreshToken } = await authService.googleAuth(req.body, meta(req));
+  res.cookie(COOKIE_NAME, refreshToken, cookieOptions);
+  sendSuccess(res, { user, accessToken });
+}

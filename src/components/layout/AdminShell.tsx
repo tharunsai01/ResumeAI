@@ -4,8 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { 
   LayoutDashboard, Users, AlertOctagon, Tags, ScrollText, 
   BrainCircuit, Activity, Settings, LogOut, Bell, Menu,
-  Search, Shield, FileText as FileTextIcon, Lock, Info, ChevronDown, ChevronUp, ChevronRight, Sun, Moon, HelpCircle, CheckCircle2, Check,
-  User, Calendar, Star, BarChart, AlertTriangle
+  Search, Shield, FileText as FileTextIcon, Lock, Info, ChevronRight, Sun, Moon, HelpCircle, CheckCircle2, Check,
 } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { notificationService } from "../../services/notificationService"
@@ -13,9 +12,8 @@ import { authService } from "../../services/authService"
 import { settingsService } from "../../services/settingsService"
 import type { AppNotification } from "../../data/mockNotifications"
 import { PageTransition } from "./PageTransition"
-import SpotlightCard from "../ui/SpotlightCard";
 
-let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
+
 
 interface AdminShellProps {
   children: React.ReactNode

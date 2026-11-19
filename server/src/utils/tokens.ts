@@ -29,3 +29,8 @@ export function generateRefreshToken() {
   const raw = crypto.randomBytes(48).toString('hex');
   return { raw, hash: hashToken(raw) };
 }
+
+export function generateOpaqueToken() {
+  const raw = crypto.randomBytes(32).toString('hex');
+  return { raw, hash: hashToken(raw) };
+}

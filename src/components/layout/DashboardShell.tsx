@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, Search, Briefcase, 
   Settings, LogOut, Bell, User, Menu, BarChart,
   CheckCircle2, AlertCircle, Calendar, Star, Check,
-  HelpCircle, AlertTriangle, Shield, FileText as FileTextIcon, Lock, Info, ChevronDown, ChevronUp, ChevronRight, Sun, Moon
+  HelpCircle, AlertTriangle, Shield, FileText as FileTextIcon, Lock, Info, ChevronDown, ChevronRight, Sun, Moon
 } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { notificationService } from "../../services/notificationService"
@@ -13,9 +13,8 @@ import { authService } from "../../services/authService"
 import { settingsService } from "../../services/settingsService"
 import type { AppNotification } from "../../data/mockNotifications"
 import { PageTransition } from "./PageTransition"
-import SpotlightCard from "../ui/SpotlightCard";
 
-let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
+
 
 interface DashboardShellProps {
   children: React.ReactNode
@@ -307,7 +306,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                               : "text-brand-navy/70 hover:text-brand-navy dark:text-white/60 dark:hover:text-white"
                           )}
                         >
-                          {({ isActive }) => (
+                          {() => (
                             <>
                               <div className={cn("w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-colors", link.iconBg)}>
                                 <link.icon className="h-3 w-3" strokeWidth={2} />

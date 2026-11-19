@@ -1,134 +1,102 @@
-export type UserRole = "candidate" | "recruiter" | "admin"
+import { api, refreshSession, setAccessToken, setAuthFailureHandler, type AuthUser, type Session } from './httpClient';
+
+export type UserRole = 'candidate' | 'recruiter' | 'admin';
 
 export interface User {
-  id: string
-  email: string
-  name: string
-  role: UserRole
-  company?: string // Optional, for recruiters
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  company?: string; // recruiters; filled from the profile API in Phase 3
+  isVerified?: boolean;
 }
 
-const USERS_KEY = "hiresmart_users"
-const SESSION_KEY = "hiresmart_session"
+const AUTH_EVENT = 'hiresmart_auth_changed';
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+// The old mock stored users and plaintext passwords here: delete them
+localStorage.removeItem('hiresmart_users');
+localStorage.removeItem('hiresmart_session');
+
+let currentUser: User | null = null;
+
+function setUser(user: User | null) {
+  currentUser = user;
+  window.dispatchEvent(new Event(AUTH_EVENT));
+}
+
+function toUser(u: AuthUser): User {
+  return { id: u.id, email: u.email, name: u.fullName, role: u.role, isVerified: u.isVerified };
+}
+
+// If a refresh fails mid-session, api.ts calls this and the app logs the user out
+setAuthFailureHandler(() => setUser(null));
+
+async function startSession(path: string, body: unknown, company?: string): Promise<User> {
+  const session = await api<Session>(path, { method: 'POST', body, auth: false });
+  setAccessToken(session.accessToken);
+  const user = { ...toUser(session.user), ...(company ? { company } : {}) };
+  setUser(user);
+  return user;
+}
 
 export const authService = {
-  getUsers(): any[] {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(USERS_KEY)
-      return stored ? JSON.parse(stored) : []
-    }
-    return []
-  },
-
+  // Same name as the mock: returns whoever is logged in right now (in memory)
   getCurrentUser(): User | null {
-    if (typeof window !== "undefined") {
-      const session = localStorage.getItem(SESSION_KEY)
-      return session ? JSON.parse(session) : null
-    }
-    return null
-  },
-
-  async login(email: string, password: string):Promise<User> {
-    await delay(800) // Mock network delay
-
-    // Hardcode an admin login for testing the frontend admin portal
-    if (email === "admin@hiresmart.ai" || email === "admin") {
-      const sessionUser: User = { 
-        id: "mock_admin_123", 
-        email: "admin@hiresmart.ai", 
-        name: "Admin User", 
-        role: "admin" 
-      }
-      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
-      window.dispatchEvent(new Event('hiresmart_auth_changed'))
-      return sessionUser
-    }
-
-    const users = this.getUsers()
-    const user = users.find(u => u.email === email && u.password === password)
-    if (!user) throw new Error("Invalid email or password.")
-    
-    const sessionUser: User = { id: user.id, email: user.email, name: user.name, role: user.role, company: user.company }
-    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
-    window.dispatchEvent(new Event('hiresmart_auth_changed'))
-    return sessionUser
-  },
-
-  async register(data: { email: string; password?: string; name: string; role: UserRole; company?: string; isGoogle?: boolean }): Promise<User> {
-    await delay(800)
-    const users = this.getUsers()
-    
-    if (users.find(u => u.email === data.email)) {
-      throw new Error("An account with this email already exists.")
-    }
-
-    const newUser = {
-      id: Math.random().toString(36).substr(2, 9),
-      email: data.email,
-      password: data.password || null,
-      name: data.name,
-      role: data.role,
-      company: data.company,
-      isGoogle: !!data.isGoogle
-    }
-
-    users.push(newUser)
-    localStorage.setItem(USERS_KEY, JSON.stringify(users))
-
-    const sessionUser: User = { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role, company: newUser.company }
-    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
-    window.dispatchEvent(new Event('hiresmart_auth_changed'))
-    return sessionUser
-  },
-
-  async googleAuth(role?: UserRole): Promise<User> {
-    await delay(1200) // Mock popup delay
-    
-    // In a real app, this would open a Google OAuth popup, get the token, and send it to the backend.
-    // For this mock, we will generate a random Google user or log them into a mock account.
-    
-    const mockEmail = `google.${Math.random().toString(36).substr(2, 5)}@gmail.com`
-    const mockName = "Google User"
-
-    // If role is provided, it's a registration flow via Google. 
-    // If not, it's a login flow.
-    if (role) {
-      return this.register({
-        email: mockEmail,
-        name: mockName,
-        role,
-        isGoogle: true
-      })
-    } else {
-      // For mock login purposes without a role specified (Login screen), 
-      // just pick the first user or throw an error.
-      const users = this.getUsers()
-      if (users.length > 0) {
-        const user = users[0] // Just log into the first available account for demo purposes
-        const sessionUser: User = { id: user.id, email: user.email, name: user.name, role: user.role, company: user.company }
-        localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
-        window.dispatchEvent(new Event('hiresmart_auth_changed'))
-        return sessionUser
-      } else {
-        // If no users exist, create a mock candidate to demonstrate
-        return this.register({
-          email: mockEmail,
-          name: mockName,
-          role: "candidate",
-          isGoogle: true
-        })
-      }
-    }
-  },
-
-  logout() {
-    localStorage.removeItem(SESSION_KEY)
-    window.dispatchEvent(new Event('hiresmart_auth_changed'))
+    return currentUser;
   },
 
   isAuthenticated(): boolean {
-    return this.getCurrentUser() !== null
-  }
-}
+    return currentUser !== null;
+  },
+
+  // NEW: call once on app start to restore the session from the refresh cookie
+  async restoreSession(): Promise<User | null> {
+    const session = await refreshSession();
+    setUser(session ? toUser(session.user) : null);
+    return currentUser;
+  },
+
+  login(email: string, password: string): Promise<User> {
+    return startSession('/auth/login', { email, password });
+  },
+
+  register(data: {
+    email: string;
+    password: string;
+    name: string;
+    role: UserRole;
+    company?: string;
+  }): Promise<User> {
+    if (data.role === 'admin') throw new Error('Invalid role');
+    return startSession(
+      '/auth/register',
+      {
+        fullName: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        companyName: data.company,
+      },
+      data.company,
+    );
+  },
+
+  // CHANGED: needs the credential from Google's button (see below)
+  googleAuth(credential: string, role?: UserRole, company?: string): Promise<User> {
+    return startSession('/auth/google', { credential, role, companyName: company }, company);
+  },
+
+  async logout(): Promise<void> {
+    setAccessToken(null);
+    setUser(null); // the UI updates immediately
+    await api('/auth/logout', { method: 'POST', auth: false }).catch(() => {});
+  },
+
+  verifyEmail: (token: string) =>
+    api('/auth/verify-email', { method: 'POST', body: { token }, auth: false }),
+  resendVerification: () => api('/auth/resend-verification', { method: 'POST' }),
+  forgotPassword: (email: string) =>
+    api('/auth/forgot-password', { method: 'POST', body: { email }, auth: false }),
+  resetPassword: (token: string, password: string) =>
+    api('/auth/reset-password', { method: 'POST', body: { token, password }, auth: false }),
+};

@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../utils/ApiError';
 import { verifyAccessToken } from '../utils/tokens';
+import { User } from '../models';
 
 export function authenticate(req: Request, _res: Response, next: NextFunction) {
   const header = req.get('authorization');
@@ -15,6 +16,12 @@ export function authenticate(req: Request, _res: Response, next: NextFunction) {
   } catch {
     next(ApiError.unauthorized('Invalid or expired access token'));
   }
+}
+
+export async function requireVerified(req: Request, _res: Response, next: NextFunction) {
+  const user = await User.findById(req.user!.id).select('isVerified');
+  if (!user?.isVerified) return next(ApiError.forbidden('Please verify your email first'));
+  next();
 }
 
 export const authorize =

@@ -5,7 +5,7 @@ import App from './App.tsx'
 
 import { Component } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
-
+import { GoogleOAuthProvider } from '@react-oauth/google';
 interface Props {
   children?: ReactNode;
 }
@@ -46,7 +46,9 @@ class ErrorBoundary extends Component<Props, State> {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
+     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <App />
+     </GoogleOAuthProvider>
     </ErrorBoundary>
   </StrictMode>,
 )

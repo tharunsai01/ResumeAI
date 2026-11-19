@@ -3,7 +3,6 @@ import { motion } from "framer-motion"
 import {
   ArrowRight, BrainCircuit, FileText, Briefcase, CheckCircle2,
   Search, BarChart, Shield, Target, Users, Zap, Lock, User,
-  Moon, Sun
 } from "lucide-react"
 import { Button } from "../components/ui/Button"
 import { MatchScore } from "../components/shared/MatchScore"
@@ -14,8 +13,7 @@ import { Navigate, Link } from "react-router-dom"
 import type { UserRole } from "../services/authService"
 import LightRays from "../components/ui/LightRays"
 import { PremiumCard, PremiumCardContent, PremiumCardTitle, PremiumCardDescription } from "../components/ui/PremiumCard"
-import { settingsService } from "../services/settingsService"
-import { useEffect } from "react"
+
 
 export default function Landing() {
   const { user } = useAuth()
@@ -25,25 +23,9 @@ export default function Landing() {
   const [authMode, setAuthMode] = useState<"login" | "register">("login")
   const [selectedRole, setSelectedRole] = useState<UserRole>("candidate")
 
-  const [theme, setTheme] = useState(settingsService.getSettings().appearance.theme)
+ 
 
-  useEffect(() => {
-    // Make sure theme matches settings service
-    setTheme(settingsService.getSettings().appearance.theme)
-  }, [])
-
-  const toggleTheme = () => {
-    const isDark = document.documentElement.classList.contains('dark')
-    const newTheme = isDark ? 'Light' : 'Dark'
-    settingsService.updateSettings({
-      appearance: {
-        ...settingsService.getSettings().appearance,
-        theme: newTheme
-      }
-    })
-    setTheme(newTheme)
-  }
-
+  
   // If already logged in, redirect to dashboard
   if (user) {
     const dashboardPath = user.role === "admin" ? "/admin" : `/${user.role}/dashboard`

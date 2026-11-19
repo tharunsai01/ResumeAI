@@ -26,5 +26,24 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+export const verifyEmailSchema = z.object({ token: z.string().min(20).max(200) });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(20).max(200),
+  password,
+});
+
+export const googleSchema = z.object({
+  credential: z.string().min(20),
+  role: z.enum(['candidate', 'recruiter']).optional(),
+  companyName: z.string().trim().min(1).max(150).optional(),
+});
+
+export type GoogleInput = z.infer<typeof googleSchema>;
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
