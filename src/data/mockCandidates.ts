@@ -1,32 +1,7 @@
 import { mockResumeAnalysis } from "./mockResume"
+import type { Candidate } from "../types/candidate"
 
-export interface Candidate {
-  id: string;
-  summary: string;
-  personalInfo: {
-    name: string;
-    email: string;
-    phone: string;
-    location: string;
-    linkedin: string;
-  };
-  skills: {
-    languages: string[];
-    frameworks: string[];
-    tools: string[];
-  };
-  experience: {
-    role: string;
-    company: string;
-    duration: string;
-    highlights: string[];
-  }[];
-  education: {
-    degree: string;
-    institution: string;
-    year: string;
-  }[];
-}
+export type { Candidate }
 
 export const mockCandidates: Candidate[] = [
   {

@@ -1,74 +1,22 @@
-import type { SkillData } from "./mockSkills"
+import type {
+  CareerLevel,
+  Education,
+  Experience,
+  Project,
+  CareerPreferences,
+  CandidateProfile
+} from "../types/candidate"
+import type { JobType, WorkMode } from "../types/job"
 
-export type CareerLevel = "Fresher" | "Entry Level" | "Mid Level" | "Senior" | "Lead"
-export type JobType = "Full-time" | "Part-time" | "Internship" | "Contract"
-export type WorkMode = "On-site" | "Hybrid" | "Remote"
-
-export interface Education {
-  id: string
-  degree: string
-  fieldOfStudy: string
-  institution: string
-  startYear: string
-  endYear: string
-  grade?: string
-}
-
-export interface Experience {
-  id: string
-  jobTitle: string
-  company: string
-  location: string
-  startDate: string
-  endDate: string
-  currentlyWorking: boolean
-  description: string
-}
-
-export interface Project {
-  id: string
-  name: string
-  description: string
-  technologies: string[]
-  projectUrl?: string
-  githubUrl?: string
-  startDate: string
-  endDate: string
-}
-
-export interface CareerPreferences {
-  preferredJobTitles: string[]
-  preferredLocations: string[]
-  preferredJobType: JobType[]
-  preferredWorkMode: WorkMode[]
-  preferredExperienceLevel: CareerLevel
-  expectedSalary: string
-  willingToRelocate: boolean
-}
-
-export interface CandidateProfile {
-  id: string
-  fullName: string
-  email: string
-  phone: string
-  location: string
-  linkedin: string
-  github: string
-  portfolio: string
-  avatar: string
-  summary: string
-  currentRole: string
-  yearsOfExperience: string
-  careerLevel: CareerLevel
-  skills: Pick<SkillData, "id" | "name" | "level" | "category">[]
-  education: Education[]
-  experience: Experience[]
-  projects: Project[]
-  careerPreferences: CareerPreferences
-  careerInterests: string[]
-  openToWork: boolean
-  visibility: "Visible to Recruiters" | "Private"
-  profileCompletion: number
+export type {
+  CareerLevel,
+  JobType,
+  WorkMode,
+  Education,
+  Experience,
+  Project,
+  CareerPreferences,
+  CandidateProfile
 }
 
 export const defaultMockProfile: CandidateProfile = {

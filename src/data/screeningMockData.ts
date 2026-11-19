@@ -1,16 +1,8 @@
-import type { AppStatus, AIScreeningStatus } from "./recruiterMockData"
+import type { ScreeningJob, DetailedScreeningCandidate } from "../types/screening"
 
 export const AI_SCREENING_THRESHOLD = 80
 
-export interface ScreeningJob {
-  id: string
-  title: string
-  location: string
-  applications: number
-  screened: number
-  strongMatches: number
-  pending: number
-}
+export type { ScreeningJob, DetailedScreeningCandidate }
 
 export const screeningJobs: ScreeningJob[] = [
   {
@@ -55,26 +47,6 @@ export const jobRequirements = {
       "Collaborate with cross-functional teams to define, design, and ship new features."
     ]
   }
-}
-
-export interface DetailedScreeningCandidate {
-  id: string
-  name: string
-  role: string
-  location: string
-  experience: string
-  skills: { name: string; proficiency: string; matchType: "Matched" | "Partial" | "Missing" }[]
-  overallMatch: number
-  skillMatch: number
-  experienceMatch: number
-  educationMatch: number
-  roleSimilarity: number
-  keywordMatch: number
-  status: AppStatus
-  screeningStatus: AIScreeningStatus
-  appliedDate: string
-  matchedStrengths: string[]
-  potentialGaps: string[]
 }
 
 export const initialScreeningCandidates: DetailedScreeningCandidate[] = [

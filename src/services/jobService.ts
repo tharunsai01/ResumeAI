@@ -1,27 +1,14 @@
+import { env } from "../config/env"
 import { mockJobs } from "../data/mockJobs"
-import type { Job } from "../data/mockJobs"
+import type { Job, JobMatchResult, RecruiterJob } from "../types/job"
 import { mockResumeAnalysis } from "../data/mockResume"
 import type { ResumeAnalysisResult } from "../data/mockResume"
 import { profileService } from "./profileService"
 import { initialRecruiterJobs } from "../data/recruiterMockData"
-import type { RecruiterJob } from "../data/recruiterMockData"
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-export interface JobMatchResult {
-  job: Job
-  skillMatch: number
-  experienceMatch: number
-  educationMatch: number
-  roleSimilarity: number
-  overallMatch: number
-  matchedSkills: string[]
-  missingSkills: string[]
-  explanation: {
-    strengths: string[]
-    improvements: string[]
-  }
-}
+export type { JobMatchResult }
 
 const STORAGE_KEY = "hiresmart_created_jobs"
 const RECRUITER_STORAGE_KEY = "hiresmart_recruiter_jobs"
@@ -51,6 +38,9 @@ export const jobService = {
   },
 
   getJobs: async (): Promise<Job[]> => {
+    if (!env.useMock) {
+      throw new Error("Live API mode is not yet configured for jobService.")
+    }
     await delay(0)
     let customJobs: Job[] = []
     if (typeof window !== "undefined") {
@@ -58,7 +48,7 @@ export const jobService = {
       if (stored) {
         try {
           customJobs = JSON.parse(stored)
-        } catch (_) {}
+        } catch (_) { }
       }
     }
     return [...customJobs, ...mockJobs]
@@ -77,12 +67,12 @@ export const jobService = {
     const jobs = await jobService.getRecruiterJobs()
     const newId = `job_${Date.now()}`
 
-    const skillsList: string[] = jobData.skills 
-      ? jobData.skills 
+    const skillsList: string[] = jobData.skills
+      ? jobData.skills
       : Array.from(new Set([
-          ...(jobData.requiredSkills || []),
-          ...(jobData.preferredSkills || [])
-        ]))
+        ...(jobData.requiredSkills || []),
+        ...(jobData.preferredSkills || [])
+      ]))
 
     const newJob: RecruiterJob = {
       id: newId,
@@ -108,7 +98,7 @@ export const jobService = {
       let customJobs: any[] = []
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        try { customJobs = JSON.parse(stored) } catch (_) {}
+        try { customJobs = JSON.parse(stored) } catch (_) { }
       }
       customJobs.unshift({
         ...newJob,
@@ -133,11 +123,11 @@ export const jobService = {
     if (index === -1) return undefined
 
     const existing = jobs[index]
-    const updatedSkills = updates.skills 
-      ? updates.skills 
-      : (updates.requiredSkills 
-          ? Array.from(new Set([...updates.requiredSkills, ...(updates.preferredSkills || [])])) 
-          : existing.skills)
+    const updatedSkills = updates.skills
+      ? updates.skills
+      : (updates.requiredSkills
+        ? Array.from(new Set([...updates.requiredSkills, ...(updates.preferredSkills || [])]))
+        : existing.skills)
 
     const updatedJob: RecruiterJob = {
       ...existing,
@@ -162,7 +152,7 @@ export const jobService = {
             customJobs[cIndex] = { ...customJobs[cIndex], ...updatedJob, type: updatedJob.jobType }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(customJobs))
           }
-        } catch (_) {}
+        } catch (_) { }
       }
 
       window.dispatchEvent(new Event("hiresmart_jobs_updated"))
@@ -183,7 +173,7 @@ export const jobService = {
           let customJobs: any[] = JSON.parse(stored)
           customJobs = customJobs.filter(j => j.id !== id)
           localStorage.setItem(STORAGE_KEY, JSON.stringify(customJobs))
-        } catch (_) {}
+        } catch (_) { }
       }
 
       window.dispatchEvent(new Event("hiresmart_jobs_updated"))
@@ -194,13 +184,13 @@ export const jobService = {
   calculateJobMatch: (candidate: ResumeAnalysisResult, job: Job): JobMatchResult => {
     // Deterministic calculation based on candidate skills vs job requirements
     const candidateSkillNames = candidate.skills.map(s => s.name.toLowerCase())
-    
+
     const matchedSkills = job.skills.filter(s => candidateSkillNames.includes(s.toLowerCase()))
     const missingSkills = job.skills.filter(s => !candidateSkillNames.includes(s.toLowerCase()))
-    
+
     // Skill Match
-    const skillMatch = job.skills.length > 0 
-      ? Math.round((matchedSkills.length / job.skills.length) * 100) 
+    const skillMatch = job.skills.length > 0
+      ? Math.round((matchedSkills.length / job.skills.length) * 100)
       : 100
 
     // Experience Match - simple heuristic based on job experience requirement
@@ -218,7 +208,7 @@ export const jobService = {
     const prefs = profileService.getCandidateProfile().careerPreferences
     let prefMatch = 0
     let prefFactors = 0
-    
+
     if (prefs.preferredLocations.length > 0) {
       prefFactors++
       if (prefs.preferredLocations.some(l => job.location.toLowerCase().includes(l.toLowerCase()))) {
@@ -227,28 +217,28 @@ export const jobService = {
         prefMatch += 50
       }
     }
-    
+
     if (prefs.preferredJobType.length > 0) {
       prefFactors++
       if (prefs.preferredJobType.some(t => job.type.toLowerCase().includes(t.toLowerCase()))) {
         prefMatch += 100
       }
     }
-    
+
     if (prefs.preferredJobTitles.length > 0) {
       prefFactors++
       if (prefs.preferredJobTitles.some(t => job.title.toLowerCase().includes(t.toLowerCase()))) {
         prefMatch += 100
       }
     }
-    
+
     const preferenceMatchScore = prefFactors > 0 ? prefMatch / prefFactors : 100
 
     // Overall Match (Weighted average incorporating preferences)
     const overallMatch = Math.round(
-      (skillMatch * 0.45) + 
-      (experienceMatch * 0.20) + 
-      (roleSimilarity * 0.10) + 
+      (skillMatch * 0.45) +
+      (experienceMatch * 0.20) +
+      (roleSimilarity * 0.10) +
       (educationMatch * 0.10) +
       (preferenceMatchScore * 0.15)
     )

@@ -1,20 +1,6 @@
-export interface Job {
-  id: string
-  title: string
-  company: string
-  location: string
-  category: string
-  salary: string
-  type: "Full-time" | "Part-time" | "Internship" | "Contract"
-  experience: "Fresher" | "0–2 Years" | "2–5 Years" | "5+ Years"
-  description: string
-  aboutCompany: string
-  additionalInfo: string
-  responsibilities: string[]
-  requirements: string[]
-  skills: string[]
-  postedDate: string
-}
+import type { Job } from "../types/job"
+
+export type { Job }
 
 export const mockJobs: Job[] = [
   {

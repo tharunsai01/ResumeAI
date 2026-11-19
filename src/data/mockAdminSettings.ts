@@ -1,80 +1,25 @@
-export interface AdminProfile {
-  id: string
-  name: string
-  email: string
-  role: string
-  status: string
-  emailVerified: boolean
-  department?: string
-  createdAt: string
-  lastActive: string
-  phone?: string
-  avatar?: string | null
-}
+import type { 
+  AdminProfile, 
+  AdminSecurity, 
+  AdminSession, 
+  AdminSessionPreferences, 
+  AdminNotifications, 
+  AdminAppearance, 
+  AdminPrivacy, 
+  AdminActivityItem, 
+  AdminAccountState 
+} from "../types/admin"
 
-export interface AdminSecurity {
-  twoFactorEnabled: boolean
-  lastPasswordChange: string
-}
-
-export interface AdminSession {
-  id: string
-  device: string
-  browser: string
-  location: string
-  lastActive: string
-  isCurrent: boolean
-}
-
-export interface AdminSessionPreferences {
-  timeoutMinutes: number
-}
-
-export interface AdminNotifications {
-  alerts: {
-    complaint: boolean
-    criticalSecurity: boolean
-    systemHealth: boolean
-    aiEvaluation: boolean
-    userManagement: boolean
-    skillTaxonomy: boolean
-    auditActivity: boolean
-  }
-  channels: {
-    inApp: boolean
-    email: boolean
-  }
-}
-
-export interface AdminAppearance {
-  theme: "Dark" | "Light" | "System"
-  density: "Comfortable" | "Compact"
-  animations: boolean
-}
-
-export interface AdminPrivacy {
-  profileVisibility: "Private" | "Organization Only"
-  activityVisibility: "Private" | "Organization Only"
-  showEmailInProfile: boolean
-}
-
-export interface AdminActivityItem {
-  id: string
-  action: string
-  time: string
-}
-
-export interface AdminAccountState {
-  profile: AdminProfile
-  security: AdminSecurity
-  sessions: {
-    preferences: AdminSessionPreferences
-    activeList: AdminSession[]
-  }
-  notifications: AdminNotifications
-  appearance: AdminAppearance
-  privacy: AdminPrivacy
-  recentActivity: AdminActivityItem[]
+export type { 
+  AdminProfile, 
+  AdminSecurity, 
+  AdminSession, 
+  AdminSessionPreferences, 
+  AdminNotifications, 
+  AdminAppearance, 
+  AdminPrivacy, 
+  AdminActivityItem, 
+  AdminAccountState 
 }
 
 export const defaultMockAdminAccount: AdminAccountState = {

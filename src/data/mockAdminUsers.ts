@@ -1,39 +1,15 @@
-export type AdminUserRole = "Candidate" | "Recruiter" | "Administrator"
-export type AdminUserStatus = "Active" | "Suspended" | "Pending"
-export type AdminUserVerification = "Verified" | "Unverified"
+import type { 
+  AdminUserRole, 
+  AdminUserStatus, 
+  AdminUserVerification, 
+  AdminUser 
+} from "../types/admin"
 
-export interface AdminUser {
-  id: string
-  name: string
-  email: string
-  role: AdminUserRole
-  status: AdminUserStatus
-  verification: AdminUserVerification
-  joinedAt: string
-  lastActive: string
-  profile?: {
-    headline?: string
-    company?: string
-    education?: string
-    experience?: string
-    skills?: string[]
-    department?: string
-  }
-  activitySummary?: {
-    label1: string
-    value1: number
-    label2: string
-    value2: number
-    label3: string
-    value3: number
-  }
-  recentActivity?: {
-    action: string
-    time: string
-  }[]
-  security?: {
-    events: number
-  }
+export type { 
+  AdminUserRole, 
+  AdminUserStatus, 
+  AdminUserVerification, 
+  AdminUser 
 }
 
 export const mockAdminUsers: AdminUser[] = [

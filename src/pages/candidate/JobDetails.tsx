@@ -10,7 +10,7 @@ import { MatchScore } from "../../components/shared/MatchScore"
 import { jobService } from "../../services/jobService"
 import type { JobMatchResult } from "../../services/jobService"
 import { useJobActions } from "../../hooks/useJobActions"
-import { mockResumeAnalysis } from "../../data/mockResume"
+import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import SpotlightCard from "../../components/ui/SpotlightCard";
@@ -24,6 +24,7 @@ export default function CandidateJobDetails() {
   const isApplyModalOpen = searchParams.get("apply") === "true"
 
   const { isJobSaved, toggleSaveJob, hasApplied, applyToJob } = useJobActions()
+  const activeResume = resumeService.getActiveResumeAnalysis()
   
   const [loading, setLoading] = React.useState(true)
   const [matchData, setMatchData] = React.useState<JobMatchResult | null>(null)
@@ -38,7 +39,7 @@ export default function CandidateJobDetails() {
         if (!jobId) return
         const job = await jobService.getJobById(jobId)
         if (job) {
-          const match = jobService.calculateJobMatch(mockResumeAnalysis, job)
+          const match = jobService.calculateJobMatch(activeResume, job)
           setMatchData(match)
         }
       } finally {
@@ -66,7 +67,7 @@ export default function CandidateJobDetails() {
 
   if (loading) {
     return (
-      <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+      <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
         <div className="flex items-center justify-center h-[60vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-indigo/30 border-t-brand-indigo" />
@@ -79,7 +80,7 @@ export default function CandidateJobDetails() {
 
   if (!matchData) {
     return (
-      <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+      <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
         <div className="text-center p-12">
           <h2 className="text-xl font-display font-semibold text-brand-navy">Job not found</h2>
           <Button className="mt-4" onClick={() => navigate("/candidate/jobs")}>Back to Jobs</Button>
@@ -93,7 +94,7 @@ export default function CandidateJobDetails() {
   const applied = hasApplied(job.id)
 
   return (
-    <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+    <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-5xl mx-auto space-y-6 pb-12">
         
         {/* Navigation & Actions */}
@@ -377,7 +378,7 @@ export default function CandidateJobDetails() {
                           </div>
                         </div>
                         <div className="text-left sm:text-right shrink-0">
-                          <p className="text-sm font-semibold text-brand-indigo">{mockResumeAnalysis.score}% Profile Score</p>
+                          <p className="text-sm font-semibold text-brand-indigo">{activeResume.score}% Profile Score</p>
                           <p className="text-xs font-semibold text-semantic-success">{matchData.overallMatch}% Job Match</p>
                         </div>
                       </div>

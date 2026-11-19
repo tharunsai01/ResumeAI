@@ -8,7 +8,7 @@ import { Button } from "../../components/ui/Button"
 import { Modal } from "../../components/ui/Modal"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { pipelineService } from "../../services/pipelineService"
-import { AI_SCREENING_THRESHOLD } from "../../data/screeningMockData"
+import { AI_SCREENING_THRESHOLD } from "../../services/aiScreeningService"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import { cn } from "../../lib/utils"
 import SpotlightCard from "../../components/ui/SpotlightCard";

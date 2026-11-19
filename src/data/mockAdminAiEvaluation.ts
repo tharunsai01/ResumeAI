@@ -1,25 +1,6 @@
-export interface FairnessPair {
-  id: string
-  scoreA: number
-  scoreB: number
-  difference: number
-  status: string
-}
+import type { FairnessPair, EvaluationRecord } from "../types/admin"
 
-export interface EvaluationRecord {
-  id: string
-  modelVersion: string
-  dataset: string
-  components: string
-  date: string
-  status: string
-  metrics: {
-    skillExtraction?: string
-    scoreStability?: string
-    fairness?: string
-    security?: string
-  }
-}
+export type { FairnessPair, EvaluationRecord }
 
 export const mockAiEvaluationData = {
   summary: {

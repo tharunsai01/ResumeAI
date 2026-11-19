@@ -1,3 +1,4 @@
+import { env } from "../config/env"
 import { initialPipelineCandidates } from "../data/pipelineMockData"
 import type { PipelineCandidate, PipelineStage } from "../data/pipelineMockData"
 import { applicationService } from "./applicationService"
@@ -46,6 +47,9 @@ export const pipelineService = {
   },
 
   updateCandidateStage(id: string, stage: PipelineStage): PipelineCandidate | null {
+    if (!env.useMock) {
+      throw new Error("Live API mode is not yet configured for pipelineService.")
+    }
     if (!id || !VALID_PIPELINE_STAGES.includes(stage)) {
       return null
     }

@@ -8,7 +8,7 @@ import { Badge } from "../../components/ui/Badge"
 import { Button } from "../../components/ui/Button"
 import { MatchScore } from "../../components/shared/MatchScore"
 import { useJobActions, type AppliedJob } from "../../hooks/useJobActions"
-import { mockResumeAnalysis } from "../../data/mockResume"
+import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import { jobService } from "../../services/jobService"
@@ -23,6 +23,7 @@ export default function CandidateApplicationDetails() {
   const navigate = useNavigate()
   
   const { updateApplicationNote, withdrawApplication } = useJobActions()
+  const activeResume = resumeService.getActiveResumeAnalysis()
 
   const [loading, setLoading] = React.useState(true)
   const [application, setApplication] = React.useState<AppliedJob | null>(null)
@@ -70,7 +71,7 @@ export default function CandidateApplicationDetails() {
         notes: appRecord.notes || ""
       }
 
-      const match = jobService.calculateJobMatch(mockResumeAnalysis, job)
+      const match = jobService.calculateJobMatch(activeResume, job)
       
       setApplication(fullApp)
       setNoteContent(appRecord.notes || "")
@@ -110,7 +111,7 @@ export default function CandidateApplicationDetails() {
 
   if (loading) {
     return (
-      <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+      <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
         <div className="flex items-center justify-center h-[60vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-indigo/30 border-t-brand-indigo" />
@@ -123,7 +124,7 @@ export default function CandidateApplicationDetails() {
 
   if (error) {
     return (
-      <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+      <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
         <div className="text-center p-12 max-w-md mx-auto">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-semantic-error/10 text-semantic-error mb-4">
             <AlertTriangle className="w-6 h-6" />
@@ -141,7 +142,7 @@ export default function CandidateApplicationDetails() {
 
   if (!application || !matchData) {
     return (
-      <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+      <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
         <div className="text-center p-12 max-w-md mx-auto">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-brand-gray/50 text-brand-navy/40 mb-4">
             <FileText className="w-6 h-6" />
@@ -173,7 +174,7 @@ export default function CandidateApplicationDetails() {
   const isWithdrawn = application.status === "Withdrawn"
 
   return (
-    <DashboardShell type="candidate" userName={mockResumeAnalysis.personalInfo.name}>
+    <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-5xl mx-auto space-y-6 pb-12">
         
         {/* Navigation */}
@@ -365,7 +366,7 @@ export default function CandidateApplicationDetails() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-brand-navy break-all">Rahul_Kumar_Resume.pdf</p>
-                        <p className="text-xs text-brand-navy/60 mt-1">Profile Score: {mockResumeAnalysis.score}%</p>
+                        <p className="text-xs text-brand-navy/60 mt-1">Profile Score: {activeResume.score}%</p>
                       </div>
                     </div>
                   </div>

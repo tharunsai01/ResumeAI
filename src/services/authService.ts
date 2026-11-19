@@ -1,12 +1,6 @@
-export type UserRole = "candidate" | "recruiter" | "admin"
+import type { UserRole, User } from "../types/auth"
 
-export interface User {
-  id: string
-  email: string
-  name: string
-  role: UserRole
-  company?: string // Optional, for recruiters
-}
+export type { UserRole, User }
 
 const USERS_KEY = "hiresmart_users"
 const SESSION_KEY = "hiresmart_session"

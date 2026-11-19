@@ -33,7 +33,7 @@ export default function RecruiterAbout() {
               <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-brand-blue/20 rounded-full blur-3xl"></div>
               
               <Target className="w-10 h-10 sm:w-12 sm:h-12 text-brand-indigo mx-auto mb-2 sm:mb-4 relative z-10" />
-              <h3 className="text-xl sm:text-2xl font-display font-bold relative z-10 break-words">Our Goal</h3>
+              <h3 className="text-xl sm:text-2xl font-display font-bold text-white relative z-10 break-words">Our Goal</h3>
               <div className="space-y-3 sm:space-y-4 text-white/80 font-medium text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl mx-auto relative z-10">
                 <p>
                   Traditional recruitment can require recruiters to manually review large numbers of resumes and compare candidate qualifications with job requirements.
@@ -49,13 +49,13 @@ export default function RecruiterAbout() {
         {/* HOW IT WORKS WORKFLOW */}
         <motion.div variants={slideUp} className="space-y-4 sm:space-y-6">
           <div className="text-center">
-            <h3 className="text-xl sm:text-2xl font-bold text-brand-navy break-words">How HireSmart AI Works</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-brand-navy dark:text-white break-words">How HireSmart AI Works</h3>
             <div className="w-16 h-1 bg-brand-indigo mx-auto mt-3 sm:mt-4 rounded-full"></div>
           </div>
           
           <PremiumCard className="border-brand-gray/30 shadow-sm">
             <PremiumCardContent className="p-4 sm:p-8">
-              <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 text-xs sm:text-sm font-bold text-brand-navy text-center">
+              <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 text-xs sm:text-sm font-bold text-brand-navy dark:text-white text-center">
                 {["Job Creation", "Candidate Applications", "Resume Analysis", "Skill Extraction", "Requirement Matching", "AI Match Score", "Candidate Ranking", "Recruiter Review", "Shortlisting", "Interview", "Hiring Decision"].map((step, idx, arr) => (
                   <React.Fragment key={idx}>
                     <div className="bg-brand-light/80 border border-brand-gray/30 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg shadow-sm hover:border-brand-indigo/40 hover:bg-brand-indigo/5 transition-colors">
@@ -122,12 +122,12 @@ export default function RecruiterAbout() {
                 <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-brand-indigo" />
               </div>
               <div className="min-w-0">
-                <h3 className="text-xl sm:text-2xl font-bold text-brand-navy mb-2 sm:mb-3 break-words">AI-Assisted Recruitment</h3>
-                <p className="text-brand-navy/80 font-medium mb-3 sm:mb-4 text-xs sm:text-sm md:text-base leading-relaxed break-words">
+                <h3 className="text-xl sm:text-2xl font-bold text-brand-navy dark:text-white mb-2 sm:mb-3 break-words">AI-Assisted Recruitment</h3>
+                <p className="text-brand-navy/80 dark:text-white/80 font-medium mb-3 sm:mb-4 text-xs sm:text-sm md:text-base leading-relaxed break-words">
                   HireSmart AI uses AI to assist with resume analysis and job-candidate matching.
                 </p>
-                <div className="bg-white border-l-4 border-brand-indigo p-3.5 sm:p-4 rounded-r-lg shadow-sm">
-                  <p className="text-brand-navy font-semibold text-xs sm:text-sm leading-relaxed">
+                <div className="bg-white dark:bg-brand-navy/80 border-l-4 border-brand-indigo p-3.5 sm:p-4 rounded-r-lg shadow-sm">
+                  <p className="text-brand-navy dark:text-white font-semibold text-xs sm:text-sm leading-relaxed">
                     <span className="text-brand-indigo font-bold">Important:</span> AI-generated recommendations are designed to support human decision-making. Recruiters remain responsible for reviewing candidates and making final hiring decisions.
                   </p>
                 </div>
@@ -141,7 +141,7 @@ export default function RecruiterAbout() {
           <div className="text-center px-4 sm:px-6 py-8 sm:py-12 rounded-2xl sm:rounded-3xl bg-brand-navy text-white relative overflow-hidden shadow-xl border border-brand-navy/80">
             <div className="absolute inset-0 bg-gradient-to-br from-brand-indigo/20 to-brand-blue/20"></div>
             <Globe className="w-10 h-10 sm:w-12 sm:h-12 text-white/50 mx-auto mb-4 sm:mb-6 relative z-10" />
-            <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 relative z-10 break-words">Our Vision</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 relative z-10 break-words">Our Vision</h3>
             <p className="text-base sm:text-xl md:text-2xl font-display font-medium leading-relaxed max-w-3xl mx-auto text-white/90 relative z-10 italic break-words">
               "To create a recruitment platform where technology reduces repetitive work while keeping human judgment, transparency, and responsible decision-making at the center of the hiring process."
             </p>

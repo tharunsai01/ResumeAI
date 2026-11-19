@@ -3,7 +3,7 @@ import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
 import { AdminStatCard } from "../../components/admin/AdminStatCard"
 import { Users, AlertOctagon, Activity, Briefcase, FileText } from "lucide-react"
 
-import { adminDashboardStats } from "../../data/mockAdminDashboard"
+import { adminDashboardService } from "../../services/adminDashboardService"
 import { PlatformActivityChart } from "../../components/admin/dashboard/PlatformActivityChart"
 import { ComplaintOverview } from "../../components/admin/dashboard/ComplaintOverview"
 import { AiOverview } from "../../components/admin/dashboard/AiOverview"
@@ -13,7 +13,7 @@ import { SkillTaxonomyOverview } from "../../components/admin/dashboard/SkillTax
 import { QuickActions } from "../../components/admin/dashboard/QuickActions"
 
 export default function AdminDashboard() {
-  const { totalUsers, activeUsers, activeJobs, openComplaints, resumesProcessed, aiEvaluationStatus } = adminDashboardStats
+  const { totalUsers, activeUsers, activeJobs, openComplaints, resumesProcessed, aiEvaluationStatus } = adminDashboardService.getStats()
 
   return (
     <AdminShell>

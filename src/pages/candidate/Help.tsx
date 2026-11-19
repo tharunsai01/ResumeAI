@@ -213,7 +213,7 @@ export default function HelpCenterPage() {
           </div>
 
           <div className="relative z-10 max-w-2xl mx-auto">
-            <h1 className="text-2xl sm:text-5xl font-display font-bold">How can we help you?</h1>
+            <h1 className="text-2xl sm:text-5xl font-display font-bold text-white">How can we help you?</h1>
             <p className="text-white/80 mt-4 text-sm sm:text-lg">
               Find answers about resumes, AI analysis, job matching, applications, and your HireSmart AI profile.
             </p>

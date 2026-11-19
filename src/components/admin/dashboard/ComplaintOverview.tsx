@@ -1,10 +1,11 @@
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
-import { complaintOverview } from "../../../data/mockAdminDashboard"
+import { adminDashboardService } from "../../../services/adminDashboardService"
 import { AlertOctagon, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export function ComplaintOverview() {
   const navigate = useNavigate()
+  const complaintOverview = adminDashboardService.getComplaintOverview()
 
   return (
     <PremiumCard className="flex flex-col">

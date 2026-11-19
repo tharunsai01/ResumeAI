@@ -1,10 +1,11 @@
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
-import { skillTaxonomyOverview } from "../../../data/mockAdminDashboard"
+import { adminDashboardService } from "../../../services/adminDashboardService"
 import { Tags, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export function SkillTaxonomyOverview() {
   const navigate = useNavigate()
+  const skillTaxonomyOverview = adminDashboardService.getSkillTaxonomyOverview()
 
   return (
     <PremiumCard className="flex flex-col">

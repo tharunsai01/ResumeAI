@@ -1,15 +1,6 @@
-export type NotificationType = "job_match" | "application" | "skill" | "interview" | "other"
+import type { NotificationType, AppNotification } from "../types/notifications"
 
-export interface AppNotification {
-  id: string
-  title: string
-  description: string
-  time: string
-  read: boolean
-  type: NotificationType
-  link?: string
-  role?: "candidate" | "recruiter" | "admin"
-}
+export type { NotificationType, AppNotification }
 
 export const defaultMockNotifications: AppNotification[] = [
   {

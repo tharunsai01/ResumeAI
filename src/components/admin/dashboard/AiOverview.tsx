@@ -1,11 +1,11 @@
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../ui/PremiumCard"
-import { aiEvaluationOverview } from "../../../data/mockAdminDashboard"
+import { adminDashboardService } from "../../../services/adminDashboardService"
 import { BrainCircuit, ArrowRight, ShieldCheck, CheckCircle2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export function AiOverview() {
   const navigate = useNavigate()
-  const { processing, security, evaluation } = aiEvaluationOverview
+  const { processing, security, evaluation } = adminDashboardService.getAiEvaluationOverview()
 
   return (
     <PremiumCard className="col-span-1 lg:col-span-2 flex flex-col">

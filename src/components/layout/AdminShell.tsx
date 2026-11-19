@@ -356,7 +356,7 @@ export function AdminShell({ children }: AdminShellProps) {
       <motion.aside
         initial={false}
         animate={{ width: isSidebarOpen ? 260 : 80 }}
-        className="hidden lg:block z-20 h-full bg-white border-r border-brand-gray/50 shadow-sm"
+        className="hidden lg:block z-20 h-full bg-white dark:bg-brand-navy border-r border-brand-gray/50 dark:border-white/10 shadow-sm"
       >
         {renderSidebarContent()}
       </motion.aside>
@@ -377,7 +377,7 @@ export function AdminShell({ children }: AdminShellProps) {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="fixed inset-y-0 left-0 z-40 w-[260px] bg-white border-r border-brand-gray/50 shadow-2xl lg:hidden"
+              className="fixed inset-y-0 left-0 z-40 w-[260px] bg-white dark:bg-brand-navy border-r border-brand-gray/50 dark:border-white/10 shadow-2xl lg:hidden"
             >
               {renderSidebarContent()}
             </motion.aside>
@@ -499,8 +499,8 @@ export function AdminShell({ children }: AdminShellProps) {
             <div className="relative" ref={profileRef}>
               <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-3 focus:outline-none">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium text-brand-navy">{user?.name || "Administrator"}</p>
-                  <p className="text-xs text-brand-navy/60 capitalize">Administrator</p>
+                  <p className="text-sm font-medium text-brand-navy dark:text-white">{user?.name || "Administrator"}</p>
+                  <p className="text-xs text-brand-navy/60 dark:text-white/60 capitalize">Administrator</p>
                 </div>
                 <div className="h-9 w-9 rounded-full bg-brand-indigo/10 text-brand-indigo flex items-center justify-center font-semibold border border-brand-indigo/20">
                   {user?.name?.charAt(0) || "A"}
@@ -518,7 +518,7 @@ export function AdminShell({ children }: AdminShellProps) {
                       transition={{ duration: 0.2 }}
                       className="glass-card absolute right-0 top-full mt-2 w-48 max-w-[calc(100vw-2rem)] z-50 overflow-hidden flex flex-col py-2"
                     >
-                      <button onClick={() => { setIsProfileOpen(false); navigate(`/admin/settings`); }} className="w-full text-left px-4 py-2 text-sm text-brand-navy/70 hover:bg-brand-light hover:text-brand-indigo transition-colors flex items-center gap-2">
+                      <button onClick={() => { setIsProfileOpen(false); navigate(`/admin/settings`); }} className="w-full text-left px-4 py-2 text-sm text-brand-navy/70 dark:text-white/70 hover:bg-brand-light dark:hover:bg-white/10 hover:text-brand-indigo dark:hover:text-white transition-colors flex items-center gap-2">
                         <Settings className="w-4 h-4" /> Settings
                       </button>
                       <div className="h-px w-full bg-brand-gray/30 my-1" />
@@ -533,7 +533,7 @@ export function AdminShell({ children }: AdminShellProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-8 bg-brand-light">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-8 bg-brand-light dark:bg-brand-navy">
           <div className="mx-auto max-w-7xl h-full">
             <AnimatePresence mode="wait">
               <PageTransition>

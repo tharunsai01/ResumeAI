@@ -1,3 +1,4 @@
+import { env } from "../config/env"
 import { defaultMockProfile } from "../data/mockProfile"
 import type { CandidateProfile, Education, Experience, Project } from "../data/mockProfile"
 import type { SkillData } from "../data/mockSkills"
@@ -23,6 +24,9 @@ export const profileService = {
   },
 
   saveProfile(profile: CandidateProfile): void {
+    if (!env.useMock) {
+      throw new Error("Live API mode is not yet configured for profileService.")
+    }
     const completion = this.calculateProfileCompletion(profile)
     const updatedProfile = { ...profile, profileCompletion: completion }
     if (typeof window !== "undefined") {

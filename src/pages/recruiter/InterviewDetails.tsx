@@ -7,8 +7,8 @@ import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } 
 import { Button } from "../../components/ui/Button"
 import { Modal } from "../../components/ui/Modal"
 import { staggerContainer, slideUp } from "../../lib/animations"
-import { initialInterviews } from "../../data/pipelineMockData"
-import type { MockInterview } from "../../data/pipelineMockData"
+import { interviewService } from "../../services/interviewService"
+import type { MockInterview } from "../../services/interviewService"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import { cn } from "../../lib/utils"
 
@@ -37,7 +37,7 @@ export default function RecruiterInterviewDetails() {
   const { interviewId } = useParams()
   
   const [loading, setLoading] = React.useState(true)
-  const [interview, setInterview] = React.useState<MockInterview | undefined>(initialInterviews.find(i => i.id === interviewId))
+  const [interview, setInterview] = React.useState<MockInterview | undefined>(() => interviewService.getRecruiterInterviewById(interviewId || ""))
   
   // Actions state
   const [rescheduleModalOpen, setRescheduleModalOpen] = React.useState(false)

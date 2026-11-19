@@ -111,7 +111,14 @@ export default function Landing() {
               <button onClick={handleSignIn} className="text-sm font-semibold text-brand-navy dark:text-white/80 hover:text-brand-indigo transition-colors px-4 py-2 hidden sm:block">
                 Sign In
               </button>
-              <Button onClick={handleGetStarted} className="px-6 py-2.5 h-auto">Get Started</Button>
+              <Button onClick={handleGetStarted} className="px-4 sm:px-6 py-2 sm:py-2.5 h-auto text-xs sm:text-sm">Get Started</Button>
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle navigation menu"
+                className="p-2 rounded-lg text-brand-navy/60 dark:text-white/60 hover:text-brand-indigo dark:hover:text-brand-indigo lg:hidden transition-colors shrink-0"
+              >
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
           </div>
         </div>
@@ -260,7 +267,7 @@ export default function Landing() {
                   {/* Match Node */}
                   <motion.div animate={{ y: [-8, 8, -8] }} transition={{ repeat: Infinity, duration: 4.5 }} className="glass-card absolute right-10 top-1/2 -translate-y-1/2 p-6 w-56 z-10">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="font-semibold text-brand-navy">Best Match</h3>
+                      <h3 className="font-semibold text-brand-navy dark:text-white">Best Match</h3>
                       <MatchScore score={94} size="sm" />
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -351,7 +358,7 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold mb-4 sm:mb-6 break-words">Take Control of Your Career Trajectory</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-white mb-4 sm:mb-6 break-words">Take Control of Your Career Trajectory</h2>
                 <ul className="space-y-4 mb-8 sm:mb-10">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-brand-blue shrink-0 mt-0.5" />
@@ -530,27 +537,27 @@ export default function Landing() {
         <section className="py-16 sm:py-20 lg:py-24 bg-brand-navy text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <Shield className="w-12 h-12 sm:w-16 sm:h-16 text-brand-blue mx-auto mb-4 sm:mb-6" />
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold mb-8 sm:mb-12 break-words">Built on Trust and Responsibility</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-white mb-8 sm:mb-12 break-words">Built on Trust and Responsibility</h2>
 
             <div className="grid md:grid-cols-3 gap-8">
               <div className="bg-white/5 p-8 rounded-2xl border border-white/10 text-left">
                 <Lock className="w-8 h-8 text-brand-blue mb-4" />
-                <h3 className="text-xl font-bold mb-3">Secure & Private</h3>
-                <p className="text-white/60 text-sm leading-relaxed">
+                <h3 className="text-xl font-bold text-white mb-3">Secure & Private</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
                   Candidate data is strictly private. Resumes and personal information are handled securely and only shared with explicitly applied jobs.
                 </p>
               </div>
               <div className="bg-white/5 p-8 rounded-2xl border border-white/10 text-left">
                 <BrainCircuit className="w-8 h-8 text-brand-blue mb-4" />
-                <h3 className="text-xl font-bold mb-3">Responsible AI</h3>
-                <p className="text-white/60 text-sm leading-relaxed">
+                <h3 className="text-xl font-bold text-white mb-3">Responsible AI</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
                   Our AI models are designed for transparent matching. We provide the "why" behind every match score to prevent hidden algorithmic bias.
                 </p>
               </div>
               <div className="bg-white/5 p-8 rounded-2xl border border-white/10 text-left">
                 <Users className="w-8 h-8 text-brand-blue mb-4" />
-                <h3 className="text-xl font-bold mb-3">Human Final Say</h3>
-                <p className="text-white/60 text-sm leading-relaxed">
+                <h3 className="text-xl font-bold text-white mb-3">Human Final Say</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
                   AI performs the heavy lifting of screening and matching, but no automatic hiring decisions are made. Recruiters retain total control.
                 </p>
               </div>
@@ -692,8 +699,8 @@ function MatchBar({ label, score }: { label: string, score: number }) {
   return (
     <div>
       <div className="flex justify-between text-sm mb-1.5">
-        <span className="text-brand-navy/70 font-medium">{label}</span>
-        <span className="font-bold text-brand-navy">{score}%</span>
+        <span className="text-brand-navy/70 dark:text-white/70 font-medium">{label}</span>
+        <span className="font-bold text-brand-navy dark:text-white">{score}%</span>
       </div>
       <div className="h-2 w-full bg-brand-gray/30 rounded-full overflow-hidden">
         <motion.div

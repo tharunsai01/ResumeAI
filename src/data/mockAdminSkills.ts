@@ -1,31 +1,18 @@
-export type SkillStatus = "Active" | "Inactive"
-export type CategoryStatus = "Active" | "Inactive"
+import type { 
+  SkillStatus, 
+  CategoryStatus, 
+  AdminSkillCategory, 
+  SkillTaxonomy, 
+  TaxonomyActivity 
+} from "../types/admin"
 
-export interface SkillCategory {
-  id: string
-  name: string
-  description: string
-  status: CategoryStatus
-}
+export type SkillCategory = AdminSkillCategory
 
-export interface SkillTaxonomy {
-  id: string
-  name: string
-  categoryId: string
-  aliases: string[]
-  description: string
-  usageCount: number
-  status: SkillStatus
-  createdAt: string
-  updatedAt: string
-}
-
-export interface TaxonomyActivity {
-  id: string
-  action: string
-  skill: string
-  actor: string
-  time: string
+export type { 
+  SkillStatus, 
+  CategoryStatus, 
+  SkillTaxonomy, 
+  TaxonomyActivity 
 }
 
 export const initialSkillCategories: SkillCategory[] = [
