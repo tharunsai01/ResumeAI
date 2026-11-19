@@ -13,7 +13,9 @@
         "test:phase4": "node scripts/test-phase4.js",
         "test:phase4:offline": "node scripts/test-phase4-offline.js",
         "test:phase5": "node scripts/test-phase5.js",
-        "test:phase5:offline": "node scripts/test-phase5-offline.js"
+        "test:phase5:offline": "node scripts/test-phase5-offline.js",
+        "test:phase6": "node scripts/test-phase6.js",
+        "test:phase6:offline": "node scripts/test-phase6-offline.js"
     },
     "engines": {
         "node": ">=18"

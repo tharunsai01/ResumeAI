@@ -9,15 +9,28 @@ export function skillKey(name) {
     .replace(/[\s._\-/]+/g, "");
 }
 
-// Remove "(...)" notes and trailing version numbers: "Python 3.11" -> "Python"
+// Words that describe how well someone knows a skill, not the skill itself.
+const LEADING_ADJECTIVES = /^(?:basic|working|strong|good|solid|hands-on|practical|proficient|expert|intermediate|beginner|advanced|fundamental)\s+/i;
+const LEADING_NOUNS = /^(?:experience|knowledge|understanding|familiarity|proficiency|expertise|exposure|skills?)\s+(?:in|with|of|on|using)\s+/i;
+const TRAILING_NOUNS = /\s+(?:knowledge|skills?|proficiency|expertise|fundamentals|basics)$/i;
+
+// Remove "(...)" notes, level words and trailing version numbers:
+// "Python 3.11" -> "Python", "Basic machine learning knowledge" -> "machine learning"
 export function cleanSkillName(raw) {
   if (typeof raw !== "string") return "";
-  const cleaned = raw
+  let cleaned = raw
     .replace(/\(.*?\)/g, " ")
     .replace(/^[\s\-*•·–]+/, "")
-    .replace(/\s+v?\d+(\.\d+)*\+?$/i, "")
     .replace(/\s+/g, " ")
     .trim();
+
+  for (let i = 0; i < 3; i++) {
+    const before = cleaned;
+    cleaned = cleaned.replace(LEADING_ADJECTIVES, "").replace(LEADING_NOUNS, "").replace(TRAILING_NOUNS, "").trim();
+    if (cleaned === before) break;
+  }
+
+  cleaned = cleaned.replace(/\s+v?\d+(\.\d+)*\+?$/i, "").replace(/\s+/g, " ").trim();
   if (cleaned.length === 0 || cleaned.length > 60 || !/[a-z]/i.test(cleaned)) return "";
   return cleaned;
 }

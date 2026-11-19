@@ -2,6 +2,7 @@ import { parseResume } from "./parsing/parseResume.js";
 import { cleanText } from "./parsing/cleanText.js";
 import { scanForInjection } from "./security/injectionScan.js";
 import { extractResume } from "./extraction/extractResume.js";
+import { sha256 } from "./audit/hash.js";
 
 export { ResumeParseError, MAX_FILE_BYTES } from "./parsing/parseResume.js";
 export { extractResume, buildAnalysis, ExtractionError } from "./extraction/extractResume.js";
@@ -21,6 +22,20 @@ export { fromBoardJob, toMatchJob } from "./matching/jobAdapters.js";
 export { buildResumeReport } from "./report/resumeReport.js";
 export { buildSkillGap } from "./skillgap/skillGap.js";
 export { recommendJobs, recommendJobsSemantic } from "./recommend/recommendJobs.js";
+export { extractJobFromText, buildJobFromFacts } from "./jobs/extractJob.js";
+export { LlmError } from "./llm/jsonCall.js";
+export { buildBlindProfile, pseudonym } from "./blind/blindProfile.js";
+export { redactText } from "./blind/redact.js";
+export { aggregateUnknownSkills } from "./skills/unknownSkills.js";
+export { sha256 } from "./audit/hash.js";
+export {
+  AUDIT_TYPES,
+  auditResumeAnalyzed,
+  auditMatchScored,
+  auditScreeningRun,
+  auditJobExtracted,
+  auditInjectionDetected,
+} from "./audit/auditEvents.js";
 
 /**
  * Phase 1 pipeline: file -> parsed text -> cleaned -> security-scanned.
@@ -60,6 +75,7 @@ export async function analyzeResumeFile(buffer, filename, options = {}) {
       pageCount: processed.pageCount,
       wordCount: processed.wordCount,
     },
+    fileHash: sha256(buffer),
     security: processed.security,
     text: processed.text,
     analysis,

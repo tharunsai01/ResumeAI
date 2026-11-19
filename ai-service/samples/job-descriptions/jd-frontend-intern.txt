@@ -1,0 +1,18 @@
+Frontend Developer Intern
+
+We are a small product studio hiring a frontend intern for a 6-month internship. No prior professional experience is needed; freshers are welcome.
+
+What you will do
+- Build responsive pages and reusable components with React
+- Turn Figma designs into clean HTML and CSS
+- Fix bugs and improve performance with guidance from a mentor
+
+What we look for
+- Working knowledge of React, HTML, CSS and JavaScript
+- Currently pursuing or recently completed a Bachelor's degree in Computer Science or a related field
+- Good communication skills
+
+A plus
+- TypeScript
+- Tailwind CSS
+- Basic Git knowledge
