@@ -48,6 +48,47 @@ export const adminDashboardService = {
     return adminDashboardStats
   },
 
+  async fetchLiveStats() {
+    if (env.useMock) {
+      return adminDashboardStats
+    }
+    try {
+      const res = await httpClient.get<{ success: boolean; data: any }>("/admin/stats")
+      if (res?.data) {
+        const d = res.data
+        return {
+          ...adminDashboardStats,
+          totalUsers: {
+            value: d.users?.total ?? adminDashboardStats.totalUsers.value,
+            breakdown: {
+              candidates: d.users?.candidates ?? 0,
+              recruiters: d.users?.recruiters ?? 0,
+              administrators: d.users?.admins ?? 0,
+            },
+          },
+          activeJobs: {
+            ...adminDashboardStats.activeJobs,
+            value: d.jobs?.active ?? adminDashboardStats.activeJobs.value,
+          },
+          resumesProcessed: {
+            ...adminDashboardStats.resumesProcessed,
+            value: d.resumes?.total ?? adminDashboardStats.resumesProcessed.value,
+          },
+          overview: {
+            totalUsers: d.users?.total ?? 0,
+            totalJobs: d.jobs?.total ?? 0,
+            totalApplications: d.applications?.total ?? 0,
+            totalResumes: d.resumes?.total ?? 0,
+          },
+          liveRaw: d,
+        }
+      }
+    } catch (err) {
+      console.warn("[AdminDashboardService] Live stats fetch failed, fallback to mock:", err)
+    }
+    return adminDashboardStats
+  },
+
   getPlatformActivity() {
     return platformActivityData
   },

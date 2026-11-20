@@ -137,7 +137,7 @@ export default function RecruiterHiringPipeline() {
 
   return (
     <DashboardShell type="recruiter" userName="Recruiter">
-      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-[1600px] mx-auto h-[calc(100vh-80px)] flex flex-col relative">
+      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-[1600px] mx-auto h-[calc(100dvh-80px)] min-h-[500px] flex flex-col relative">
         
         {/* TOAST */}
         <AnimatePresence>

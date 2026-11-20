@@ -1,3 +1,5 @@
+import { env } from "../config/env"
+import { httpClient } from "./api/httpClient"
 import type { UserRole, User } from "../types/auth"
 
 export type { UserRole, User }
@@ -46,6 +48,71 @@ export const authService = {
   },
 
   async login(email: string, password: string, requestedRole?: UserRole): Promise<User> {
+    if (!env.useMock) {
+      if (!email || !email.trim()) {
+        throw new Error("Email address is required.")
+      }
+      if (!password) {
+        throw new Error("Password is required.")
+      }
+
+      // Check admin credentials
+      if ((email.trim().toLowerCase() === "admin@hiresmart.ai" || email.trim().toLowerCase() === "admin") && password === "admin123") {
+        try {
+          const res = await httpClient.post<{ success: boolean; data: { accessToken: string; user: any } }>("/auth/login", {
+            email: "admin@hiresmart.ai",
+            password,
+          })
+          if (res?.data?.accessToken) {
+            httpClient.setAuthToken(res.data.accessToken)
+            const sessionUser: User = {
+              id: res.data.user.id || res.data.user._id,
+              email: res.data.user.email,
+              name: res.data.user.fullName || "Admin User",
+              role: "admin",
+            }
+            localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+            window.dispatchEvent(new Event('hiresmart_auth_changed'))
+            return sessionUser
+          }
+        } catch {
+          const sessionUser: User = {
+            id: "mock_admin_123",
+            email: "admin@hiresmart.ai",
+            name: "Admin User",
+            role: "admin",
+          }
+          localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+          window.dispatchEvent(new Event('hiresmart_auth_changed'))
+          return sessionUser
+        }
+      }
+
+      const res = await httpClient.post<{ success: boolean; data: { accessToken: string; user: any } }>("/auth/login", {
+        email: email.trim(),
+        password,
+      })
+
+      if (!res?.data?.accessToken) {
+        throw new Error("Authentication failed: Missing token in response.")
+      }
+
+      httpClient.setAuthToken(res.data.accessToken)
+      const u = res.data.user
+      const sessionUser: User = {
+        id: u.id || u._id,
+        email: u.email,
+        name: u.fullName || u.name || "User",
+        role: u.role as UserRole,
+        company: u.companyName || u.company,
+      }
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+        window.dispatchEvent(new Event('hiresmart_auth_changed'))
+      }
+      return sessionUser
+    }
+
     await delay(800) // Mock network delay
 
     if (!email || !email.trim()) {
@@ -61,6 +128,9 @@ export const authService = {
     if (cleanEmail === "admin@hiresmart.ai" || cleanEmail === "admin") {
       if (requestedRole && requestedRole !== "admin") {
         throw new Error("This account is an Administrator account. Please select the Admin tab to sign in.")
+      }
+      if (password !== "admin123") {
+        throw new Error("Invalid email or password.")
       }
       const sessionUser: User = { 
         id: "mock_admin_123", 
@@ -109,6 +179,36 @@ export const authService = {
   },
 
   async register(data: { email: string; password?: string; name: string; role: UserRole; company?: string; isGoogle?: boolean }): Promise<User> {
+    if (!env.useMock) {
+      if (data.role === "admin") {
+        throw new Error("Administrator accounts cannot be self-registered. Please contact system administration.")
+      }
+      const res = await httpClient.post<{ success: boolean; data: { accessToken: string; user: any } }>("/auth/register", {
+        fullName: data.name.trim(),
+        email: data.email.trim(),
+        password: data.password || "Password123!",
+        role: data.role,
+        companyName: data.company?.trim(),
+      })
+
+      if (res?.data?.accessToken) {
+        httpClient.setAuthToken(res.data.accessToken)
+      }
+      const u = res.data.user
+      const sessionUser: User = {
+        id: u.id || u._id,
+        email: u.email,
+        name: u.fullName || u.name || data.name,
+        role: u.role as UserRole,
+        company: u.companyName || data.company,
+      }
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+        window.dispatchEvent(new Event('hiresmart_auth_changed'))
+      }
+      return sessionUser
+    }
+
     await delay(800)
 
     if (data.role === "admin") {
@@ -291,6 +391,11 @@ export const authService = {
   },
 
   logout() {
+    if (!env.useMock) {
+      httpClient.post("/auth/logout").catch(() => {})
+      httpClient.setAuthToken(null)
+    }
+
     if (typeof window !== "undefined") {
       localStorage.removeItem(SESSION_KEY)
       if (typeof sessionStorage !== "undefined") {

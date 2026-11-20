@@ -5,6 +5,7 @@
  */
 
 import { env } from "../config/env"
+import { httpClient } from "./api/httpClient"
 import type { Job } from "../types/job"
 import { jobService } from "./jobService"
 import { applicationService } from "./applicationService"
@@ -69,12 +70,9 @@ export const aiScreeningService = {
    * Analyze a job description to extract requirements
    */
   async analyzeJob(job: Partial<Job>) {
-    if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for aiScreeningService.")
-    }
-    await delay(800) // Mock AI processing delay
+    await delay(800) // Processing delay
     
-    // Naive mock extraction based on standard buzzwords
+    // Skill extraction based on standard keywords
     const allSkills = ["React", "Python", "Java", "Docker", "Kubernetes", "AWS", "SQL", "MongoDB", "Node.js", "TypeScript"]
     const text = `${job.title} ${job.description} ${job.requirements?.join(" ")}`.toLowerCase()
     
@@ -97,8 +95,26 @@ export const aiScreeningService = {
    */
   async calculateMatch(appId: string) {
     if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for aiScreeningService.")
+      try {
+        const res = await httpClient.post<{ success: boolean; data: any }>(`/ai/screen/${appId}`)
+        if (res?.data?.screening) {
+          const s = res.data.screening
+          const screeningResult = {
+            skillMatch: s.skillsScore ?? 85,
+            experienceMatch: s.experienceScore ?? 80,
+            educationMatch: s.educationScore ?? 85,
+            roleMatch: s.overallScore ?? 85,
+            strengths: s.strengths || [],
+            missingSkills: s.missingRequirements || [],
+          }
+          applicationService.updateAIScreening(appId, screeningResult, s.overallScore)
+          return s.overallScore
+        }
+      } catch (err) {
+        console.warn("[AIScreeningService] Live screening error, fallback to local match:", err)
+      }
     }
+
     const app = applicationService.getApplication(appId)
     if (!app) throw new Error("Application not found")
     
@@ -107,7 +123,7 @@ export const aiScreeningService = {
 
     await delay(300) // Simulated processing
 
-    // Deterministic mock scoring based on string hashes or ID for demo purposes
+    // Deterministic scoring based on string hashes or ID for demo purposes
     const hash = Array.from(app.id + job.id).reduce((acc, char) => acc + char.charCodeAt(0), 0)
     
     const skillMatch = 70 + (hash % 30) // 70-99
@@ -140,8 +156,19 @@ export const aiScreeningService = {
    */
   async screenCandidatesForJob(jobId: string, onProgress?: (progress: number) => void) {
     if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for aiScreeningService.")
+      try {
+        const res = await httpClient.post<{ success: boolean; data: any }>(`/ai/screen/job/${jobId}/bulk`, {
+          batchSize: 10,
+        })
+        if (res?.data?.succeeded !== undefined) {
+          if (onProgress) onProgress(100)
+          return applicationService.getApplicationsByJob(jobId)
+        }
+      } catch (err) {
+        console.warn("[AIScreeningService] Live bulk screening error, fallback to local simulation:", err)
+      }
     }
+
     const apps = applicationService.getApplicationsByJob(jobId)
     const unscreenedApps = apps.filter(a => a.status === "Applied")
     

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { NavLink, useNavigate } from "react-router-dom"
+import { NavLink, useNavigate, Link } from "react-router-dom"
 import { 
   LayoutDashboard, FileText, Search, Briefcase, 
   Settings, LogOut, Bell, User, Menu, BarChart,
@@ -27,6 +27,9 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
   const [isMobileOpen, setIsMobileOpen] = React.useState(false)
   const [isMoreOpen, setIsMoreOpen] = React.useState(false)
   const [isProfileOpen, setIsProfileOpen] = React.useState(false)
+  const [headerSearchTerm, setHeaderSearchTerm] = React.useState("")
+
+  const effectiveUserName = (userName && userName !== "User" && userName !== "Recruiter") ? userName : (authService.getCurrentUser()?.name || (type === "recruiter" ? "Recruiter" : "User"))
   
   // Notification State
   const [isNotifOpen, setIsNotifOpen] = React.useState(false)
@@ -183,8 +186,12 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex h-[80px] items-center px-5 border-b border-brand-gray/20">
           <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-[12px] bg-brand-indigo flex items-center justify-center shrink-0 shadow-sm transition-all">
+            <Link 
+              to={type === "candidate" ? "/candidate/dashboard" : "/recruiter/dashboard"}
+              className="flex items-center gap-3 cursor-pointer group"
+              aria-label="HireSmart AI Dashboard"
+            >
+              <div className="h-10 w-10 rounded-[12px] bg-brand-indigo flex items-center justify-center shrink-0 shadow-sm transition-all group-hover:scale-105">
                 <span className="text-white font-display font-bold text-lg">H</span>
               </div>
               {(isSidebarOpen || isMobileOpen) && (
@@ -192,7 +199,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                   HireSmart <span className="text-brand-indigo">AI</span>
                 </span>
               )}
-            </div>
+            </Link>
             {isMobileOpen ? (
               <button 
                 onClick={toggleMobile} 
@@ -400,7 +407,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="fixed inset-y-0 left-0 z-40 w-[260px] bg-white dark:bg-brand-navy border-r border-brand-gray/50 dark:border-white/10 shadow-2xl lg:hidden"
+              className="fixed inset-y-0 left-0 z-40 w-[260px] max-w-[85vw] bg-white dark:bg-brand-navy border-r border-brand-gray/50 dark:border-white/10 shadow-2xl lg:hidden"
             >
               {renderSidebarContent()}
             </motion.aside>
@@ -411,7 +418,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
-        <header className="flex h-16 items-center justify-between border-b border-brand-gray/50 bg-white/80 dark:bg-brand-navy/80 backdrop-blur-md px-4 sm:px-6 z-40 relative shadow-sm">
+        <header className="flex h-16 items-center justify-between border-b border-brand-gray/50 bg-white/80 dark:bg-brand-navy/80 backdrop-blur-md px-3 sm:px-6 z-40 relative shadow-sm">
           <div className="flex items-center gap-4">
             <button
               onClick={toggleMobile}
@@ -426,17 +433,27 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
               <Menu className="h-5 w-5" />
             </button>
             
-            <div className="hidden sm:flex items-center bg-brand-light dark:bg-white/5 rounded-full px-4 py-2 text-sm text-brand-navy/60 dark:text-white/60 w-64 border border-brand-gray/50 dark:border-white/10">
+            <div className="hidden sm:flex items-center bg-brand-light dark:bg-white/5 rounded-full px-4 py-2 text-sm text-brand-navy/60 dark:text-white/60 w-64 border border-brand-gray/50 dark:border-white/10 focus-within:border-brand-indigo transition-colors">
               <Search className="h-4 w-4 mr-2 text-brand-navy/40" />
               <input 
                 type="text" 
-                placeholder="Search..." 
-                className="bg-transparent border-none outline-none w-full placeholder:text-brand-navy/40 dark:placeholder:text-white/40"
+                placeholder={type === "candidate" ? "Search jobs..." : "Search candidates..."}
+                value={headerSearchTerm}
+                onChange={(e) => setHeaderSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && headerSearchTerm.trim()) {
+                    const destination = type === "candidate"
+                      ? `/candidate/jobs?search=${encodeURIComponent(headerSearchTerm.trim())}`
+                      : `/recruiter/candidates?search=${encodeURIComponent(headerSearchTerm.trim())}`
+                    navigate(destination)
+                  }
+                }}
+                className="bg-transparent border-none outline-none w-full placeholder:text-brand-navy/40 dark:placeholder:text-white/40 text-brand-navy dark:text-white"
               />
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             
             {/* Theme Toggle */}
             <button
@@ -528,11 +545,11 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
             <div className="relative" ref={profileRef}>
               <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-3 focus:outline-none">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium text-brand-navy dark:text-white">{userName}</p>
+                  <p className="text-sm font-medium text-brand-navy dark:text-white">{effectiveUserName}</p>
                   <p className="text-xs text-brand-navy/60 dark:text-white/60 capitalize">{type}</p>
                 </div>
                 <div className="h-9 w-9 rounded-full bg-brand-indigo/10 text-brand-indigo flex items-center justify-center font-semibold border border-brand-indigo/20">
-                  {userName.charAt(0)}
+                  {effectiveUserName.charAt(0)}
                 </div>
               </button>
 

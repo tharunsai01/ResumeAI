@@ -8,6 +8,7 @@ import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } 
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { jobService } from "../../services/jobService"
+import { authService } from "../../services/authService"
 import { cn } from "../../lib/utils"
 
 const StatCard = ({ title, data, icon: Icon, color, delay, loading }: any) => (
@@ -122,7 +123,7 @@ export default function RecruiterDashboard() {
         {/* 1. PAGE HEADER */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Good morning, Recruiter</h1>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-brand-navy break-words">Good morning, {(authService.getCurrentUser()?.name || "Recruiter").split(' ')[0]}</h1>
             <p className="text-sm sm:text-base text-brand-navy/60 mt-1">Here's an overview of your recruitment activity.</p>
           </div>
           <Button 

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, Filter, SlidersHorizontal } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { JobCard } from "../../components/shared/JobCard"
 import { Button } from "../../components/ui/Button"
@@ -18,15 +18,23 @@ let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(
 
 export default function CandidateJobs() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { savedJobs, toggleSaveJob, hasApplied } = useJobActions()
   const activeResume = resumeService.getActiveResumeAnalysis()
 
   const [loading, setLoading] = React.useState(true)
   const [allJobs, setAllJobs] = React.useState<JobMatchResult[]>([])
 
-  const [searchTerm, setSearchTerm] = React.useState("")
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState("")
+  const [searchTerm, setSearchTerm] = React.useState(() => searchParams.get("search") || "")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState(() => searchParams.get("search") || "")
   
+  React.useEffect(() => {
+    const query = searchParams.get("search")
+    if (query !== null) {
+      setSearchTerm(query)
+    }
+  }, [searchParams])
+
   React.useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm)

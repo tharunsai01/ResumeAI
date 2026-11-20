@@ -29,8 +29,13 @@ const candidateProfileSchema = new Schema(
     skills: [{ type: String, trim: true }],
     experience: [experienceSchema],
     education: [educationSchema],
-    links: { linkedin: String, github: String, portfolio: String },
+    links: {
+      linkedin: String,
+      github: String,
+      portfolio: String,
+    },
     preferredJobTypes: [{ type: String, enum: [...JOB_TYPES] }],
+    profileCompletion: { type: Number, default: 0, min: 0, max: 100 },
   },
   { timestamps: true },
 );

@@ -38,11 +38,31 @@ export class HttpClient {
   readonly baseUrl: string
   readonly defaultTimeoutMs: number
   readonly defaultHeaders: Record<string, string>
+  private authToken: string | null = null
 
   constructor(config: HttpClientConfig = {}) {
     this.baseUrl = config.baseUrl ?? env.apiBaseUrl
     this.defaultTimeoutMs = config.defaultTimeoutMs ?? DEFAULT_TIMEOUT_MS
     this.defaultHeaders = { ...(config.defaultHeaders ?? {}) }
+  }
+
+  setAuthToken(token: string | null): void {
+    this.authToken = token
+    if (typeof window !== "undefined") {
+      if (token) {
+        localStorage.setItem("hiresmart_access_token", token)
+      } else {
+        localStorage.removeItem("hiresmart_access_token")
+      }
+    }
+  }
+
+  getAuthToken(): string | null {
+    if (this.authToken) return this.authToken
+    if (typeof window !== "undefined") {
+      this.authToken = localStorage.getItem("hiresmart_access_token")
+    }
+    return this.authToken
   }
 
   /**
@@ -96,6 +116,11 @@ export class HttpClient {
     const headers: Record<string, string> = {
       ...this.defaultHeaders,
       ...(customHeaders ?? {}),
+    }
+
+    const token = this.getAuthToken()
+    if (token && !headers["Authorization"] && !headers["authorization"]) {
+      headers["Authorization"] = `Bearer ${token}`
     }
 
     if (body === undefined || body === null) {
@@ -177,6 +202,7 @@ export class HttpClient {
 
     try {
       const response = await fetch(url, {
+        credentials: "include",
         ...options,
         method,
         headers,

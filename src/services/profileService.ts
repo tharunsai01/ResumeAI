@@ -1,4 +1,5 @@
 import { env } from "../config/env"
+import { httpClient } from "./api/httpClient"
 import { defaultMockProfile } from "../data/mockProfile"
 import type { CandidateProfile, Education, Experience, Project } from "../data/mockProfile"
 import type { SkillData } from "../data/mockSkills"
@@ -23,15 +24,92 @@ export const profileService = {
     return defaultMockProfile
   },
 
-  saveProfile(profile: CandidateProfile): void {
-    if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for profileService.")
+  async fetchLiveProfile(): Promise<CandidateProfile> {
+    if (env.useMock) {
+      return this.getCandidateProfile()
     }
+    try {
+      const res = await httpClient.get<{ success: boolean; data: any }>("/candidates/profile")
+      if (res?.data) {
+        const p = res.data
+        const mapped: CandidateProfile = {
+          ...defaultMockProfile,
+          summary: p.summary || defaultMockProfile.summary,
+          location: p.location || defaultMockProfile.location,
+          phone: p.phone || defaultMockProfile.phone,
+          currentRole: p.headline || defaultMockProfile.currentRole,
+          skills: Array.isArray(p.skills)
+            ? p.skills.map((s: any, idx: number) => (typeof s === "string" ? { id: `s_${idx}`, name: s, level: "Intermediate", category: "Programming" } : s))
+            : defaultMockProfile.skills,
+          experience: p.experience || defaultMockProfile.experience,
+          education: p.education || defaultMockProfile.education,
+          projects: p.projects || defaultMockProfile.projects,
+          profileCompletion: p.profileCompletion ?? this.calculateProfileCompletion(defaultMockProfile),
+        }
+        if (typeof window !== "undefined") {
+          localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(mapped))
+          window.dispatchEvent(new Event('hiresmart_profile_updated'))
+        }
+        return mapped
+      }
+    } catch (e) {
+      console.warn("[ProfileService] Live fetch failed, using cached profile", e)
+    }
+    return this.getCandidateProfile()
+  },
+
+  saveProfile(profile: CandidateProfile): void {
     const completion = this.calculateProfileCompletion(profile)
     const updatedProfile = { ...profile, profileCompletion: completion }
     if (typeof window !== "undefined") {
       localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(updatedProfile))
       window.dispatchEvent(new Event('hiresmart_profile_updated'))
+    }
+
+    if (!env.useMock) {
+      const skills = Array.isArray(profile.skills)
+        ? profile.skills.map((s: any) => (typeof s === "string" ? s : s?.name)).filter(Boolean)
+        : undefined
+
+      const cleanYear = (y: any) => {
+        const num = parseInt(String(y), 10)
+        return !isNaN(num) && num >= 1950 && num <= 2100 ? num : null
+      }
+
+      const experience = Array.isArray(profile.experience)
+        ? profile.experience.map((exp: any) => ({
+            company: exp.company || "Company",
+            title: exp.jobTitle || exp.title || "Role",
+            startDate: exp.startDate || null,
+            endDate: exp.endDate || null,
+            current: !!exp.currentlyWorking,
+            description: exp.description || null,
+          }))
+        : undefined
+
+      const education = Array.isArray(profile.education)
+        ? profile.education.map((edu: any) => ({
+            institution: edu.institution || "Institution",
+            degree: edu.degree || null,
+            fieldOfStudy: edu.fieldOfStudy || null,
+            startYear: cleanYear(edu.startYear),
+            endYear: cleanYear(edu.endYear),
+          }))
+        : undefined
+
+      httpClient
+        .put("/candidates/profile", {
+          headline: profile.currentRole || undefined,
+          summary: profile.summary || undefined,
+          location: profile.location || undefined,
+          phone: profile.phone || undefined,
+          skills,
+          experience,
+          education,
+        })
+        .catch((err) => {
+          console.warn("[ProfileService] Live profile sync warning:", err)
+        })
     }
   },
 

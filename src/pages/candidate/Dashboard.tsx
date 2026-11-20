@@ -13,6 +13,7 @@ import { useJobActions } from "../../hooks/useJobActions"
 import { resumeService } from "../../services/resumeService"
 import { skillService } from "../../services/skillService"
 import { profileService } from "../../services/profileService"
+import { authService } from "../../services/authService"
 import { Badge } from "../../components/ui/Badge"
 import { SkillBadge } from "../../components/shared/SkillBadge"
 import SpotlightCard from "../../components/ui/SpotlightCard";
@@ -44,7 +45,9 @@ export default function CandidateDashboard() {
   const totalOffers = appliedJobs.filter(a => a.status === "Offer").length
   
   const activeResume = resumeService.getActiveResumeAnalysis()
-  const profileCompletion = profileService.getCandidateProfile().profileCompletion
+  const candidateProfile = profileService.getCandidateProfile()
+  const candidateName = candidateProfile?.fullName || authService.getCurrentUser()?.name || activeResume.personalInfo.name
+  const profileCompletion = candidateProfile?.profileCompletion ?? 85
 
   const stats = [
     { label: "Jobs Applied", value: totalApplied.toString(), icon: Briefcase, color: "text-brand-blue", bg: "bg-brand-blue/10" },
@@ -67,7 +70,7 @@ export default function CandidateDashboard() {
   }
 
   return (
-    <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
+    <DashboardShell type="candidate" userName={candidateName}>
       <motion.div
         variants={staggerContainer}
         initial="initial"
@@ -78,7 +81,7 @@ export default function CandidateDashboard() {
         <MotionSpotlightCard variants={slideUp} className="glass-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 sm:p-6">
           <div>
             <h1 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy break-words">
-              Welcome back, {activeResume.personalInfo.name.split(' ')[0]} <span className="inline-block animate-bounce">👋</span>
+              Welcome back, {candidateName.split(' ')[0]} <span className="inline-block animate-bounce">👋</span>
             </h1>
             <p className="text-sm sm:text-base text-brand-navy/60 mt-1">
               Discover opportunities that match your skills and career goals.

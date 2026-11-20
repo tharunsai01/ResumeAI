@@ -81,12 +81,32 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
       }
 
       if (mode === "login") {
-        await authService.login(email, password, role)
+        const cleanEmail = email.trim().toLowerCase()
+        if (!cleanEmail) {
+          throw new Error("Email address is required.")
+        }
+        if (!password) {
+          throw new Error("Password is required.")
+        }
+        await authService.login(cleanEmail, password, role)
       } else {
         if (role === "admin") {
           throw new Error("Administrator accounts cannot be self-registered.")
         }
-        await authService.register({ email, password, name, role, company })
+        const cleanEmail = email.trim().toLowerCase()
+        if (!cleanEmail) {
+          throw new Error("Email address is required.")
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+          throw new Error("Please enter a valid email address.")
+        }
+        if (!name.trim()) {
+          throw new Error("Full name is required.")
+        }
+        if (password.length < 6) {
+          throw new Error("Password must be at least 6 characters.")
+        }
+        await authService.register({ email: cleanEmail, password, name: name.trim(), role, company: company.trim() })
       }
       onClose()
     } catch (err: any) {

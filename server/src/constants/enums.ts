@@ -1,4 +1,4 @@
-export const ROLES = ['candidate', 'recruiter'] as const;
+export const ROLES = ['candidate', 'recruiter', 'admin'] as const;
 
 export const JOB_STATUS = ['draft', 'open', 'closed'] as const;
 export const JOB_TYPES = ['full-time', 'part-time', 'contract', 'internship'] as const;
@@ -26,6 +26,8 @@ export const NOTIFICATION_TYPES = [
   'shortlisted',
   'interview_scheduled',
   'system',
+  'screening_completed',
+  'application_withdrawn',
 ] as const;
 
 export const COMPLAINT_CATEGORIES = [

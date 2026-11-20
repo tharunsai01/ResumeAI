@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
 import { AdminEmptyState } from "../../components/admin/AdminEmptyState"
@@ -16,9 +17,17 @@ import { useAdminUsers } from "../../contexts/AdminUsersContext"
 
 export default function AdminUsers() {
   const { users, setUsers } = useAdminUsers()
+  const [searchParams] = useSearchParams()
 
   // Filters
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") || "")
+
+  useEffect(() => {
+    const query = searchParams.get("search")
+    if (query !== null) {
+      setSearchQuery(query)
+    }
+  }, [searchParams])
   const [selectedRole, setSelectedRole] = useState<AdminUserRole | "All Roles">("All Roles")
   const [selectedStatus, setSelectedStatus] = useState<AdminUserStatus | "All Status">("All Status")
   const [selectedVerification, setSelectedVerification] = useState<AdminUserVerification | "All">("All")

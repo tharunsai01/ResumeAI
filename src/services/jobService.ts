@@ -1,6 +1,7 @@
 import { env } from "../config/env"
+import { httpClient } from "./api/httpClient"
 import { mockJobs } from "../data/mockJobs"
-import type { Job, JobMatchResult, RecruiterJob } from "../types/job"
+import type { Job, JobMatchResult, RecruiterJob, JobExperienceLevel } from "../types/job"
 import { mockResumeAnalysis } from "../data/mockResume"
 import type { ResumeAnalysisResult } from "../data/mockResume"
 import { profileService } from "./profileService"
@@ -13,8 +14,61 @@ export type { JobMatchResult }
 const STORAGE_KEY = "hiresmart_created_jobs"
 const RECRUITER_STORAGE_KEY = "hiresmart_recruiter_jobs"
 
+function mapBackendJobToFrontend(b: any): Job {
+  const expLevel: JobExperienceLevel = b.minExperienceYears
+    ? (b.minExperienceYears >= 5 ? "5+ Years" : b.minExperienceYears <= 2 ? "0–2 Years" : "2–5 Years")
+    : "2–5 Years"
+
+  return {
+    id: b._id || b.id,
+    title: b.title,
+    company: b.companyName || b.company || "HireSmart Partner",
+    location: b.location || "Remote",
+    category: b.department || "Engineering",
+    salary: b.salaryRange ? `$${b.salaryRange.min ?? 80000} - $${b.salaryRange.max ?? 140000}` : "$90,000 - $130,000",
+    type: (b.jobType ? (b.jobType.charAt(0).toUpperCase() + b.jobType.slice(1)) : "Full-time") as any,
+    experience: expLevel,
+    description: b.description || "",
+    aboutCompany: b.companyOverview || b.description || "",
+    additionalInfo: b.niceToHaveSkills?.join(", ") || "",
+    responsibilities: b.responsibilities || [],
+    requirements: b.requirements || [],
+    skills: b.requiredSkills || b.skills || [],
+    postedDate: b.createdAt ? new Date(b.createdAt).toLocaleDateString() : "Recently",
+  }
+}
+
+function mapBackendJobToRecruiterJob(b: any): RecruiterJob {
+  return {
+    id: b._id || b.id,
+    title: b.title,
+    company: b.companyName || "My Company",
+    location: b.location || "Remote",
+    workMode: (b.workMode ? (b.workMode.charAt(0).toUpperCase() + b.workMode.slice(1)) : "Remote") as any,
+    jobType: (b.jobType ? (b.jobType.charAt(0).toUpperCase() + b.jobType.slice(1)) : "Full-time") as any,
+    experience: b.minExperienceYears ? `${b.minExperienceYears}+ Years` : "2–5 Years",
+    salary: b.salaryRange ? `$${b.salaryRange.min} - $${b.salaryRange.max}` : "$100k - $140k",
+    skills: b.requiredSkills || b.skills || [],
+    description: b.description || "",
+    status: (b.status === "open" ? "Active" : b.status === "closed" ? "Closed" : "Draft") as any,
+    applications: b.applicationCount || 0,
+    postedDate: b.createdAt ? new Date(b.createdAt).toLocaleDateString() : "Recently",
+  }
+}
+
 export const jobService = {
   getRecruiterJobs: async (): Promise<RecruiterJob[]> => {
+    if (!env.useMock) {
+      try {
+        const res = await httpClient.get<{ success: boolean; data: any[] }>("/jobs/recruiter/mine")
+        if (res?.data && Array.isArray(res.data)) {
+          return res.data.map(mapBackendJobToRecruiterJob)
+        }
+      } catch (err) {
+        console.warn("[JobService] Live getRecruiterJobs failed, using local cache:", err)
+      }
+    }
+
     await delay(0)
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(RECRUITER_STORAGE_KEY)
@@ -32,6 +86,16 @@ export const jobService = {
   },
 
   getRecruiterJobById: async (id: string): Promise<RecruiterJob | undefined> => {
+    if (!env.useMock) {
+      try {
+        const res = await httpClient.get<{ success: boolean; data: any }>(`/jobs/${id}`)
+        if (res?.data) {
+          return mapBackendJobToRecruiterJob(res.data)
+        }
+      } catch (err) {
+        console.warn("[JobService] Live getRecruiterJobById failed:", err)
+      }
+    }
     await delay(0)
     const jobs = await jobService.getRecruiterJobs()
     return jobs.find(j => j.id === id)
@@ -39,8 +103,16 @@ export const jobService = {
 
   getJobs: async (): Promise<Job[]> => {
     if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for jobService.")
+      try {
+        const res = await httpClient.get<{ success: boolean; data: { jobs: any[] } }>("/jobs")
+        if (res?.data?.jobs && Array.isArray(res.data.jobs)) {
+          return res.data.jobs.map(mapBackendJobToFrontend)
+        }
+      } catch (err) {
+        console.warn("[JobService] Live getJobs failed, using local cache:", err)
+      }
     }
+
     await delay(0)
     let customJobs: Job[] = []
     if (typeof window !== "undefined") {
@@ -55,6 +127,16 @@ export const jobService = {
   },
 
   getJobById: async (id: string): Promise<any | undefined> => {
+    if (!env.useMock) {
+      try {
+        const res = await httpClient.get<{ success: boolean; data: any }>(`/jobs/${id}`)
+        if (res?.data) {
+          return mapBackendJobToFrontend(res.data)
+        }
+      } catch (err) {
+        console.warn("[JobService] Live getJobById failed:", err)
+      }
+    }
     await delay(0)
     const recruiterJob = await jobService.getRecruiterJobById(id)
     if (recruiterJob) return recruiterJob
@@ -63,16 +145,38 @@ export const jobService = {
   },
 
   createJob: async (jobData: any): Promise<RecruiterJob> => {
-    await delay(0)
-    const jobs = await jobService.getRecruiterJobs()
-    const newId = `job_${Date.now()}`
-
     const skillsList: string[] = jobData.skills
       ? jobData.skills
       : Array.from(new Set([
         ...(jobData.requiredSkills || []),
         ...(jobData.preferredSkills || [])
       ]))
+
+    if (!env.useMock) {
+      try {
+        const payload = {
+          title: jobData.title,
+          companyName: jobData.company || "HireSmart Technologies",
+          description: jobData.description || "Exciting career opportunity.",
+          location: jobData.location || "Remote",
+          workMode: (jobData.workMode?.toLowerCase() === "on-site" ? "onsite" : jobData.workMode?.toLowerCase()) || "remote",
+          jobType: jobData.jobType?.toLowerCase() || "full-time",
+          requiredSkills: skillsList.length > 0 ? skillsList : ["Communication"],
+          minExperienceYears: 2,
+          status: "open",
+        }
+        const res = await httpClient.post<{ success: boolean; data: any }>("/jobs", payload)
+        if (res?.data) {
+          return mapBackendJobToRecruiterJob(res.data)
+        }
+      } catch (err) {
+        console.warn("[JobService] Live createJob failed, fallback to local:", err)
+      }
+    }
+
+    await delay(0)
+    const jobs = await jobService.getRecruiterJobs()
+    const newId = `job_${Date.now()}`
 
     const newJob: RecruiterJob = {
       id: newId,
@@ -117,6 +221,19 @@ export const jobService = {
   },
 
   updateJob: async (id: string, updates: any): Promise<RecruiterJob | undefined> => {
+    if (!env.useMock) {
+      try {
+        const payload: Record<string, any> = {}
+        if (updates.title) payload.title = updates.title
+        if (updates.description) payload.description = updates.description
+        if (updates.status) payload.status = updates.status.toLowerCase() === "active" ? "open" : updates.status.toLowerCase()
+        if (updates.skills) payload.requiredSkills = updates.skills
+        await httpClient.patch(`/jobs/${id}`, payload)
+      } catch (err) {
+        console.warn("[JobService] Live updateJob failed:", err)
+      }
+    }
+
     await delay(0)
     const jobs = await jobService.getRecruiterJobs()
     const index = jobs.findIndex(j => j.id === id)

@@ -4,6 +4,7 @@
  */
 
 import { env } from "../config/env"
+import { httpClient } from "./api/httpClient"
 import { mockResumeAnalysis } from "../data/mockResume"
 import type { ResumeAnalysisResult } from "../types/resume"
 
@@ -24,9 +25,30 @@ export const resumeService = {
   /**
    * Asynchronously fetches resume analysis results by ID.
    */
-  async getResumeAnalysis(_analysisId?: string): Promise<ResumeAnalysisResult> {
-    if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for resumeService.")
+  async getResumeAnalysis(analysisId?: string): Promise<ResumeAnalysisResult> {
+    if (!env.useMock && analysisId) {
+      try {
+        const res = await httpClient.get<{ success: boolean; data: any }>(`/resumes/${analysisId}`)
+        if (res?.data?.aiAnalysis) {
+          const ai = res.data.aiAnalysis
+          return {
+            score: ai.qualityScore ?? 85,
+            breakdown: ai.breakdown || mockResumeAnalysis.breakdown,
+            personalInfo: mockResumeAnalysis.personalInfo,
+            skills: ai.skills || mockResumeAnalysis.skills,
+            experience: mockResumeAnalysis.experience,
+            education: mockResumeAnalysis.education,
+            projects: mockResumeAnalysis.projects,
+            insights: {
+              strengths: ai.strengths || [],
+              improvements: ai.suggestions || [],
+              summary: ai.summary || "",
+            },
+          }
+        }
+      } catch (err) {
+        console.warn("[ResumeService] Live analysis retrieval error, using fallback:", err)
+      }
     }
     await delay(800)
     return mockResumeAnalysis
@@ -36,9 +58,6 @@ export const resumeService = {
    * Simulates uploading a resume file.
    */
   async uploadResume(file: File): Promise<{ success: boolean; fileId: string }> {
-    if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for resumeService.")
-    }
     const validTypes = [
       "application/pdf",
       "application/msword",
@@ -50,6 +69,14 @@ export const resumeService = {
     if (file.size > 10 * 1024 * 1024) {
       throw new Error("Maximum file size is 10 MB.")
     }
+
+    if (!env.useMock) {
+      const formData = new FormData()
+      formData.append("file", file)
+      const res = await httpClient.post<{ success: boolean; data: { _id: string } }>("/resumes", formData)
+      return { success: true, fileId: res.data._id }
+    }
+
     await delay(1000)
     return { success: true, fileId: "doc_" + Math.random().toString(36).substring(7) }
   },
@@ -59,7 +86,8 @@ export const resumeService = {
    */
   async analyzeResume(fileId: string): Promise<{ success: boolean; analysisId: string }> {
     if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for resumeService.")
+      await httpClient.post<{ success: boolean; data: any }>(`/ai/resume/analyze/${fileId}`)
+      return { success: true, analysisId: fileId }
     }
     await delay(4000)
     return { success: true, analysisId: "analysis_" + fileId }

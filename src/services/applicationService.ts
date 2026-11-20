@@ -1,4 +1,5 @@
 import { env } from "../config/env"
+import { httpClient } from "./api/httpClient"
 import { mockJobs } from "../data/mockJobs"
 import type { ApplicationStatus, TimelineEvent, Application, ApplicationAiScreening } from "../types/application"
 
@@ -124,14 +125,52 @@ export const applicationService = {
     return this.getApplications().find(a => a.id === id)
   },
 
-  createApplication(app: Omit<Application, "id">): Application {
-    if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for applicationService.")
+  async fetchLiveApplications(): Promise<Application[]> {
+    if (env.useMock) {
+      return this.getApplications()
     }
+    try {
+      const res = await httpClient.get<{ success: boolean; data: any[] }>("/applications/me")
+      if (res?.data && Array.isArray(res.data)) {
+        const mapped: Application[] = res.data.map((item) => ({
+          id: item._id,
+          jobId: item.job?._id || item.job,
+          candidateId: item.candidate?._id || item.candidate,
+          status: (item.status ? (item.status.charAt(0).toUpperCase() + item.status.slice(1)) : "Applied") as ApplicationStatus,
+          matchScore: 85,
+          appliedDate: item.createdAt || new Date().toISOString(),
+          timeline: Array.isArray(item.statusHistory)
+            ? item.statusHistory.map((h: any) => ({
+                status: (h.status ? (h.status.charAt(0).toUpperCase() + h.status.slice(1)) : "Applied") as ApplicationStatus,
+                date: h.changedAt || new Date().toISOString(),
+              }))
+            : [{ status: "Applied", date: item.createdAt || new Date().toISOString() }],
+          notes: "",
+        }))
+        this.saveApplications(mapped)
+        return mapped
+      }
+    } catch (err) {
+      console.warn("[ApplicationService] Live fetch failed, using cached applications:", err)
+    }
+    return this.getApplications()
+  },
+
+  createApplication(app: Omit<Application, "id">): Application {
     const apps = this.getApplications()
     const newApp = { ...app, id: Math.random().toString(36).substr(2, 9) }
     apps.unshift(newApp)
     this.saveApplications(apps)
+
+    if (!env.useMock) {
+      httpClient.post("/applications", {
+        jobId: app.jobId,
+        resumeId: (app as any).resumeId,
+        coverLetter: (app as any).coverLetter || app.notes,
+      }).catch((err) => {
+        console.warn("[ApplicationService] Live submit application sync warning:", err)
+      })
+    }
     return newApp
   },
 
@@ -142,6 +181,13 @@ export const applicationService = {
       app.status = status
       app.timeline.push({ status, date: new Date().toISOString() })
       this.saveApplications(apps)
+
+      if (!env.useMock) {
+        const backendStatus = status.toLowerCase() === "ai screened" ? "screened" : status.toLowerCase()
+        httpClient.patch(`/applications/${id}/status`, { status: backendStatus }).catch((err) => {
+          console.warn("[ApplicationService] Live status update warning:", err)
+        })
+      }
     }
   },
 

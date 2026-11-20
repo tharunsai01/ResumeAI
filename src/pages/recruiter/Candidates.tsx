@@ -1,7 +1,7 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, Users, CheckCircle2, UserPlus, Filter, X } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
@@ -35,11 +35,19 @@ const StatCard = ({ title, value, icon: Icon, color, delay, loading }: any) => (
 
 export default function RecruiterCandidates() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [loading, setLoading] = React.useState(true)
   const [candidates, setCandidates] = React.useState<RecruiterCandidate[]>([])
   
   // Filters
-  const [searchTerm, setSearchTerm] = React.useState("")
+  const [searchTerm, setSearchTerm] = React.useState(() => searchParams.get("search") || "")
+
+  React.useEffect(() => {
+    const query = searchParams.get("search")
+    if (query !== null) {
+      setSearchTerm(query)
+    }
+  }, [searchParams])
   const [statusFilter, setStatusFilter] = React.useState<"All" | AppStatus>("All")
   const [screeningFilter, setScreeningFilter] = React.useState<"All" | AIScreeningStatus>("All")
   const [scoreFilter, setScoreFilter] = React.useState<"All" | "90+" | "80+" | "70+" | "Below 70">("All")

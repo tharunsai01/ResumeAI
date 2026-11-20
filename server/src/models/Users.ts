@@ -9,6 +9,7 @@ const userSchema = new Schema(
     googleId: { type: String, unique: true, sparse: true },
     role: { type: String, enum: [...ROLES], required: true },
     isVerified: { type: Boolean, default: false },
+    status: { type: String, enum: ['active', 'suspended', 'inactive'], default: 'active' },
     lastLoginAt: Date,
   },
   { timestamps: true },

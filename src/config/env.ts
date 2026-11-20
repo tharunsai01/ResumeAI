@@ -35,9 +35,18 @@ function resolveEnvBoolean(value: string | undefined, defaultValue: boolean): bo
   return defaultValue
 }
 
-export const env: AppConfig = Object.freeze({
-  apiBaseUrl: resolveEnvString(import.meta.env.VITE_API_BASE_URL, "http://localhost:5000/api/v1"),
-  aiServiceUrl: resolveEnvString(import.meta.env.VITE_AI_SERVICE_URL, "http://localhost:8000/api"),
-  useMock: resolveEnvBoolean(import.meta.env.VITE_USE_MOCK, true),
-  appEnv: (import.meta.env.MODE as AppConfig["appEnv"]) || "development",
-})
+const globalProcess = typeof globalThis !== "undefined" ? (globalThis as any).process : undefined
+
+const metaEnv: Record<string, any> =
+  typeof import.meta !== "undefined" && (import.meta as any).env
+    ? (import.meta as any).env
+    : globalProcess?.env
+    ? globalProcess.env
+    : {}
+
+export const env: AppConfig = {
+  apiBaseUrl: resolveEnvString(metaEnv.VITE_API_BASE_URL, "http://localhost:5000/api/v1"),
+  aiServiceUrl: resolveEnvString(metaEnv.VITE_AI_SERVICE_URL, "http://localhost:8000/api"),
+  useMock: resolveEnvBoolean(metaEnv.VITE_USE_MOCK, true),
+  appEnv: (metaEnv.MODE as AppConfig["appEnv"]) || "development",
+}

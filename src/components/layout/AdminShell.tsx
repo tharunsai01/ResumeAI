@@ -1,6 +1,6 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { NavLink, useNavigate } from "react-router-dom"
+import { NavLink, useNavigate, Link } from "react-router-dom"
 import { 
   LayoutDashboard, Users, AlertOctagon, Tags, ScrollText, 
   BrainCircuit, Activity, Settings, LogOut, Bell, Menu,
@@ -24,6 +24,7 @@ export function AdminShell({ children }: AdminShellProps) {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false)
   const [isMoreOpen, setIsMoreOpen] = React.useState(false)
   const [isProfileOpen, setIsProfileOpen] = React.useState(false)
+  const [headerSearchTerm, setHeaderSearchTerm] = React.useState("")
   
   // Notification State
   const [isNotifOpen, setIsNotifOpen] = React.useState(false)
@@ -198,8 +199,12 @@ export function AdminShell({ children }: AdminShellProps) {
     <div className="flex h-full flex-col">
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex h-[80px] items-center px-5 border-b border-brand-gray/20 justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-[12px] bg-brand-indigo flex items-center justify-center shrink-0 shadow-sm">
+          <Link 
+            to="/admin" 
+            className="flex items-center gap-3 cursor-pointer group"
+            aria-label="HireSmart AI Admin"
+          >
+            <div className="h-10 w-10 rounded-[12px] bg-brand-indigo flex items-center justify-center shrink-0 shadow-sm transition-all group-hover:scale-105">
               <span className="text-white font-display font-bold text-lg">H</span>
             </div>
             {(isSidebarOpen || isMobileOpen) && (
@@ -207,7 +212,7 @@ export function AdminShell({ children }: AdminShellProps) {
                 HireSmart <span className="text-brand-indigo">AI</span>
               </span>
             )}
-          </div>
+          </Link>
           {isMobileOpen ? (
             <button 
               onClick={toggleMobile} 
@@ -377,7 +382,7 @@ export function AdminShell({ children }: AdminShellProps) {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="fixed inset-y-0 left-0 z-40 w-[260px] bg-white dark:bg-brand-navy border-r border-brand-gray/50 dark:border-white/10 shadow-2xl lg:hidden"
+              className="fixed inset-y-0 left-0 z-40 w-[260px] max-w-[85vw] bg-white dark:bg-brand-navy border-r border-brand-gray/50 dark:border-white/10 shadow-2xl lg:hidden"
             >
               {renderSidebarContent()}
             </motion.aside>
@@ -388,7 +393,7 @@ export function AdminShell({ children }: AdminShellProps) {
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
-        <header className="flex h-16 items-center justify-between border-b border-brand-gray/50 bg-white/80 dark:bg-brand-navy/80 backdrop-blur-md px-4 sm:px-6 z-40 relative shadow-sm">
+        <header className="flex h-16 items-center justify-between border-b border-brand-gray/50 bg-white/80 dark:bg-brand-navy/80 backdrop-blur-md px-3 sm:px-6 z-40 relative shadow-sm">
           <div className="flex items-center gap-4">
             <button
               onClick={toggleMobile}
@@ -403,17 +408,24 @@ export function AdminShell({ children }: AdminShellProps) {
               <Menu className="h-5 w-5" />
             </button>
             
-            <div className="hidden sm:flex items-center bg-brand-light dark:bg-white/5 rounded-full px-4 py-2 text-sm text-brand-navy/60 dark:text-white/60 w-64 border border-brand-gray/50 dark:border-white/10">
+            <div className="hidden sm:flex items-center bg-brand-light dark:bg-white/5 rounded-full px-4 py-2 text-sm text-brand-navy/60 dark:text-white/60 w-64 border border-brand-gray/50 dark:border-white/10 focus-within:border-brand-indigo transition-colors">
               <Search className="h-4 w-4 mr-2 text-brand-navy/40" />
               <input 
                 type="text" 
-                placeholder="Search..." 
-                className="bg-transparent border-none outline-none w-full placeholder:text-brand-navy/40 dark:placeholder:text-white/40"
+                placeholder="Search admin users..." 
+                value={headerSearchTerm}
+                onChange={(e) => setHeaderSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && headerSearchTerm.trim()) {
+                    navigate(`/admin/users?search=${encodeURIComponent(headerSearchTerm.trim())}`)
+                  }
+                }}
+                className="bg-transparent border-none outline-none w-full placeholder:text-brand-navy/40 dark:placeholder:text-white/40 text-brand-navy dark:text-white"
               />
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             
             {/* Theme Toggle */}
             <button

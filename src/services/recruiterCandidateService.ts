@@ -3,7 +3,6 @@
  * Manages recruiter-facing candidate lists, candidate profile lookups, and status updates.
  */
 
-import { env } from "../config/env"
 import { initialRecruiterCandidates } from "../data/recruiterMockData"
 import type { RecruiterCandidate, AppStatus, AIScreeningStatus } from "../types/recruiter"
 
@@ -55,9 +54,6 @@ export const recruiterCandidateService = {
    * Updates fields on an existing candidate.
    */
   updateCandidate(id: string, updates: Partial<RecruiterCandidate>): RecruiterCandidate | undefined {
-    if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for recruiterCandidateService.")
-    }
     const list = this.getCandidates()
     const index = list.findIndex(c => c.id === id)
     if (index === -1) return undefined

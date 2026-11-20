@@ -1,3 +1,5 @@
+import { env } from "../config/env"
+import { httpClient } from "./api/httpClient"
 import { 
   defaultMockNotifications, 
   defaultRecruiterNotifications, 
@@ -110,6 +112,33 @@ export const notificationService = {
     }
   },
 
+  async fetchLiveNotifications(): Promise<AppNotification[]> {
+    if (env.useMock) {
+      return this.getNotifications()
+    }
+    try {
+      const res = await httpClient.get<{ success: boolean; data: { notifications: any[] } }>("/notifications")
+      if (res?.data?.notifications && Array.isArray(res.data.notifications)) {
+        const targetRole = resolveRole()
+        const mapped: AppNotification[] = res.data.notifications.map((n) => ({
+          id: n._id,
+          title: n.title || "Notification",
+          description: n.message,
+          time: new Date(n.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          read: !!n.isRead,
+          type: (n.type === "application_received" ? "application" : n.type === "interview_scheduled" ? "interview" : "other") as any,
+          link: n.link,
+          role: targetRole,
+        }))
+        this.saveNotifications(mapped, targetRole)
+        return mapped
+      }
+    } catch (err) {
+      console.warn("[NotificationService] Live fetch failed, using cached notifications:", err)
+    }
+    return this.getNotifications()
+  },
+
   getUnreadCount(role?: string): number {
     return this.getNotifications(role).filter(n => !n.read).length
   },
@@ -118,18 +147,30 @@ export const notificationService = {
     const notifications = this.getNotifications(role)
     const updated = notifications.map(n => n.id === id ? { ...n, read: true } : n)
     this.saveNotifications(updated, role)
+
+    if (!env.useMock) {
+      httpClient.patch(`/notifications/${id}/read`).catch(() => {})
+    }
   },
 
   markAllAsRead(role?: string): void {
     const notifications = this.getNotifications(role)
     const updated = notifications.map(n => ({ ...n, read: true }))
     this.saveNotifications(updated, role)
+
+    if (!env.useMock) {
+      httpClient.patch("/notifications/read-all").catch(() => {})
+    }
   },
 
   deleteNotification(id: string, role?: string): void {
     const notifications = this.getNotifications(role)
     const updated = notifications.filter(n => n.id !== id)
     this.saveNotifications(updated, role)
+
+    if (!env.useMock) {
+      httpClient.delete(`/notifications/${id}`).catch(() => {})
+    }
   },
 
   addNotification(notification: Omit<AppNotification, "id" | "time" | "read">, role?: string): void {

@@ -10,7 +10,7 @@ import { MatchScore } from "../components/shared/MatchScore"
 import { RoleSelector } from "../components/auth/RoleSelector"
 import { AuthModal } from "../components/auth/AuthModal"
 import { useAuth } from "../context/AuthContext"
-import { Navigate, Link } from "react-router-dom"
+import { Navigate, Link, useLocation } from "react-router-dom"
 import type { UserRole } from "../services/authService"
 import LightRays from "../components/ui/LightRays"
 import { PremiumCard, PremiumCardContent, PremiumCardTitle, PremiumCardDescription } from "../components/ui/PremiumCard"
@@ -19,6 +19,7 @@ import { useEffect } from "react"
 
 export default function Landing() {
   const { user } = useAuth()
+  const location = useLocation()
 
   const [isRoleSelectorOpen, setIsRoleSelectorOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -27,6 +28,14 @@ export default function Landing() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const [theme, setTheme] = useState(settingsService.getSettings().appearance.theme)
+
+  useEffect(() => {
+    // If redirected from a protected route requiring login, open auth modal
+    if (location.state?.action === "login") {
+      setAuthMode("login")
+      setIsAuthModalOpen(true)
+    }
+  }, [location.state])
 
   useEffect(() => {
     // Make sure theme matches settings service
@@ -87,7 +96,7 @@ export default function Landing() {
               <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-brand-indigo flex items-center justify-center shadow-lg shadow-brand-indigo/20 shrink-0">
                 <span className="text-white font-display font-bold text-lg sm:text-xl">H</span>
               </div>
-              <span className="text-lg sm:text-2xl font-display font-semibold text-brand-navy dark:text-white truncate">
+              <span className="text-lg sm:text-2xl font-display font-semibold text-brand-navy dark:text-white truncate max-w-[130px] sm:max-w-none">
                 HireSmart <span className="text-brand-indigo">AI</span>
               </span>
             </div>
@@ -111,7 +120,7 @@ export default function Landing() {
               <button onClick={handleSignIn} className="text-sm font-semibold text-brand-navy dark:text-white/80 hover:text-brand-indigo transition-colors px-4 py-2 hidden sm:block">
                 Sign In
               </button>
-              <Button onClick={handleGetStarted} className="px-4 sm:px-6 py-2 sm:py-2.5 h-auto text-xs sm:text-sm">Get Started</Button>
+              <Button onClick={handleGetStarted} className="px-3 sm:px-6 py-2 sm:py-2.5 h-auto text-xs sm:text-sm shrink-0">Get Started</Button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle navigation menu"

@@ -5,8 +5,11 @@ const notificationSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     type: { type: String, enum: [...NOTIFICATION_TYPES], required: true },
+    title: { type: String },
     message: { type: String, required: true },
     link: String,
+    entityId: { type: Schema.Types.ObjectId },
+    entityType: { type: String },
     isRead: { type: Boolean, default: false },
   },
   { timestamps: true },
