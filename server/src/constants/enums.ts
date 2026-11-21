@@ -39,3 +39,5 @@ export const COMPLAINT_CATEGORIES = [
   'other',
 ] as const;
 export const COMPLAINT_STATUS = ['open', 'in_review', 'resolved'] as const;
+export const COMPANY_SIZES = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'] as const;
+export const THEMES = ['light', 'dark', 'system'] as const;

@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { ROLES,USER_STATUS } from '../constants/enums';
+import { ROLES,USER_STATUS,THEMES } from '../constants/enums';
 
 const userSchema = new Schema(
   {
@@ -10,6 +10,14 @@ const userSchema = new Schema(
     role: { type: String, enum: [...ROLES], required: true },
     isVerified: { type: Boolean, default: false },
     status: { type: String, enum: [...USER_STATUS], default: 'active', index: true },
+    preferences: {
+    theme: { type: String, enum: [...THEMES], default: 'system' },
+    notifications: {
+    applicationUpdates: { type: Boolean, default: true },
+    jobRecommendations: { type: Boolean, default: true },
+    interviewReminders: { type: Boolean, default: true },
+  },
+},
     lastLoginAt: Date,
   },
   { timestamps: true },

@@ -17,7 +17,12 @@ const educationSchema = new Schema({
   startYear: Number,
   endYear: Number,
 });
-
+const projectSchema = new Schema({
+  title: { type: String, required: true, trim: true },
+  description: String,
+  technologies: [{ type: String, trim: true }],
+  link: String,
+});
 const candidateProfileSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
@@ -31,8 +36,16 @@ const candidateProfileSchema = new Schema(
     education: [educationSchema],
     links: { linkedin: String, github: String, portfolio: String },
     preferredJobTypes: [{ type: String, enum: [...JOB_TYPES] }],
+    projects: [projectSchema],
+    careerPreferences: {
+    preferredJobTitles: [{ type: String, trim: true }],
+    expectedSalary: Number,
+
+},
   },
   { timestamps: true },
 );
+
+
 
 export const CandidateProfile = model('CandidateProfile', candidateProfileSchema);

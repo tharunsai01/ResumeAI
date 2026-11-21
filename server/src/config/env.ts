@@ -15,6 +15,7 @@ const schema = z.object({
         SMTP_PASS: z.string().optional(),
         EMAIL_FROM: z.string().default('HireSmart AI <no-reply@hiresmart.local>'),
         GOOGLE_CLIENT_ID: z.string().optional(),
+	UPLOAD_DIR: z.string().default('uploads'),
 });
 
 const parsed = schema.safeParse(process.env);

@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-
+import { COMPANY_SIZES } from '../constants/enums'
 const recruiterProfileSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
@@ -7,7 +7,7 @@ const recruiterProfileSchema = new Schema(
     phone: String,
     companyName: { type: String, required: true, trim: true },
     industry: { type: String, trim: true },
-    companySize: { type: String, enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'] },
+    companySize: { type: String, enum: [...COMPANY_SIZES] },
     website: String,
     description: String,
     location: { type: String, trim: true },
