@@ -1,5 +1,4 @@
 import { CandidateProfile } from '../models';
-import { ApiError } from '../utils/ApiError';
 import type {
   UpdateCandidateProfileInput,
   PatchCandidateProfileInput,

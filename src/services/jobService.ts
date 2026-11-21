@@ -120,7 +120,7 @@ export const jobService = {
       if (stored) {
         try {
           customJobs = JSON.parse(stored)
-        } catch (_) { }
+        } catch { }
       }
     }
     return [...customJobs, ...mockJobs]
@@ -202,7 +202,7 @@ export const jobService = {
       let customJobs: any[] = []
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        try { customJobs = JSON.parse(stored) } catch (_) { }
+        try { customJobs = JSON.parse(stored) } catch { }
       }
       customJobs.unshift({
         ...newJob,
@@ -269,7 +269,7 @@ export const jobService = {
             customJobs[cIndex] = { ...customJobs[cIndex], ...updatedJob, type: updatedJob.jobType }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(customJobs))
           }
-        } catch (_) { }
+        } catch { }
       }
 
       window.dispatchEvent(new Event("hiresmart_jobs_updated"))
@@ -290,7 +290,7 @@ export const jobService = {
           let customJobs: any[] = JSON.parse(stored)
           customJobs = customJobs.filter(j => j.id !== id)
           localStorage.setItem(STORAGE_KEY, JSON.stringify(customJobs))
-        } catch (_) { }
+        } catch { }
       }
 
       window.dispatchEvent(new Event("hiresmart_jobs_updated"))

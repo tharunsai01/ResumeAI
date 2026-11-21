@@ -105,7 +105,7 @@ export default function CandidateJobs() {
       }
     }
     fetchJobs()
-  }, [])
+  }, [activeResume])
 
   // Apply filters and sort using useMemo
   const filteredJobs = React.useMemo(() => {

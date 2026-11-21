@@ -47,7 +47,7 @@ export default function CandidateJobDetails() {
       }
     }
     fetchJobDetails()
-  }, [jobId])
+  }, [jobId, activeResume])
 
   const handleApply = async () => {
     if (!matchData) return
