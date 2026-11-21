@@ -1,4 +1,5 @@
-export const ROLES = ['candidate', 'recruiter'] as const;
+export const ROLES = ['candidate', 'recruiter', 'admin'] as const;
+export const USER_STATUS = ['active', 'suspended'] as const;
 
 export const JOB_STATUS = ['draft', 'open', 'closed'] as const;
 export const JOB_TYPES = ['full-time', 'part-time', 'contract', 'internship'] as const;

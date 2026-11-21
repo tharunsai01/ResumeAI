@@ -9,6 +9,18 @@ import { AuthToken } from '../models';
 import { generateOpaqueToken } from '../utils/tokens'; 
 import { sendVerificationEmail, sendPasswordResetEmail } from './email.service';
 import type { GoogleInput } from '../validators/auth.validators'; 
+import { AuditLog } from '../models';
+
+export function audit(
+  actor: string,
+  action: string,
+  targetType: string,
+  targetId: string,
+  meta?: unknown,
+  ip?: string,
+) {
+  return AuditLog.create({ actor, action, targetType, targetId, meta, ip });
+}
 
 interface Meta {
   ip?: string;
@@ -111,6 +123,7 @@ export async function login(input: LoginInput, meta: Meta) {
   if (!user || !user.passwordHash || !ok) {
     throw ApiError.unauthorized('Invalid email or password');
   }
+  if (user.status === 'suspended') throw ApiError.forbidden('This account has been suspended');
 
   await User.updateOne({ _id: user._id }, { lastLoginAt: new Date() });
   const tokens = await issueTokens(user, meta);
@@ -135,6 +148,7 @@ export async function refresh(rawToken: string | undefined, meta: Meta) {
   if (stored.expiresAt < new Date()) throw ApiError.unauthorized('Session expired, please log in again');
 
   const user = await User.findById(stored.user);
+  if (user?.status === 'suspended') throw ApiError.unauthorized('Account suspended');
   if (!user) throw ApiError.unauthorized('User no longer exists');
 
   const tokens = await issueTokens(user, meta);
@@ -209,6 +223,8 @@ export async function googleAuth(input: GoogleInput, meta: Meta) {
   let user = (await User.findOne({ googleId: payload.sub })) ?? (await User.findOne({ email }));
 
   if (user) {
+    if (user.role === 'admin') throw ApiError.forbidden('Admin accounts must sign in with a password');
+    if (user.status === 'suspended') throw ApiError.forbidden('This account has been suspended'); 
     if (!user.googleId) {
       // Linking to an existing account. If that account's email was never verified,
       // someone else may have registered it with their own password: wipe it.

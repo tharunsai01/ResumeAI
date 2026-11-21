@@ -33,3 +33,12 @@ export const authorize =
     }
     next();
   };
+
+export async function requireAdmin(req: Request, _res: Response, next: NextFunction) {
+  // Check the DB, not the token: roles and status can change after a token was issued
+  const user = await User.findById(req.user!.id).select('role status');
+  if (!user || user.role !== 'admin' || user.status !== 'active') {
+    return next(ApiError.forbidden('Admin access required'));
+  }
+  next();
+}

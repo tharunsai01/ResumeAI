@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { ROLES } from '../constants/enums';
+import { ROLES,USER_STATUS } from '../constants/enums';
 
 const userSchema = new Schema(
   {
@@ -9,6 +9,7 @@ const userSchema = new Schema(
     googleId: { type: String, unique: true, sparse: true },
     role: { type: String, enum: [...ROLES], required: true },
     isVerified: { type: Boolean, default: false },
+    status: { type: String, enum: [...USER_STATUS], default: 'active', index: true },
     lastLoginAt: Date,
   },
   { timestamps: true },

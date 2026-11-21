@@ -11,3 +11,4 @@ export { Notification } from './Notification';
 export { Complaint } from './Complaint';
 export { RefreshToken } from './RefreshToken';
 export { AuthToken } from './AuthToken';
+export { AuditLog } from './AuditLog';

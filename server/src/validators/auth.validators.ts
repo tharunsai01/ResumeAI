@@ -1,6 +1,5 @@
 import { z } from 'zod';
-
-const password = z
+export const password = z
   .string()
   .min(8, 'Password must be at least 8 characters')
   .max(72, 'Password must be at most 72 characters')
