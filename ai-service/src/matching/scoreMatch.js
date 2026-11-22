@@ -8,7 +8,6 @@ import { SEMANTIC } from "../semantic/semanticConfig.js";
 // It never reads name, email, location, company or institution.
 
 const WEIGHT_KEYS = Object.keys(DEFAULT_WEIGHTS);
-const CREDIT = { Matched: 1, Partial: MATCH.partialCredit, Missing: 0 };
 
 /** Recruiter weights -> valid weights. Bad or missing values fall back to the defaults. */
 export function resolveWeights(input = {}) {
@@ -46,14 +45,15 @@ function matchSkills(wanted, candidateSkills, required) {
   });
 }
 
-function coverage(entries) {
+function coverage(entries, partialCredit) {
   if (entries.length === 0) return null;
-  return entries.reduce((sum, e) => sum + CREDIT[e.matchType], 0) / entries.length;
+  const credit = { Matched: 1, Partial: partialCredit, Missing: 0 };
+  return entries.reduce((sum, e) => sum + credit[e.matchType], 0) / entries.length;
 }
 
-function skillScore(requiredEntries, preferredEntries) {
-  const req = coverage(requiredEntries);
-  const pref = coverage(preferredEntries);
+function skillScore(requiredEntries, preferredEntries, partialCredit) {
+  const req = coverage(requiredEntries, partialCredit);
+  const pref = coverage(preferredEntries, partialCredit);
   if (req === null && pref === null) return null;
   if (pref === null) return Math.round(100 * req);
   if (req === null) return Math.round(100 * pref);
@@ -65,7 +65,7 @@ const list = (items) => items.join(", ");
 const yearsLabel = (y) => (y === 0 ? "Fresher" : `${y} ${y === 1 ? "year" : "years"}`);
 const rangeLabel = (r) => (r.max === null ? `${r.min}+ years` : `${r.min}–${r.max} years`);
 
-function explain({ job, years, range, reqEntries, prefEntries, education, unverified }) {
+function explain({ job, years, range, reqEntries, prefEntries, education, unverified, unproven }) {
   const strengths = [];
   const gaps = [];
 
@@ -100,6 +100,9 @@ function explain({ job, years, range, reqEntries, prefEntries, education, unveri
   }
 
   if (missingReq.length > 0) gaps.push(`Missing required skills: ${list(names(missingReq))}`);
+  if (unproven > MATCH.listedOnlyCap) {
+    gaps.unshift(`${unproven} skills are listed without evidence of use, so each one counts for less`);
+  }
   if (partialReq.length > 0) gaps.push(`Listed but no evidence of use: ${list(names(partialReq))}`);
   if (missingPref.length > 0) gaps.push(`No sign of preferred skills: ${list(names(missingPref))}`);
 
@@ -123,6 +126,10 @@ export function scoreMatch(resume, rawJob, options = {}) {
   const weights = resolveWeights(options.weights);
 
   const candidateSkills = new Map(analysis.skills.map((s) => [s.name, s]));
+
+  // Skills listed with no evidence of use count for less when there are many of them (keyword-stuffing guard).
+  const unproven = analysis.skills.filter((s) => s.score > 0 && s.score < MATCH.matchedMinScore).length;
+  const partialCredit = MATCH.partialCredit * Math.min(1, MATCH.listedOnlyCap / Math.max(1, unproven));
   const reqEntries = matchSkills(job.required, candidateSkills, true);
   const prefEntries = matchSkills(job.preferred, candidateSkills, false);
 
@@ -141,7 +148,7 @@ export function scoreMatch(resume, rawJob, options = {}) {
   }
 
   const components = {
-    skills: skillScore(reqEntries, prefEntries),
+    skills: skillScore(reqEntries, prefEntries, partialCredit),
     experience: experienceScore(years, range),
     education: educationScore(job.education, degrees),
     roleSimilarity: roleScore,
@@ -168,6 +175,7 @@ export function scoreMatch(resume, rawJob, options = {}) {
     prefEntries,
     education: components.education,
     unverified,
+    unproven,
   });
   if (requiredEducationLevel(job.education) !== null && analysis.education.length === 0) {
     potentialGaps.unshift("No education details found on the resume");

@@ -35,7 +35,13 @@ export {
   auditScreeningRun,
   auditJobExtracted,
   auditInjectionDetected,
+  auditEvaluationRun,
 } from "./audit/auditEvents.js";
+export { analyzeResumeText } from "./evaluation/analyzeText.js";
+export { runEvaluation, COMPONENTS as EVALUATION_COMPONENTS } from "./evaluation/runEvaluation.js";
+export { skillExtractionMetrics, stabilityMetrics, fairnessMetrics, securityMetrics } from "./evaluation/metrics.js";
+export { ATTACKS } from "./evaluation/attacks.js";
+export { buildVariants } from "./evaluation/fairnessVariants.js";
 
 /**
  * Phase 1 pipeline: file -> parsed text -> cleaned -> security-scanned.

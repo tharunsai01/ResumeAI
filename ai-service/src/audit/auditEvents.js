@@ -15,6 +15,7 @@ export const AUDIT_TYPES = {
   SCREENING_RUN: "SCREENING_RUN",
   JOB_EXTRACTED: "JOB_EXTRACTED",
   INJECTION_DETECTED: "INJECTION_DETECTED",
+  EVALUATION_RUN: "EVALUATION_RUN",
 };
 
 function makeEvent(type, summary, details, now) {
@@ -133,3 +134,26 @@ export function auditInjectionDetected(security, options = {}) {
     options.now
   );
 }
+
+/** result: what runEvaluation returned. options: { now } */
+export function auditEvaluationRun(result, options = {}) {
+    const { report, record } = result;
+    return makeEvent(
+      AUDIT_TYPES.EVALUATION_RUN,
+      `Evaluation ${record.id} completed: ${record.components}`,
+      {
+        evaluationId: record.id,
+        dataset: record.dataset,
+        components: report.modelInfo.components,
+        skillExtraction: record.metrics.skillExtraction ?? null,
+        scoreStability: record.metrics.scoreStability ?? null,
+        fairnessMaximumDifference: report.fairness?.maximumDifference ?? null,
+        fairnessCasesToReview: report.fairness?.scoreDifferencesDetected ?? null,
+        injectionScenariosTested: report.security?.attacksTested ?? null,
+        injectionScenariosManipulated: report.security?.attacksManipulated ?? null,
+        reviewFlags: report.reviewFlags.length,
+        model: config.groq.model,
+      },
+      options.now
+    );
+  }

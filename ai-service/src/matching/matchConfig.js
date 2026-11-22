@@ -16,4 +16,5 @@ export const MATCH = {
   partialCredit: 0.5, // share of a skill's credit a "Partial" earns
   requiredShare: 0.8, // required skills vs preferred skills inside the skill score
   maxListItems: 5, // strengths / gaps shown per candidate
+  listedOnlyCap: 12, // above this many skills listed with no evidence of use, each one counts for less (keyword-stuffing guard)
 };

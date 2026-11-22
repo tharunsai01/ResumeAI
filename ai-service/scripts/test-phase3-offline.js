@@ -222,4 +222,21 @@ check("finds skills written in the text", () => {
   assert.equal(keywordMatch("", [], []), null);
 });
 
+console.log("Keyword-stuffing guard");
+const EXTRA_SKILLS = ["Angular", "Vue.js", "Django", "Flask", "Go", "Rust", "Kotlin", "Swift", "PHP", "Ruby", "Scala", "Kubernetes", "Terraform", "Jenkins", "Ansible", "Azure", "Redis", "MySQL", "Elasticsearch", "GraphQL", "gRPC", "TensorFlow", "PyTorch", "scikit-learn", "Pandas", "NumPy", "LLMs", "LangChain", "Tableau", "Power BI", "Apache Spark", "Machine Learning", "Deep Learning", "NLP", "Selenium", "Jest", "Webpack", "Redux", "Bootstrap", "Next.js"];
+const stuffed = analyse({ ...RAHUL_FACTS, skillsSection: [...RAHUL_FACTS.skillsSection, ...EXTRA_SKILLS] });
+check("a normal number of listed-only skills is not penalised", () => {
+  assert.equal(r101.skillMatch, 73); // Rahul lists 9 skills without evidence, below the cap of 12
+});
+check("forty extra listed skills do not raise the score, and the result says why", () => {
+  const result = scoreMatch({ analysis: stuffed }, job("job_101"));
+  assert.ok(result.overallMatch <= r101.overallMatch, `${result.overallMatch} vs ${r101.overallMatch}`);
+  assert.ok(result.potentialGaps.some((g) => g.includes("listed without evidence of use, so each one counts for less")));
+});
+check("skills with real evidence are not affected by the guard", () => {
+  const result = scoreMatch({ analysis: stuffed }, job("job_101"));
+  assert.equal(result.skills.find((s) => s.name === "React").matchType, "Matched");
+  assert.equal(result.skills.find((s) => s.name === "MongoDB").matchType, "Matched");
+});
+
 console.log(`\n${passed} checks passed${process.exitCode ? " (some FAILED)" : ""}`);
