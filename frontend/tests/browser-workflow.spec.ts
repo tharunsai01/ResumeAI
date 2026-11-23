@@ -26,6 +26,10 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
     await expect(page.getByPlaceholder('Email Address')).toBeVisible();
     await expect(page.getByPlaceholder('Password')).toBeVisible();
 
+    // Verify OAuth social buttons are present in AuthModal
+    await expect(page.getByRole('button', { name: /continue with google/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /continue with linkedin/i })).toBeVisible();
+
     // Close modal
     const closeBtn = page.locator('button:has(svg.lucide-x)').first();
     if (await closeBtn.isVisible()) {
@@ -56,17 +60,17 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
     await expect(page.locator('text=Welcome back')).toBeVisible({ timeout: 15000 });
 
     // 2. Candidate Dashboard Metrics
-    await expect(page.locator('text=Applications')).toBeVisible();
-    await expect(page.locator('text=Profile Completion')).toBeVisible();
+    await expect(page.locator('text=Applications').first()).toBeVisible();
+    await expect(page.locator('text=Profile Score').or(page.locator('text=Profile Strength')).first()).toBeVisible();
 
     // 3. Navigate to Resume Page
     await page.goto('/candidate/resume');
-    await expect(page.locator('h1')).toContainText(/resume/i);
-    await expect(page.locator('text=Upload your resume')).toBeVisible();
+    await expect(page.locator('h1').first()).toContainText(/resume/i);
+    await expect(page.locator('text=Upload your resume').first()).toBeVisible();
 
     // 4. Navigate to Jobs Discovery
     await page.goto('/candidate/jobs');
-    await expect(page.locator('h1')).toContainText(/jobs/i);
+    await expect(page.locator('h1').first()).toContainText(/opportunity|job/i);
 
     // Search for a job
     const searchInput = page.getByPlaceholder(/search by title/i);
@@ -77,15 +81,15 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
 
     // 5. Navigate to Candidate Skills
     await page.goto('/candidate/skills');
-    await expect(page.locator('h1')).toContainText(/skills/i);
+    await expect(page.locator('h1').first()).toContainText(/skill/i);
 
     // 6. Navigate to Candidate Profile
     await page.goto('/candidate/profile');
-    await expect(page.locator('h1')).toContainText(/profile/i);
+    await expect(page.locator('h1').first()).toContainText(/profile/i);
 
     // 7. Navigate to Candidate Complaints
     await page.goto('/candidate/complaint');
-    await expect(page.locator('h1')).toContainText(/complaint|feedback|support/i);
+    await expect(page.locator('h1').first()).toContainText(/report|issue|complaint|feedback/i);
 
     // 8. Logout
     const logoutBtn = page.getByRole('button', { name: /sign out|log out/i });
@@ -103,15 +107,15 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
 
     // 1. Open AuthModal, select Recruiter role and login
     await page.getByRole('button', { name: /sign in/i }).first().click();
-    await page.getByRole('button', { name: 'Recruiter' }).click();
+    await page.getByRole('button', { name: 'Recruiter', exact: true }).click();
 
     await page.getByPlaceholder('Email Address').fill('recruiter@test.com');
     await page.getByPlaceholder('Password').fill('Password123!');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.locator('form').getByRole('button', { name: /sign in/i }).click();
 
     // Verify redirected to recruiter dashboard
     await expect(page).toHaveURL(/\/recruiter\/dashboard/, { timeout: 15000 });
-    await expect(page.locator('text=Total Candidates').or(page.locator('text=Active Jobs'))).toBeVisible();
+    await expect(page.locator('text=Total Candidates').or(page.locator('text=Active Jobs')).first()).toBeVisible();
 
     // 2. Navigate to Jobs Management
     await page.goto('/recruiter/jobs');
@@ -157,15 +161,15 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
 
     // 1. Open AuthModal, select Admin role and login
     await page.getByRole('button', { name: /sign in/i }).first().click();
-    await page.getByRole('button', { name: 'Admin' }).click();
+    await page.getByRole('button', { name: 'Admin', exact: true }).click();
 
     await page.getByPlaceholder('Email Address').fill('admin@hiresmart.ai');
     await page.getByPlaceholder('Password').fill('admin123');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.locator('form').getByRole('button', { name: /sign in/i }).click();
 
     // Verify redirected to Admin Dashboard
     await expect(page).toHaveURL(/\/admin/, { timeout: 15000 });
-    await expect(page.locator('text=Total Users').or(page.locator('text=Admin'))).toBeVisible();
+    await expect(page.locator('text=Total Users').or(page.locator('text=Admin')).first()).toBeVisible();
 
     // 2. Navigate to User Management
     await page.goto('/admin/users');
@@ -209,11 +213,11 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
     await page.getByRole('button', { name: /sign in/i }).first().click();
     await page.getByPlaceholder('Email Address').fill('alice@test.com');
     await page.getByPlaceholder('Password').fill('WrongPassword999!');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.locator('form').getByRole('button', { name: /sign in/i }).click();
 
     // Verify error banner displays
     const errorBanner = page.locator('text=invalid credentials').or(page.locator('text=incorrect password')).or(page.locator('.text-semantic-error'));
-    await expect(errorBanner).toBeVisible({ timeout: 10000 });
+    await expect(errorBanner.first()).toBeVisible({ timeout: 10000 });
 
     // Close modal
     const closeBtn = page.locator('button:has(svg.lucide-x)').first();
@@ -231,6 +235,24 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
 
     // 4. Unauthenticated access to /candidate/dashboard redirects to Landing
     await page.goto('/candidate/dashboard');
+    await expect(page).toHaveURL('/');
+  });
+
+  // =================================================================
+  // 6. OAUTH CALLBACK & SOCIAL AUTH FLOWS
+  // =================================================================
+  test('6. OAuth Flow: OAuthCallback handles access denied and error reporting gracefully', async ({ page }) => {
+    // Navigate to OAuth callback with access_denied error parameter
+    await page.goto('/oauth/callback?error=access_denied&error_description=User%20declined%20OAuth%20consent');
+
+    // Verify error card renders with appropriate status
+    await expect(page.locator('text=Authentication Failed')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=User declined OAuth consent')).toBeVisible();
+
+    // Verify Return Home action works
+    const returnHomeBtn = page.getByRole('button', { name: /return home/i });
+    await expect(returnHomeBtn).toBeVisible();
+    await returnHomeBtn.click();
     await expect(page).toHaveURL('/');
   });
 

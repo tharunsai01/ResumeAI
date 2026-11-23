@@ -1,4 +1,12 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Ensure .env is loaded whether run from repo root, backend folder, or child processes
+dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), 'backend/.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+
 import { z } from 'zod';
 
 const schema = z.object({
@@ -15,6 +23,11 @@ const schema = z.object({
   SMTP_PASS: z.string().optional(),
   EMAIL_FROM: z.string().default('HireSmart AI <no-reply@hiresmart.local>'),
   GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_REDIRECT_URI: z.string().optional(),
+  LINKEDIN_CLIENT_ID: z.string().optional(),
+  LINKEDIN_CLIENT_SECRET: z.string().optional(),
+  LINKEDIN_REDIRECT_URI: z.string().optional(),
   GEMINI_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
   GROQ_API_KEY: z.string().optional(),

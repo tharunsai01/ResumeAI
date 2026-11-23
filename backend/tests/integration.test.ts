@@ -200,6 +200,60 @@ async function main() {
     adminToken = res.json.data.accessToken
   })
 
+  await runTest("GET /auth/google/url returns configured URL or 503 configuration error", async () => {
+    const res = await request("GET", "/api/v1/auth/google/url?role=candidate")
+    if (res.status === 200) {
+      if (!res.json?.data?.url?.includes("accounts.google.com")) {
+        throw new Error(`Expected Google URL, got: ${JSON.stringify(res.json)}`)
+      }
+    } else if (res.status === 503) {
+      if (!res.json?.error?.message?.includes("Google sign-in is not configured")) {
+        throw new Error(`Expected configuration error, got: ${JSON.stringify(res.json)}`)
+      }
+    } else {
+      throw new Error(`Expected 200 or 503, got ${res.status}`)
+    }
+  })
+
+  await runTest("GET /auth/linkedin/url returns configured URL or 503 configuration error", async () => {
+    const res = await request("GET", "/api/v1/auth/linkedin/url?role=candidate")
+    if (res.status === 200) {
+      if (!res.json?.data?.url?.includes("linkedin.com")) {
+        throw new Error(`Expected LinkedIn URL, got: ${JSON.stringify(res.json)}`)
+      }
+    } else if (res.status === 503) {
+      if (!res.json?.error?.message?.includes("LinkedIn sign-in is not configured")) {
+        throw new Error(`Expected configuration error, got: ${JSON.stringify(res.json)}`)
+      }
+    } else {
+      throw new Error(`Expected 200 or 503, got ${res.status}`)
+    }
+  })
+
+  await runTest("POST /auth/google creates candidate session with authProvider=google", async () => {
+    const res = await request("POST", "/api/v1/auth/google", {
+      code: "mock_google_auth_code_test",
+      role: "candidate",
+    })
+    if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}: ${JSON.stringify(res.json)}`)
+    if (!res.json?.data?.accessToken) throw new Error("Missing accessToken")
+    if (res.json?.data?.user?.authProvider !== "google") {
+      throw new Error(`Expected authProvider google, got ${res.json?.data?.user?.authProvider}`)
+    }
+  })
+
+  await runTest("POST /auth/linkedin creates candidate session with authProvider=linkedin", async () => {
+    const res = await request("POST", "/api/v1/auth/linkedin", {
+      code: "mock_linkedin_auth_code_test",
+      role: "candidate",
+    })
+    if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}: ${JSON.stringify(res.json)}`)
+    if (!res.json?.data?.accessToken) throw new Error("Missing accessToken")
+    if (res.json?.data?.user?.authProvider !== "linkedin") {
+      throw new Error(`Expected authProvider linkedin, got ${res.json?.data?.user?.authProvider}`)
+    }
+  })
+
   // --- SUITE 3: Candidate Features ---
   console.log("\n--- 3. CANDIDATE PROFILE & DASHBOARD ---")
   await runTest("GET /candidates/profile retrieves candidate profile", async () => {

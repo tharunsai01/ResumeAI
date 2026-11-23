@@ -94,3 +94,23 @@ export async function google(req: Request, res: Response) {
   res.cookie(COOKIE_NAME, refreshToken, cookieOptions);
   sendSuccess(res, { user, accessToken });
 }
+
+export async function googleUrl(req: Request, res: Response) {
+  const role = (req.query.role as string) || 'candidate';
+  const redirectUri = req.query.redirectUri as string | undefined;
+  const url = await authService.getGoogleAuthUrl(role, redirectUri);
+  sendSuccess(res, { url });
+}
+
+export async function linkedin(req: Request, res: Response) {
+  const { user, accessToken, refreshToken } = await authService.linkedinAuth(req.body, meta(req));
+  res.cookie(COOKIE_NAME, refreshToken, cookieOptions);
+  sendSuccess(res, { user, accessToken });
+}
+
+export async function linkedinUrl(req: Request, res: Response) {
+  const role = (req.query.role as string) || 'candidate';
+  const redirectUri = req.query.redirectUri as string | undefined;
+  const url = await authService.getLinkedInAuthUrl(role, redirectUri);
+  sendSuccess(res, { url });
+}

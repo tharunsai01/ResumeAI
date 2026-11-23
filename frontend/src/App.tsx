@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Landing from "./pages/Landing"
+import OAuthCallback from "./pages/OAuthCallback"
 import CandidateDashboard from "./pages/candidate/Dashboard"
 import CandidateResume from "./pages/candidate/Resume"
 import CandidateResumeAnalysis from "./pages/candidate/ResumeAnalysis"
@@ -87,6 +88,7 @@ function App() {
             <Route path="/" element={<Landing />} />
             
             {/* Public Informational Routes */}
+            <Route path="/oauth/callback" element={<OAuthCallback />} />
             <Route path="/about" element={<RecruiterAbout />} />
             <Route path="/terms" element={<RecruiterTerms />} />
             <Route path="/privacy" element={<RecruiterPrivacy />} />

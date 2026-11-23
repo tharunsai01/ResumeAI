@@ -12,6 +12,10 @@ export interface AppConfig {
   readonly useMock: boolean
   /** Application environment name */
   readonly appEnv: "development" | "production" | "test"
+  /** Optional Google Client ID for Google OAuth / Sign-in */
+  readonly googleClientId: string
+  /** Optional LinkedIn Client ID for LinkedIn OAuth */
+  readonly linkedinClientId: string
 }
 
 function resolveEnvString(value: string | undefined, defaultValue: string): string {
@@ -49,4 +53,6 @@ export const env: AppConfig = {
   aiServiceUrl: resolveEnvString(metaEnv.VITE_AI_SERVICE_URL, "http://localhost:8000/api"),
   useMock: resolveEnvBoolean(metaEnv.VITE_USE_MOCK, true),
   appEnv: (metaEnv.MODE as AppConfig["appEnv"]) || "development",
+  googleClientId: resolveEnvString(metaEnv.VITE_GOOGLE_CLIENT_ID, ""),
+  linkedinClientId: resolveEnvString(metaEnv.VITE_LINKEDIN_CLIENT_ID, ""),
 }

@@ -10,6 +10,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   googleSchema,
+  linkedinSchema,
 } from '../validators/auth.validators';
 
 const router = Router();
@@ -45,6 +46,9 @@ router.post('/verify-email', authLimiter, validate(verifyEmailSchema), ctrl.veri
 router.post('/resend-verification', authenticate, emailLimiter, ctrl.resendVerification);
 router.post('/forgot-password', emailLimiter, validate(forgotPasswordSchema), ctrl.forgotPassword);
 router.post('/reset-password', authLimiter, validate(resetPasswordSchema), ctrl.resetPassword);
+router.get('/google/url', ctrl.googleUrl);
 router.post('/google', authLimiter, validate(googleSchema), ctrl.google);
+router.get('/linkedin/url', ctrl.linkedinUrl);
+router.post('/linkedin', authLimiter, validate(linkedinSchema), ctrl.linkedin);
 
 export default router;

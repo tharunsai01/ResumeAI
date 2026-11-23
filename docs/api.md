@@ -10,8 +10,12 @@ All protected endpoints require an `Authorization: Bearer <accessToken>` header.
 | `POST` | `/refresh` | Public (Cookie) | Exchange refresh token for fresh access token |
 | `POST` | `/logout` | Authenticated | Invalidate refresh token and clear cookie |
 | `GET` | `/me` | Authenticated | Retrieve current user profile and role |
-| `PUT` | `/profile` | Authenticated | Update user full name and profile fields |
+| `PATCH` | `/me` | Authenticated | Update user full name, avatar, and profile fields |
 | `POST` | `/change-password` | Authenticated | Change account password with current password verification |
+| `GET` | `/google/url` | Public | Generate Google OAuth 2.0 authorization URL with CSRF state |
+| `POST` | `/google` | Public | Exchange Google authorization code or ID token for user session |
+| `GET` | `/linkedin/url` | Public | Generate LinkedIn OAuth 2.0 authorization URL with CSRF state |
+| `POST` | `/linkedin` | Public | Exchange LinkedIn authorization code for user session & profile |
 
 ## Candidates (`/api/v1/candidates`)
 | Method | Endpoint | Access | Description |

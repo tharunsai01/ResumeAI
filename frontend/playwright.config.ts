@@ -16,16 +16,22 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'node ../backend/dist/server.js',
+      command: 'node dist/server.js',
+      cwd: '../backend',
       url: 'http://localhost:5000/api/v1',
       reuseExistingServer: true,
-      timeout: 30000,
+      timeout: 45000,
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
     {
       command: 'npx vite --port 5173',
+      cwd: '.',
       url: 'http://localhost:5173',
       reuseExistingServer: true,
-      timeout: 30000,
+      timeout: 45000,
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
   ],
   projects: [

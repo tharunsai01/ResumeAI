@@ -14,7 +14,7 @@ export const registerSchema = z
     email: z.string().trim().toLowerCase().email(),
     password,
     role: z.enum(['candidate', 'recruiter']),
-    companyName: z.string().trim().min(1).max(150).optional(),
+    companyName: z.preprocess((v) => (v === '' ? undefined : v), z.string().trim().min(1).max(150).optional()),
   })
   .refine((d) => d.role !== 'recruiter' || !!d.companyName, {
     message: 'companyName is required for recruiters',
@@ -38,12 +38,25 @@ export const resetPasswordSchema = z.object({
 });
 
 export const googleSchema = z.object({
-  credential: z.string().min(20),
+  credential: z.string().min(10).optional(),
+  code: z.string().min(5).optional(),
+  accessToken: z.string().min(10).optional(),
+  redirectUri: z.string().url().optional(),
+  role: z.enum(['candidate', 'recruiter']).optional(),
+  companyName: z.string().trim().min(1).max(150).optional(),
+}).refine(data => !!(data.credential || data.code || data.accessToken), {
+  message: 'Either credential (ID token), code, or accessToken must be provided',
+});
+
+export const linkedinSchema = z.object({
+  code: z.string().min(5),
+  redirectUri: z.string().url().optional(),
   role: z.enum(['candidate', 'recruiter']).optional(),
   companyName: z.string().trim().min(1).max(150).optional(),
 });
 
 export type GoogleInput = z.infer<typeof googleSchema>;
+export type LinkedInInput = z.infer<typeof linkedinSchema>;
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;

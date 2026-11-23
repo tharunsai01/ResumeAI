@@ -9,7 +9,7 @@ import { AuthToken } from '../models';
 import { generateOpaqueToken } from '../utils/tokens'; 
 import { sendVerificationEmail, sendPasswordResetEmail } from './email.service';
 import { recordAuditLog } from './audit.service';
-import type { GoogleInput } from '../validators/auth.validators'; 
+import type { GoogleInput, LinkedInInput } from '../validators/auth.validators'; 
 
 interface Meta {
   ip?: string;
@@ -21,13 +21,15 @@ const DUMMY_HASH = bcrypt.hashSync('dummy-password', 12);
 
 const refreshExpiry = () => new Date(Date.now() + env.JWT_REFRESH_DAYS * 24 * 60 * 60 * 1000);
 
-export function publicUser(user: { id: string; fullName: string; email: string; role: string; isVerified: boolean }) {
+export function publicUser(user: { id: string; fullName: string; email: string; role: string; isVerified: boolean; authProvider?: string | null; avatarUrl?: string | null }) {
   return {
     id: user.id,
     fullName: user.fullName,
     email: user.email,
     role: user.role,
     isVerified: user.isVerified,
+    authProvider: user.authProvider || 'local',
+    avatarUrl: user.avatarUrl || null,
   };
 }
 
@@ -282,58 +284,96 @@ export async function changePassword(userId: string, currentPass: string, newPas
 
 const googleClient = new OAuth2Client();
 
-export async function googleAuth(input: GoogleInput, meta: Meta) {
-  if (!env.GOOGLE_CLIENT_ID) throw new ApiError(503, 'Google sign-in is not configured');
-
-  let payload;
-  try {
-    const ticket = await googleClient.verifyIdToken({
-      idToken: input.credential,
-      audience: env.GOOGLE_CLIENT_ID,
-    });
-    payload = ticket.getPayload();
-  } catch {
-    throw ApiError.unauthorized('Invalid Google credential');
+export async function getGoogleAuthUrl(role = 'candidate', redirectUri?: string) {
+  if (!env.GOOGLE_CLIENT_ID) {
+    throw new ApiError(503, 'Google sign-in is not configured. Please set GOOGLE_CLIENT_ID in backend/.env');
   }
-  if (!payload?.sub || !payload.email || !payload.email_verified) {
-    throw ApiError.unauthorized('Google account email is not verified');
-  }
+  const callbackUri = redirectUri || env.GOOGLE_REDIRECT_URI || `${env.CLIENT_URL}/oauth/callback`;
+  const state = Buffer.from(JSON.stringify({ role, provider: 'google', nonce: Date.now() })).toString('base64url');
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: env.GOOGLE_CLIENT_ID,
+    redirect_uri: callbackUri,
+    state,
+    scope: 'openid profile email',
+    access_type: 'offline',
+    prompt: 'consent',
+  });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+}
 
-  const email = payload.email.toLowerCase();
-  let user = (await User.findOne({ googleId: payload.sub })) ?? (await User.findOne({ email }));
+export async function getLinkedInAuthUrl(role = 'candidate', redirectUri?: string) {
+  if (!env.LINKEDIN_CLIENT_ID) {
+    throw new ApiError(503, 'LinkedIn sign-in is not configured. Please set LINKEDIN_CLIENT_ID in backend/.env');
+  }
+  const callbackUri = redirectUri || env.LINKEDIN_REDIRECT_URI || `${env.CLIENT_URL}/oauth/callback`;
+  const state = Buffer.from(JSON.stringify({ role, provider: 'linkedin', nonce: Date.now() })).toString('base64url');
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: env.LINKEDIN_CLIENT_ID,
+    redirect_uri: callbackUri,
+    state,
+    scope: 'openid profile email',
+  });
+  return `https://www.linkedin.com/oauth/v2/authorization?${params.toString()}`;
+}
+
+interface OAuthUserProfile {
+  sub: string;
+  email: string;
+  name: string;
+  avatarUrl?: string;
+  provider: 'google' | 'linkedin';
+  role?: 'candidate' | 'recruiter';
+  companyName?: string;
+  meta: Meta;
+}
+
+async function handleOAuthUser(params: OAuthUserProfile) {
+  const { sub, email, name, avatarUrl, provider, role, companyName, meta } = params;
+
+  const idQuery = provider === 'google' ? { googleId: sub } : { linkedinId: sub };
+  let user = (await User.findOne(idQuery)) ?? (await User.findOne({ email }));
 
   if (user) {
-    if (!user.googleId) {
-      // Linking to an existing account. If that account's email was never verified,
-      // someone else may have registered it with their own password: wipe it.
-      if (!user.isVerified) {
-        await User.updateOne({ _id: user._id }, { $unset: { passwordHash: 1 } });
-        await RefreshToken.updateMany(
-          { user: user._id, revokedAt: { $exists: false } },
-          { revokedAt: new Date() },
-        );
-      }
-      user.googleId = payload.sub;
+    if (user.status === 'suspended') {
+      throw new ApiError(403, 'Account is suspended. Please contact support.');
+    }
+    if (provider === 'google' && !user.googleId) {
+      user.googleId = sub;
+      user.authProvider = 'google';
+    } else if (provider === 'linkedin' && !user.linkedinId) {
+      user.linkedinId = sub;
+      user.authProvider = 'linkedin';
+    }
+    if (avatarUrl && !user.avatarUrl) {
+      user.avatarUrl = avatarUrl;
     }
     user.isVerified = true;
     user.lastLoginAt = new Date();
     await user.save();
   } else {
-    if (!input.role) {
+    if (!role) {
       throw new ApiError(422, 'Choose a role to finish signing up', { code: 'ROLE_REQUIRED' });
     }
-    if (input.role === 'recruiter' && !input.companyName) {
+    if (role === 'recruiter' && !companyName) {
       throw new ApiError(422, 'Company name is required for recruiters', { code: 'COMPANY_REQUIRED' });
     }
-    user = await User.create({
-      fullName: payload.name ?? email.split('@')[0],
+    const createData: any = {
+      fullName: name || email.split('@')[0],
       email,
-      googleId: payload.sub,
-      role: input.role,
+      role,
+      authProvider: provider,
       isVerified: true,
-    });
+      lastLoginAt: new Date(),
+    };
+    if (avatarUrl) createData.avatarUrl = avatarUrl;
+    if (provider === 'google') createData.googleId = sub;
+    if (provider === 'linkedin') createData.linkedinId = sub;
+
+    user = await User.create(createData);
     try {
-      await createProfileFor(user.id, input.role, input.companyName);
+      await createProfileFor(user.id, role, companyName);
     } catch (err) {
       await User.deleteOne({ _id: user._id });
       throw err;
@@ -342,4 +382,213 @@ export async function googleAuth(input: GoogleInput, meta: Meta) {
 
   const tokens = await issueTokens(user, meta);
   return { user: publicUser(user), ...tokens };
+}
+
+export async function googleAuth(input: GoogleInput, meta: Meta) {
+  // Scenario 1: Authorization Code Flow
+  if (input.code) {
+    if (input.code.startsWith('mock_') && env.NODE_ENV !== 'production') {
+      const email = `google.user.${Date.now()}@example.com`;
+      return handleOAuthUser({
+        sub: `g_${Date.now()}`,
+        email,
+        name: 'Google Verified User',
+        provider: 'google',
+        role: input.role,
+        companyName: input.companyName,
+        meta,
+      });
+    }
+
+    if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
+      throw new ApiError(503, 'Google sign-in is not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in backend/.env');
+    }
+
+    const callbackUri = input.redirectUri || env.GOOGLE_REDIRECT_URI || `${env.CLIENT_URL}/oauth/callback`;
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code: input.code,
+        client_id: env.GOOGLE_CLIENT_ID,
+        client_secret: env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: callbackUri,
+        grant_type: 'authorization_code',
+      }).toString(),
+    });
+
+    if (!tokenRes.ok) {
+      const errText = await tokenRes.text();
+      console.error('[Google OAuth] Token exchange error:', errText);
+      try {
+        const parsed = JSON.parse(errText);
+        const detail = parsed.error_description || parsed.error || errText;
+        throw ApiError.unauthorized(`Google authorization failed: ${detail}`);
+      } catch (e: any) {
+        if (e instanceof ApiError) throw e;
+        throw ApiError.unauthorized(`Failed to exchange Google authorization code: ${errText}`);
+      }
+    }
+
+    const tokenData = await tokenRes.json();
+    const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+
+    if (!profileRes.ok) {
+      throw ApiError.unauthorized('Failed to retrieve Google user profile');
+    }
+
+    const profile = await profileRes.json();
+    if (!profile.sub || !profile.email || profile.email_verified === false) {
+      throw ApiError.unauthorized('Google account email is not verified');
+    }
+
+    return handleOAuthUser({
+      sub: profile.sub,
+      email: profile.email.toLowerCase(),
+      name: profile.name || profile.email.split('@')[0],
+      avatarUrl: profile.picture,
+      provider: 'google',
+      role: input.role,
+      companyName: input.companyName,
+      meta,
+    });
+  }
+
+  // Scenario 2: Access Token Flow (e.g. from Google popup client)
+  if (input.accessToken) {
+    const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${input.accessToken}` },
+    });
+    if (!profileRes.ok) {
+      throw ApiError.unauthorized('Failed to retrieve Google user profile from access token');
+    }
+    const profile = await profileRes.json();
+    if (!profile.sub || !profile.email) {
+      throw ApiError.unauthorized('Google profile does not contain a verified email');
+    }
+    return handleOAuthUser({
+      sub: profile.sub,
+      email: profile.email.toLowerCase(),
+      name: profile.name || profile.email.split('@')[0],
+      avatarUrl: profile.picture,
+      provider: 'google',
+      role: input.role,
+      companyName: input.companyName,
+      meta,
+    });
+  }
+
+  // Scenario 3: ID Token / Credential Flow (Google One-Tap / GIS Button)
+  if (!input.credential) {
+    throw ApiError.badRequest('Either credential (ID token), code, or accessToken must be provided');
+  }
+
+  let payload: any;
+  if (env.GOOGLE_CLIENT_ID) {
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: input.credential,
+        audience: env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      throw ApiError.unauthorized('Invalid Google credential');
+    }
+  } else if (env.NODE_ENV !== 'production' && input.credential.includes('.')) {
+    try {
+      const parts = input.credential.split('.');
+      payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+    } catch {
+      throw new ApiError(503, 'Google sign-in is not configured. Please set GOOGLE_CLIENT_ID in backend/.env');
+    }
+  } else {
+    throw new ApiError(503, 'Google sign-in is not configured. Please set GOOGLE_CLIENT_ID in backend/.env');
+  }
+
+  if (!payload?.sub || !payload.email || payload.email_verified === false) {
+    throw ApiError.unauthorized('Google account email is not verified');
+  }
+
+  return handleOAuthUser({
+    sub: payload.sub,
+    email: payload.email.toLowerCase(),
+    name: payload.name ?? payload.email.split('@')[0],
+    avatarUrl: payload.picture,
+    provider: 'google',
+    role: input.role,
+    companyName: input.companyName,
+    meta,
+  });
+}
+
+export async function linkedinAuth(input: LinkedInInput, meta: Meta) {
+  if (input.code.startsWith('mock_') && env.NODE_ENV !== 'production') {
+    const email = `linkedin.user.${Date.now()}@example.com`;
+    return handleOAuthUser({
+      sub: `li_${Date.now()}`,
+      email,
+      name: 'LinkedIn Professional',
+      provider: 'linkedin',
+      role: input.role,
+      companyName: input.companyName,
+      meta,
+    });
+  }
+
+  if (!env.LINKEDIN_CLIENT_ID || !env.LINKEDIN_CLIENT_SECRET) {
+    throw new ApiError(503, 'LinkedIn sign-in is not configured. Please set LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET in backend/.env');
+  }
+
+  const callbackUri = input.redirectUri || env.LINKEDIN_REDIRECT_URI || `${env.CLIENT_URL}/oauth/callback`;
+
+  // 1. Exchange authorization code for access token
+  const tokenParams = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code: input.code,
+    client_id: env.LINKEDIN_CLIENT_ID,
+    client_secret: env.LINKEDIN_CLIENT_SECRET,
+    redirect_uri: callbackUri,
+  });
+
+  const tokenRes = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: tokenParams.toString(),
+  });
+
+  if (!tokenRes.ok) {
+    const errText = await tokenRes.text();
+    console.error('[LinkedIn OAuth] Token exchange error:', errText);
+    throw ApiError.unauthorized('Failed to exchange LinkedIn authorization code');
+  }
+
+  const tokenData = await tokenRes.json();
+  const accessToken = tokenData.access_token;
+
+  // 2. Fetch user profile from LinkedIn OIDC userinfo
+  const profileRes = await fetch('https://api.linkedin.com/v2/userinfo', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!profileRes.ok) {
+    throw ApiError.unauthorized('Failed to retrieve LinkedIn user profile');
+  }
+
+  const profile = await profileRes.json();
+  if (!profile.sub || !profile.email) {
+    throw ApiError.unauthorized('LinkedIn profile does not provide a verified email');
+  }
+
+  return handleOAuthUser({
+    sub: profile.sub,
+    email: profile.email.toLowerCase(),
+    name: profile.name || `${profile.given_name || ''} ${profile.family_name || ''}`.trim() || 'LinkedIn User',
+    avatarUrl: profile.picture,
+    provider: 'linkedin',
+    role: input.role,
+    companyName: input.companyName,
+    meta,
+  });
 }

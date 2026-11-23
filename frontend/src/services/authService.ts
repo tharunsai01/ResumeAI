@@ -193,7 +193,7 @@ export const authService = {
         email: data.email.trim(),
         password: data.password || "Password123!",
         role: data.role,
-        companyName: data.company?.trim(),
+        companyName: data.company?.trim() || undefined,
       })
 
       if (res?.data?.accessToken) {
@@ -254,15 +254,77 @@ export const authService = {
     return sessionUser
   },
 
-  async googleAuth(role?: UserRole): Promise<User> {
-    await delay(1200) // Mock popup delay
-
+  async googleAuth(role?: UserRole, credentialOrCode?: string): Promise<User> {
     if (role === "admin") {
       throw new Error("Administrator accounts cannot be registered via Google OAuth.")
     }
-    
+
+    if (!env.useMock) {
+      if (credentialOrCode) {
+        const payload: any = { role }
+        if (credentialOrCode.startsWith("ya29.")) {
+          payload.accessToken = credentialOrCode
+        } else if (credentialOrCode.includes(".")) {
+          payload.credential = credentialOrCode
+        } else {
+          payload.code = credentialOrCode
+          payload.redirectUri = `${window.location.origin}/oauth/callback`
+        }
+
+        const res = await httpClient.post<{ success: boolean; data: { accessToken: string; user: any } }>("/auth/google", payload)
+        if (res?.data?.accessToken) {
+          httpClient.setAuthToken(res.data.accessToken)
+          const u = res.data.user
+          const sessionUser: User = {
+            id: u.id || u._id,
+            email: u.email,
+            name: u.fullName || u.name || "Google User",
+            role: u.role as UserRole,
+            company: u.companyName || u.company,
+          }
+          localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+          window.dispatchEvent(new Event('hiresmart_auth_changed'))
+          return sessionUser
+        }
+      }
+
+      // Check if Google Identity Services Token Client is available in browser for smooth popup auth
+      if (typeof window !== "undefined" && (window as any).google?.accounts?.oauth2 && env.googleClientId) {
+        return new Promise<User>((resolve, reject) => {
+          try {
+            const client = (window as any).google.accounts.oauth2.initTokenClient({
+              client_id: env.googleClientId,
+              scope: "openid profile email",
+              callback: async (tokenResponse: any) => {
+                if (tokenResponse.error) {
+                  reject(new Error(tokenResponse.error_description || tokenResponse.error || "Google sign-in was cancelled."))
+                  return
+                }
+                if (tokenResponse.access_token) {
+                  try {
+                    const user = await this.googleAuth(role, tokenResponse.access_token)
+                    resolve(user)
+                  } catch (e) {
+                    reject(e)
+                  }
+                } else {
+                  reject(new Error("No access token received from Google."))
+                }
+              },
+            })
+            client.requestAccessToken({ prompt: "consent" })
+          } catch {
+            this.triggerGoogleRedirect(role).then(resolve).catch(reject)
+          }
+        })
+      }
+
+      return this.triggerGoogleRedirect(role)
+    }
+
+    await delay(800)
     const mockEmail = `google.${Math.random().toString(36).substr(2, 5)}@gmail.com`
-    const mockName = "Google User"
+    const mockName = "Google Verified Candidate"
 
     if (role) {
       return this.register({
@@ -294,6 +356,85 @@ export const authService = {
         })
       }
     }
+  },
+
+  async triggerGoogleRedirect(role?: UserRole): Promise<User> {
+    try {
+      const redirectUri = `${window.location.origin}/oauth/callback`
+      const res = await httpClient.get<{ success: boolean; data: { url: string } }>(
+        `/auth/google/url?role=${role || 'candidate'}&redirectUri=${encodeURIComponent(redirectUri)}`
+      )
+      if (res?.data?.url) {
+        window.location.href = res.data.url
+        return new Promise(() => {})
+      }
+      throw new Error("Failed to generate Google authentication link.")
+    } catch (err: any) {
+      const message = err.response?.data?.error?.message || err.message || ""
+      if (message.includes("not configured") || err.status === 503) {
+        throw new Error("Google Sign-In is not configured yet on the server. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to backend/.env, or sign in with your email and password.")
+      }
+      throw new Error(message || "Google authentication failed.")
+    }
+  },
+
+  async linkedinAuth(role?: UserRole, code?: string): Promise<User> {
+    if (role === "admin") {
+      throw new Error("Administrator accounts cannot be registered via LinkedIn OAuth.")
+    }
+
+    if (!env.useMock) {
+      if (code) {
+        const redirectUri = `${window.location.origin}/oauth/callback`
+        const res = await httpClient.post<{ success: boolean; data: { accessToken: string; user: any } }>("/auth/linkedin", {
+          code,
+          role,
+          redirectUri,
+        })
+        if (res?.data?.accessToken) {
+          httpClient.setAuthToken(res.data.accessToken)
+          const u = res.data.user
+          const sessionUser: User = {
+            id: u.id || u._id,
+            email: u.email,
+            name: u.fullName || u.name || "LinkedIn Professional",
+            role: u.role as UserRole,
+            company: u.companyName || u.company,
+          }
+          localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+          window.dispatchEvent(new Event('hiresmart_auth_changed'))
+          return sessionUser
+        }
+      }
+
+      try {
+        const redirectUri = `${window.location.origin}/oauth/callback`
+        const res = await httpClient.get<{ success: boolean; data: { url: string } }>(
+          `/auth/linkedin/url?role=${role || 'candidate'}&redirectUri=${encodeURIComponent(redirectUri)}`
+        )
+        if (res?.data?.url) {
+          window.location.href = res.data.url
+          return new Promise(() => {})
+        }
+      } catch (err: any) {
+        const message = err.response?.data?.error?.message || err.message || ""
+        if (message.includes("not configured") || err.status === 503) {
+          throw new Error("LinkedIn Sign-In is not configured yet on the server. Please add LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET to backend/.env, or sign in with your email and password.")
+        }
+        throw new Error(message || "LinkedIn authentication failed.")
+      }
+    }
+
+    await delay(800)
+    const mockEmail = `linkedin.${Math.random().toString(36).substr(2, 5)}@example.com`
+    const mockName = "LinkedIn Verified Candidate"
+
+    return this.register({
+      email: mockEmail,
+      name: mockName,
+      role: role || "candidate",
+      isGoogle: true
+    })
   },
 
   deleteAccount(userId: string): void {
