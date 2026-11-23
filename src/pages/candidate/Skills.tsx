@@ -405,13 +405,13 @@ export default function CandidateSkills() {
                     <div>
                       <span className="text-[10px] text-brand-navy/50 uppercase tracking-wider font-semibold block mb-2">Strong Skills</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {path.strongSkills.map(s => <Badge key={s} variant="outline" className="text-[10px] py-0 border-brand-indigo/20 text-brand-indigo bg-brand-indigo/5">{s}</Badge>)}
+                        {(path.strongSkills || []).map(s => <Badge key={s} variant="outline" className="text-[10px] py-0 border-brand-indigo/20 text-brand-indigo bg-brand-indigo/5">{s}</Badge>)}
                       </div>
                     </div>
                     <div>
                       <span className="text-[10px] text-brand-navy/50 uppercase tracking-wider font-semibold block mb-2">To Improve</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {path.missingSkills.map(s => <Badge key={s} variant="secondary" className="text-[10px] py-0 bg-brand-gray/30 text-brand-navy/60">{s}</Badge>)}
+                        {(path.missingSkills || []).map(s => <Badge key={s} variant="secondary" className="text-[10px] py-0 bg-brand-gray/30 text-brand-navy/60">{s}</Badge>)}
                       </div>
                     </div>
                   </div>

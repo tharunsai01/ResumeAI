@@ -52,10 +52,35 @@ export const skillService = {
       try {
         const res = await httpClient.get<{ success: boolean; data: any }>("/skills/analyze")
         if (res?.data) {
+          const rawCategories = Array.isArray(res.data.categories) ? res.data.categories : mockCategoryScores
+          const normalizedCategories = rawCategories.map((c: any) => ({
+            category: c.category || c.name || "Engineering",
+            score: typeof c.score === "number" ? c.score : 80,
+            skillsCount: c.skillsCount || 4,
+            description: c.description || `Assessment in ${c.category || c.name}`,
+          }))
+
+          const rawDetected = Array.isArray(res.data.detectedSkills) ? res.data.detectedSkills : []
+          const normalizedDetected = rawDetected.map((s: any, idx: number) => ({
+            id: s.id || s._id || `det_skill_${idx}`,
+            name: s.name,
+            category: s.category || "Backend",
+            level: s.level || "Intermediate",
+            currentScore: typeof s.currentScore === "number" ? s.currentScore : Math.max(60, 88 - (idx * 3)),
+            targetScore: typeof s.targetScore === "number" ? s.targetScore : 90,
+            priority: s.priority || (idx < 3 ? "High" : "Medium"),
+            jobDemand: typeof s.jobDemand === "number" ? s.jobDemand : 80,
+            description: s.description || `${s.name} core competency`,
+            recommendation: s.recommendation || `Recommended practice in ${s.name}`,
+            difficulty: s.difficulty || "Intermediate",
+            estimatedEffort: s.estimatedEffort || "3-4 weeks",
+            isDetected: true,
+          }))
+
           return {
             overallScore: res.data.overallScore ?? 85,
-            categories: res.data.categories || mockCategoryScores,
-            detectedSkills: res.data.detectedSkills || mockSkills.filter(s => s.isDetected),
+            categories: normalizedCategories.length > 0 ? normalizedCategories : mockCategoryScores,
+            detectedSkills: normalizedDetected.length > 0 ? normalizedDetected : mockSkills.filter(s => s.isDetected),
             trend: mockSkillTrend,
           }
         }
@@ -84,9 +109,14 @@ export const skillService = {
   async getCareerPaths(): Promise<CareerPath[]> {
     if (!env.useMock) {
       try {
-        const res = await httpClient.get<{ success: boolean; data: CareerPath[] }>("/skills/career-paths")
+        const res = await httpClient.get<{ success: boolean; data: any[] }>("/skills/career-paths")
         if (res?.data && Array.isArray(res.data)) {
-          return res.data
+          return res.data.map(p => ({
+            title: p.title || "Software Engineering Path",
+            readinessScore: p.readinessScore || p.matchProbability || 85,
+            strongSkills: p.strongSkills || (p.requiredSkills ? p.requiredSkills.slice(0, 3) : ["React", "TypeScript"]),
+            missingSkills: p.missingSkills || (p.requiredSkills ? p.requiredSkills.slice(3) : ["AWS", "Docker"]),
+          }))
         }
       } catch (err) {
         console.warn("[SkillService] Live getCareerPaths fetch warning, fallback to cache:", err)
