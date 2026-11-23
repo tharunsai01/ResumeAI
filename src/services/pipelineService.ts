@@ -3,6 +3,8 @@ import { initialPipelineCandidates } from "../data/pipelineMockData"
 import type { PipelineCandidate, PipelineStage } from "../data/pipelineMockData"
 import { applicationService } from "./applicationService"
 
+import { httpClient } from "./api/httpClient"
+
 const PIPELINE_STORAGE_KEY = "hiresmart_pipeline_candidates"
 const RECRUITER_CANDIDATES_KEY = "hiresmart_recruiter_candidates"
 
@@ -46,12 +48,30 @@ export const pipelineService = {
     return list.find(c => c.id === id)
   },
 
-  updateCandidateStage(id: string, stage: PipelineStage): PipelineCandidate | null {
-    if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for pipelineService.")
+  async fetchLivePipeline(jobId?: string): Promise<PipelineCandidate[]> {
+    if (env.useMock) return this.getCandidates()
+    try {
+      const endpoint = jobId ? `/recruiter/pipeline?jobId=${jobId}` : "/recruiter/pipeline"
+      const res = await httpClient.get<{ success: boolean; data: any[] }>(endpoint)
+      if (res?.data && Array.isArray(res.data)) {
+        this.saveCandidates(res.data)
+        return res.data
+      }
+    } catch (err) {
+      console.warn("[PipelineService] Live pipeline fetch failed, using cached:", err)
     }
+    return this.getCandidates()
+  },
+
+  updateCandidateStage(id: string, stage: PipelineStage): PipelineCandidate | null {
     if (!id || !VALID_PIPELINE_STAGES.includes(stage)) {
       return null
+    }
+
+    if (!env.useMock) {
+      httpClient.patch(`/recruiter/pipeline/${id}/stage`, { stage }).catch((err) => {
+        console.warn("[PipelineService] Live stage update warning:", err)
+      })
     }
 
     const candidates = this.getCandidates()

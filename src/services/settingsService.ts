@@ -1,4 +1,3 @@
-import { env } from "../config/env"
 import { defaultMockSettings } from "../data/mockSettings"
 import type { CandidateSettings } from "../data/mockSettings"
 
@@ -21,9 +20,6 @@ export const settingsService = {
   },
 
   saveSettings(settings: CandidateSettings): void {
-    if (!env.useMock) {
-      throw new Error("Live API mode is not yet configured for settingsService.")
-    }
     localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
   },
 

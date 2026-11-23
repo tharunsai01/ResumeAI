@@ -13,6 +13,8 @@ import {
   ArrowLeft, LayoutDashboard, Clock, FileText
 } from "lucide-react"
 import SpotlightCard from "../../components/ui/SpotlightCard";
+import { env } from "../../config/env";
+import { httpClient } from "../../services/api/httpClient";
 
 let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
@@ -125,6 +127,16 @@ export default function ComplaintPage() {
     setReports(updatedReports)
     localStorage.setItem("hiresmart_reports", JSON.stringify(updatedReports))
     
+    if (!env.useMock) {
+      httpClient.post("/complaints", {
+        title: subject,
+        description,
+        category: "technical",
+      }).catch((err) => {
+        console.warn("[CandidateComplaint] Live submit warning:", err)
+      })
+    }
+
     setGeneratedId(newId)
     setIsSubmitting(false)
     setIsSuccess(true)

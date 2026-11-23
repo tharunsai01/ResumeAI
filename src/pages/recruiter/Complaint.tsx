@@ -7,6 +7,8 @@ import { Input } from "../../components/ui/Input"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
+import { env } from "../../config/env"
+import { httpClient } from "../../services/api/httpClient"
 
 const CATEGORIES = [
   "Account & Profile",
@@ -34,7 +36,15 @@ export default function RecruiterComplaint() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock submission for frontend demo
+    if (!env.useMock) {
+      httpClient.post("/complaints", {
+        title: formData.subject,
+        description: formData.description,
+        category: "job_posting",
+      }).catch((err) => {
+        console.warn("[RecruiterComplaint] Live submit warning:", err)
+      })
+    }
     setIsSubmitted(true)
   }
 

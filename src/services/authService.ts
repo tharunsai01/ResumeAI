@@ -97,8 +97,13 @@ export const authService = {
         throw new Error("Authentication failed: Missing token in response.")
       }
 
-      httpClient.setAuthToken(res.data.accessToken)
       const u = res.data.user
+      if (requestedRole && u.role !== requestedRole) {
+        const properRoleName = u.role.charAt(0).toUpperCase() + u.role.slice(1)
+        throw new Error(`This account is registered as a ${u.role}. Please select the ${properRoleName} tab to sign in.`)
+      }
+
+      httpClient.setAuthToken(res.data.accessToken)
       const sessionUser: User = {
         id: u.id || u._id,
         email: u.email,
@@ -339,8 +344,6 @@ export const authService = {
   },
 
   async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<boolean> {
-    await delay(400)
-
     if (!currentPassword) {
       throw new Error("Current password is required.")
     }
@@ -350,6 +353,16 @@ export const authService = {
     if (currentPassword === newPassword) {
       throw new Error("New password must be different from your current password.")
     }
+
+    if (!env.useMock) {
+      await httpClient.post("/auth/change-password", {
+        currentPassword,
+        newPassword,
+      })
+      return true
+    }
+
+    await delay(400)
 
     const users = this.getUsers()
     const currentUser = this.getCurrentUser()
