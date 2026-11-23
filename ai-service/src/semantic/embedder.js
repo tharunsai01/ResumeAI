@@ -5,7 +5,9 @@ import { SEMANTIC } from "./semanticConfig.js";
 let extractorPromise = null;
 
 async function loadExtractor() {
-  const { pipeline } = await import("@huggingface/transformers");
+  const { pipeline, env } = await import("@huggingface/transformers");
+  // Docker downloads the model into a fixed folder at build time (EMBEDDING_CACHE_DIR) so containers start offline.
+  if (process.env.EMBEDDING_CACHE_DIR) env.cacheDir = process.env.EMBEDDING_CACHE_DIR;
   return pipeline("feature-extraction", SEMANTIC.model, { dtype: SEMANTIC.dtype });
 }
 

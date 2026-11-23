@@ -20,7 +20,9 @@ function shape(job, result) {
 }
 
 function rank(scored, options) {
-  const { limit, minScore } = { ...DEFAULTS, ...options };
+      // `??` so that an option passed as undefined (for example from an API body) keeps its default
+  const limit = options.limit ?? DEFAULTS.limit;
+  const minScore = options.minScore ?? DEFAULTS.minScore;
   return scored
     .filter(({ result }) => result.overallMatch >= minScore)
     .sort((a, b) => b.result.overallMatch - a.result.overallMatch || (b.result.skillMatch ?? 0) - (a.result.skillMatch ?? 0))

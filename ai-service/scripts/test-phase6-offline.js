@@ -204,6 +204,9 @@ await check("level words and filler are removed from skill names", () => {
     "Git skills": "Git",
     "Basic Git knowledge": "Git",
     "Experience with Kubernetes": "Kubernetes",
+    "REST API design": "REST API",
+    "Java programming": "Java",
+    "Spring Boot framework": "Spring Boot",
   };
   for (const [input, expected] of Object.entries(cases)) {
     const skill = normalizeSkill(input);
@@ -211,6 +214,12 @@ await check("level words and filler are removed from skill names", () => {
     assert.equal(skill.known, true);
   }
 });
+await check("descriptive endings are only dropped when the rest is a known skill", () => {
+    const unknown = normalizeSkill("System design");
+    assert.equal(unknown.name, "System design");
+    assert.equal(unknown.known, false);
+    assert.equal(normalizeSkill("Kafka development").known, false);
+  });
 await check("real skill names are left alone", () => {
   assert.equal(normalizeSkill("Deep Learning").name, "Deep Learning");
   assert.equal(normalizeSkill("Machine Learning").name, "Machine Learning");

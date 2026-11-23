@@ -13,6 +13,8 @@ export function skillKey(name) {
 const LEADING_ADJECTIVES = /^(?:basic|working|strong|good|solid|hands-on|practical|proficient|expert|intermediate|beginner|advanced|fundamental)\s+/i;
 const LEADING_NOUNS = /^(?:experience|knowledge|understanding|familiarity|proficiency|expertise|exposure|skills?)\s+(?:in|with|of|on|using)\s+/i;
 const TRAILING_NOUNS = /\s+(?:knowledge|skills?|proficiency|expertise|fundamentals|basics)$/i;
+// Descriptive endings ("REST API design", "Java programming"). Only dropped when what is left is a known skill.
+const DESCRIPTIVE_ENDING = /\s+(?:design|development|programming|framework|frameworks|library|libraries|concepts|principles|language|platform|tools?)$/i;
 
 // Remove "(...)" notes, level words and trailing version numbers:
 // "Python 3.11" -> "Python", "Basic machine learning knowledge" -> "machine learning"
@@ -58,7 +60,8 @@ for (const [name, category, aliases] of SKILLS) {
 export function normalizeSkill(raw) {
   const cleaned = cleanSkillName(raw);
   if (!cleaned) return null;
-  const entry = INDEX.get(skillKey(cleaned));
+  let entry = INDEX.get(skillKey(cleaned));
+  if (!entry && DESCRIPTIVE_ENDING.test(cleaned)) entry = INDEX.get(skillKey(cleaned.replace(DESCRIPTIVE_ENDING, "")));
   if (entry) return { name: entry.name, category: entry.category, known: true };
   return { name: cleaned, category: null, known: false };
 }

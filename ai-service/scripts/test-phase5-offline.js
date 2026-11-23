@@ -218,6 +218,10 @@ await check("limit and minScore are respected", () => {
   const strict = recommendJobs({ analysis: rahul }, boardJobs, { minScore: 80 });
   assert.deepEqual(strict.map((r) => r.jobId), ["job_201"]);
 });
+await check("options passed as undefined keep their defaults", () => {
+    const same = recommendJobs({ analysis: rahul }, boardJobs, { limit: undefined, minScore: undefined, weights: undefined });
+    assert.deepEqual(same, recs);
+  });
 await check("name, email and location do not change the recommendations", () => {
   const other = structuredClone(rahul);
   other.candidate = { name: "Someone Else", email: "x@y.z", location: "Elsewhere" };
