@@ -1,7 +1,4 @@
-// HireSmart AI pipeline: test in parallel, run the live journey on Docker
-// Compose, push images, then deploy to Kubernetes after manual approval.
-// Required Jenkins credentials:
-//   registry-creds (username/password), kubeconfig-hiresmart (secret file)
+
 pipeline {
   agent any
   options {
