@@ -22,7 +22,7 @@ Status key: **Done**, **Done (CI-verified only)** = written and wired into CI bu
 | 16. Kubernetes | Done | Kustomize set, NetworkPolicies, HPAs, hardened pods. 20/20 resources pass strict v1.30 validation. |
 | 17. Final QA and documentation | Done | 13 docs, README with screenshots, this log. |
 
-## Defects found and fixed during QA
+# Defects found and fixed during QA
 
 | Found by | Defect | Fix |
 |---|---|---|
