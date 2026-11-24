@@ -1,3 +1,4 @@
+import { env } from "../../config/env"
 import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import { AdminShell } from "../../components/layout/AdminShell"
@@ -17,7 +18,7 @@ import type { AuditLog } from "../../data/mockAdminAuditLogs"
 const MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 export default function AdminAuditLogs() {
-  const { auditLogs } = useAdminAuditLogs()
+  const { auditLogs, loadError } = useAdminAuditLogs()
 
   // Filters
   const [searchTerm, setSearchTerm] = useState("")
@@ -52,7 +53,7 @@ export default function AdminAuditLogs() {
       let matchesDate = true
       if (dateFilter !== "All Time") {
         const logDate = new Date(log.timestamp)
-        const now = new Date("21 Sep 2026") // Using mock current date
+        const now = env.useMock ? new Date("21 Sep 2026") : new Date()
         const diffDays = Math.floor((now.getTime() - logDate.getTime()) / (1000 * 3600 * 24))
         
         if (dateFilter === "Today") matchesDate = diffDays === 0
@@ -105,7 +106,7 @@ export default function AdminAuditLogs() {
   // Stats
   const todayCount = auditLogs.filter(log => {
     const logDate = new Date(log.timestamp)
-    const now = new Date("21 Sep 2026")
+    const now = env.useMock ? new Date("21 Sep 2026") : new Date()
     return Math.floor((now.getTime() - logDate.getTime()) / (1000 * 3600 * 24)) === 0
   }).length
   
@@ -140,6 +141,7 @@ export default function AdminAuditLogs() {
 
   return (
     <AdminShell>
+      {loadError && <p role="alert">Unable to load audit logs.</p>}
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-7xl mx-auto space-y-6 pb-12">
         
         {/* HEADER */}
@@ -156,7 +158,7 @@ export default function AdminAuditLogs() {
 
         {/* STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-          <AdminStatCard title="Total Events" value={auditLogs.length} icon={FileText} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
+          <AdminStatCard title={env.useMock ? "Total Events" : "Recent Events"} value={auditLogs.length} icon={FileText} color={{ bg: "bg-brand-indigo/10", text: "text-brand-indigo" }} />
           <AdminStatCard title="Today" value={todayCount} icon={Activity} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
           <AdminStatCard title="Admin Actions" value={adminActionsCount} icon={Users} color={{ bg: "bg-brand-purple/10", text: "text-brand-purple" }} />
           <AdminStatCard title="AI Events" value={aiEventsCount} icon={BrainCircuit} color={{ bg: "bg-emerald-500/10", text: "text-emerald-500" }} />
