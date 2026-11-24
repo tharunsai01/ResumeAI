@@ -343,6 +343,9 @@ curl --fail http://localhost:5173/api/v1/health
 docker compose exec ai-service node -e 'fetch("http://127.0.0.1:8000/v1/status", {headers: {"x-internal-key": process.env.AI_SERVICE_KEY}}).then(r => r.json()).then(console.log)'
 ```
 
+For Google sign-in with Docker Compose, set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI` in the root `.env`. Enter the exact browser origin followed by `/oauth/callback` as the authorized redirect URI on your Google OAuth web client and as `GOOGLE_REDIRECT_URI`. For example, use `http://127.0.0.1:35173/oauth/callback` if the demo opens at `http://127.0.0.1:35173`. Recreate the backend with the same Compose project name after updating the credentials.
+
+
 Open http://localhost:5173 for the demo. The backend forwards resume analysis and matching requests to the internal AI service and can fall back to the configured direct provider or rule-based scoring if the service fails. Check the AI service logs for successful requests during the demo.
 ---
 

@@ -441,7 +441,7 @@ export const authService = {
       }
       const message = err.response?.data?.error?.message || err.message || ""
       if (message.includes("not configured") || err.status === 503) {
-        throw new Error("Google Sign-In is not configured yet on the server. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to backend/.env, or sign in with your email and password.")
+        throw new Error("Google sign-in is unavailable until the server is configured. You can sign in with your email and password.")
       }
       throw new Error(message || "Google authentication failed.")
     }

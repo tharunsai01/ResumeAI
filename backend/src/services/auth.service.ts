@@ -285,8 +285,8 @@ export async function changePassword(userId: string, currentPass: string, newPas
 const googleClient = new OAuth2Client();
 
 export async function getGoogleAuthUrl(role = 'candidate', redirectUri?: string) {
-  if (!env.GOOGLE_CLIENT_ID) {
-    throw new ApiError(503, 'Google sign-in is not configured. Please set GOOGLE_CLIENT_ID in backend/.env');
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
+    throw new ApiError(503, 'Google sign-in is not configured');
   }
   const callbackUri = redirectUri || env.GOOGLE_REDIRECT_URI || `${env.CLIENT_URL}/oauth/callback`;
   const state = Buffer.from(JSON.stringify({ role, provider: 'google', nonce: Date.now() })).toString('base64url');
