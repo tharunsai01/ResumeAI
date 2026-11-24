@@ -1,0 +1,36 @@
+name: Deploy to Kubernetes
+
+# Manual, approved deployments of an image tag that CI already built.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Image tag (git SHA) to deploy
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production # configure required reviewers on this environment
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+      - name: Configure cluster access
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > ~/.kube/config
+      - name: Set image tags
+        working-directory: k8s
+        run: |
+          kubectl kustomize . > /dev/null
+          for s in frontend backend ai-service; do
+            sed -i "s#ghcr.io/OWNER/hiresmart-ai/${s}:latest#ghcr.io/${{ github.repository }}/${s}:${{ inputs.tag }}#" ${s}.yaml
+          done
+      - run: kubectl apply -k k8s/
+      - run: |
+          kubectl -n hiresmart rollout status deploy/ai-service --timeout=300s
+          kubectl -n hiresmart rollout status deploy/backend --timeout=180s
+          kubectl -n hiresmart rollout status deploy/frontend --timeout=120s

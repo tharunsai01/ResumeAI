@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: hiresmart
+spec:
+  selector: { app: backend }
+  ports:
+    - port: 5000
+      targetPort: 5000
+---
+# Resume files. ReadWriteOnce limits the backend to one replica; switch to a
+# ReadWriteMany class (EFS, Azure Files, Filestore) or object storage to scale out.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: resume-uploads
+  namespace: hiresmart
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: hiresmart
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # required while the uploads volume is ReadWriteOnce
+  selector:
+    matchLabels: { app: backend }
+  template:
+    metadata:
+      labels: { app: backend, tier: api }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: backend
+          image: ghcr.io/OWNER/hiresmart-ai/backend:latest
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef: { name: hiresmart-config }
+            - secretRef: { name: hiresmart-secrets }
+          resources:
+            requests: { cpu: 250m, memory: 256Mi }
+            limits: { cpu: "1", memory: 768Mi }
+          readinessProbe:
+            httpGet: { path: /health, port: 5000 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 5000 }
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/uploads
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: uploads
+          persistentVolumeClaim: { claimName: resume-uploads }
+        - name: tmp
+          emptyDir: {}

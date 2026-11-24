@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ai-service:
+    name: AI service (pytest)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: ai-service } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11', cache: pip }
+      # Unit tests use the TF-IDF fallback, so torch/MiniLM are not needed here
+      - run: pip install fastapi uvicorn pydantic pydantic-settings httpx python-multipart pymupdf python-docx scikit-learn numpy pytest
+      - run: python -m pytest -q
+
+  backend:
+    name: Backend (typecheck, unit + integration)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: backend } }
+    services:
+      mongo:
+        image: mongo:7.0
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok'"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+    env:
+      MONGO_URI_TEST: mongodb://localhost:27017/hiresmart_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: backend/package-lock.json }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  frontend:
+    name: Frontend (typecheck, build, Playwright UI)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Live build contains no demo data layer
+        run: "! grep -l -E 'hs-demo-session|installMockAdapter' dist/assets/*.js"
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        env: { CI: 'true' }
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: playwright-report, path: frontend/playwright-report, retention-days: 7 }
+
+  e2e-live:
+    name: End-to-end journey (Docker Compose)
+    runs-on: ubuntu-latest
+    needs: [ai-service, backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create CI environment file
+        run: |
+          cat > .env <<EOF
+          MONGO_ROOT_USER=ci
+          MONGO_ROOT_PASSWORD=$(openssl rand -hex 24)
+          JWT_ACCESS_SECRET=$(openssl rand -hex 32)
+          JWT_REFRESH_SECRET=$(openssl rand -hex 32)
+          AI_SERVICE_TOKEN=$(openssl rand -hex 32)
+          PRELOAD_MODEL=true
+          PUBLIC_URL=http://localhost:8080
+          SEED_ALLOW_PRODUCTION=true
+          EOF
+      - run: docker compose up -d --build --wait
+      - run: docker compose exec -T backend node dist/seed/seed.js
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          E2E_LIVE=1 BASE_URL=http://localhost:8080 npx playwright test
+      - if: failure()
+        run: docker compose logs --tail=200
+
+  images:
+    name: Build and push images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [e2e-live]
+    permissions: { contents: read, packages: write }
+    strategy:
+      matrix:
+        service: [frontend, backend, ai-service]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: '${{ github.actor }}', password: '${{ secrets.GITHUB_TOKEN }}' }
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.service }}
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}/${{ matrix.service }}:latest
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}

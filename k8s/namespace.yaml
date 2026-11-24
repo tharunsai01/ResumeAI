@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hiresmart
+  labels:
+    app.kubernetes.io/part-of: hiresmart
+    pod-security.kubernetes.io/enforce: baseline

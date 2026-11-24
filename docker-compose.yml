@@ -1,0 +1,115 @@
+# HireSmart AI: full local stack.
+#   cp .env.example .env    (then set the secrets)
+#   docker compose up -d --build
+#   docker compose exec backend node dist/seed/seed.js
+# App: http://localhost:8080
+
+name: hiresmart
+
+x-hardening: &hardening
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  mongo:
+    image: mongo:7.0
+    <<: *hardening
+    cap_add: [CHOWN, SETGID, SETUID, DAC_OVERRIDE, FOWNER]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:?set MONGO_ROOT_USER in .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?set MONGO_ROOT_PASSWORD in .env}
+      MONGO_INITDB_DATABASE: hiresmart
+    volumes:
+      - mongo-data:/data/db
+    networks: [data]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  ai-service:
+    build:
+      context: ./ai-service
+      args:
+        PRELOAD_MODEL: ${PRELOAD_MODEL:-true}
+    <<: *hardening
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      ENVIRONMENT: production
+      INTERNAL_SERVICE_TOKEN: ${AI_SERVICE_TOKEN:?set AI_SERVICE_TOKEN in .env}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-20b}
+      EMBEDDINGS_ENABLED: ${EMBEDDINGS_ENABLED:-true}
+    # Internal only: no published port. Only the backend can reach it.
+    networks: [ai]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health').status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    deploy:
+      resources:
+        limits: { memory: 2g }
+
+  backend:
+    build: ./backend
+    <<: *hardening
+    read_only: true
+    tmpfs: [/tmp]
+    depends_on:
+      mongo: { condition: service_healthy }
+      ai-service: { condition: service_healthy }
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongo:27017/hiresmart?authSource=admin
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?set JWT_ACCESS_SECRET in .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET in .env}
+      AI_SERVICE_URL: http://ai-service:8000
+      AI_SERVICE_TOKEN: ${AI_SERVICE_TOKEN}
+      CORS_ORIGINS: ${PUBLIC_URL:-http://localhost:8080}
+      FRONTEND_URL: ${PUBLIC_URL:-http://localhost:8080}
+      PUBLIC_API_URL: ${PUBLIC_URL:-http://localhost:8080}
+      TRUST_PROXY: 1
+      UPLOAD_DIR: /app/uploads
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
+      SEED_ALLOW_PRODUCTION: ${SEED_ALLOW_PRODUCTION:-false}
+    volumes:
+      - uploads:/app/uploads
+    networks: [web, data, ai]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  frontend:
+    build: ./frontend
+    <<: *hardening
+    read_only: true
+    tmpfs: [/tmp]
+    depends_on:
+      backend: { condition: service_healthy }
+    ports:
+      - "${HTTP_PORT:-8080}:8080"
+    networks: [web]
+
+networks:
+  web: {}
+  data: { internal: true }
+  ai: { internal: true }
+
+volumes:
+  mongo-data: {}
+  uploads: {}
