@@ -68,137 +68,133 @@ function parseJsonFromLlmOutput(raw: string): any {
 }
 
 // -------------------------------------------------------------
-// 1. Python FastAPI AI Microservice Provider (localhost:8000)
+// 1. Express AI microservice
 // -------------------------------------------------------------
+type ServiceJob = Parameters<AIProviderInterface['matchJob']>[1];
+
 export class HttpAiMicroserviceProvider implements AIProviderInterface {
-  name = 'HireSmart AI Python Microservice (Groq & MiniLM)';
+  name = 'HireSmart AI Microservice (Groq & MiniLM)';
 
   isConfigured(): boolean {
-    return !!env.AI_SERVICE_URL && env.AI_SERVICE_URL.trim().length > 0;
+    return Boolean(env.AI_SERVICE_URL?.trim() && env.AI_SERVICE_KEY);
   }
 
-  private get headers(): Record<string, string> {
-    const h: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (env.AI_SERVICE_KEY) {
-      h['x-service-key'] = env.AI_SERVICE_KEY;
+  private async post(path: string, body: object) {
+    const base = env.AI_SERVICE_URL?.trim().replace(/\/+$/, '').replace(/\/v1$/, '');
+    const response = await fetch(`${base}/v1${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-key': env.AI_SERVICE_KEY ?? '',
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(45000),
+    });
+    if (!response.ok) {
+      throw new Error(`AI microservice ${path} returned HTTP ${response.status}`);
     }
-    return h;
+    return response.json();
+  }
+
+  private async analyze(rawText: string) {
+    return this.post('/resume/analyze-text', { text: sanitizePii(rawText) });
+  }
+
+  private jobRequirements(job: ServiceJob) {
+    return {
+      title: job.title,
+      description: job.description,
+      requiredSkills: job.requiredSkills,
+      preferredSkills: job.niceToHaveSkills,
+      experience: job.minExperienceYears ? `${job.minExperienceYears} years` : undefined,
+    };
   }
 
   async analyzeResume(rawText: string): Promise<AIResumeAnalysisOutput> {
-    const sanitized = sanitizePii(rawText);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-
-    try {
-      const res = await fetch(`${env.AI_SERVICE_URL}/analyze/resume`, {
-        method: 'POST',
-        headers: this.headers,
-        body: JSON.stringify({ rawText: sanitized }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        throw new Error(`AI Microservice HTTP ${res.status}`);
-      }
-
-      const json = await res.json();
-      return aiResumeAnalysisSchema.parse(json.data || json);
-    } finally {
-      clearTimeout(timeout);
-    }
+    const { report } = await this.analyze(rawText);
+    return aiResumeAnalysisSchema.parse({
+      summary: report.insights?.summary ?? '',
+      qualityScore: report.score ?? 0,
+      breakdown: report.breakdown ?? { skills: 0, experience: 0, education: 0, projects: 0 },
+      skills: report.skills ?? [],
+      strengths: report.insights?.strengths ?? [],
+      weaknesses: report.insights?.improvements ?? [],
+      suggestions: report.insights?.improvements ?? [],
+      missingKeywords: [],
+      experience: (report.experience ?? []).map((exp: any) => ({
+        title: exp.title ?? '',
+        company: exp.company ?? '',
+        duration: exp.duration ?? '',
+        description: Array.isArray(exp.description) ? exp.description : exp.description ? [exp.description] : [],
+      })),
+      education: (report.education ?? []).map((edu: any) => ({
+        degree: edu.degree ?? '',
+        institution: edu.institution ?? '',
+        duration: edu.duration ?? '',
+      })),
+      projects: (report.projects ?? []).map((proj: any) => ({
+        name: proj.name ?? '',
+        techStack: Array.isArray(proj.techStack) ? proj.techStack : proj.techStack ? [proj.techStack] : [],
+        description: proj.description ?? '',
+      })),
+    });
   }
 
-  async matchJob(
-    resumeText: string,
-    job: {
-      title: string;
-      description: string;
-      requiredSkills: string[];
-      niceToHaveSkills?: string[];
-      minExperienceYears?: number;
-    },
-  ): Promise<AIJobMatchOutput> {
-    const sanitized = sanitizePii(resumeText);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-
-    try {
-      const res = await fetch(`${env.AI_SERVICE_URL}/match`, {
-        method: 'POST',
-        headers: this.headers,
-        body: JSON.stringify({
-          resumeText: sanitized,
-          jobTitle: job.title,
-          jobDescription: job.description,
-          requiredSkills: job.requiredSkills,
-          niceToHaveSkills: job.niceToHaveSkills,
-          minExperienceYears: job.minExperienceYears || 0,
-        }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        throw new Error(`AI Microservice HTTP ${res.status}`);
-      }
-
-      const json = await res.json();
-      const d = json.data || json;
-      return aiJobMatchSchema.parse({
-        overallScore: d.overallScore,
-        skillMatchPercentage: d.skillsScore ?? d.skillMatchPercentage ?? 80,
-        matchedSkills: d.matchedSkills || [],
-        missingSkills: d.missingSkills || [],
-        experienceCompatibility: `${d.experienceScore ?? 80}% experience requirement alignment`,
-        educationCompatibility: `${d.educationScore ?? 85}% education criteria alignment`,
-        strengths: d.strengths || [],
-        potentialGaps: d.gaps || d.potentialGaps || [],
-        actionableRecommendations: d.actionableSuggestions || d.actionableRecommendations || [],
-        explanation: d.explanation || 'Evaluated via AI microservice',
-      });
-    } finally {
-      clearTimeout(timeout);
-    }
+  async matchJob(resumeText: string, job: ServiceJob): Promise<AIJobMatchOutput> {
+    const { analysis, text } = await this.analyze(resumeText);
+    const { match } = await this.post('/match', {
+      resume: { analysis, text },
+      job: this.jobRequirements(job),
+    });
+    return aiJobMatchSchema.parse({
+      overallScore: match.overallMatch,
+      skillMatchPercentage: match.skillMatch ?? 0,
+      experienceMatch: match.experienceMatch,
+      roleSimilarity: match.roleSimilarity,
+      matchedSkills: match.skills.filter((skill: { matchType: string }) => skill.matchType === 'Matched').map((skill: { name: string }) => skill.name),
+      missingSkills: match.skills.filter((skill: { matchType: string }) => skill.matchType === 'Missing').map((skill: { name: string }) => skill.name),
+      experienceCompatibility: match.experienceMatch == null ? 'No experience requirement scored' : `${match.experienceMatch}% experience alignment`,
+      educationCompatibility: match.educationMatch == null ? 'No education requirement scored' : `${match.educationMatch}% education alignment`,
+      strengths: match.matchedStrengths,
+      potentialGaps: match.potentialGaps,
+      actionableRecommendations: match.potentialGaps,
+      explanation: match.screeningStatus,
+    });
   }
 
   async screenCandidate(
     resumeText: string,
-    job: {
-      title: string;
-      description: string;
-      requiredSkills: string[];
-      minExperienceYears?: number;
-    },
+    job: ServiceJob,
     context?: { coverLetter?: string },
   ): Promise<AICandidateScreeningOutput> {
-    const sanitized = sanitizePii(resumeText);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-
-    try {
-      const res = await fetch(`${env.AI_SERVICE_URL}/screen`, {
-        method: 'POST',
-        headers: this.headers,
-        body: JSON.stringify({
-          resumeText: sanitized,
-          jobTitle: job.title,
-          jobDescription: job.description,
-          requiredSkills: job.requiredSkills,
-          minExperienceYears: job.minExperienceYears || 0,
-          coverLetter: context?.coverLetter,
-        }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        throw new Error(`AI Microservice HTTP ${res.status}`);
-      }
-
-      const json = await res.json();
-      return aiScreeningSchema.parse(json.data || json);
-    } finally {
-      clearTimeout(timeout);
+    if (context?.coverLetter?.trim()) {
+      throw new Error('The AI microservice only scores resume evidence');
     }
+    const { analysis, text } = await this.analyze(resumeText);
+    const { ranked } = await this.post('/screen', {
+      candidates: [{ id: 'candidate', analysis, text }],
+      job: this.jobRequirements(job),
+    });
+    const [match] = ranked;
+    const required = match.skills as { required: boolean; matchType: string; name: string }[];
+    const recommendations: Record<string, string> = {
+      'Strong Match': 'strong_match',
+      'Potential Match': 'potential_match',
+      'Low Match': 'weak_match',
+    };
+    return aiScreeningSchema.parse({
+      overallScore: match.overallMatch,
+      skillsScore: match.skillMatch ?? 0,
+      experienceScore: match.experienceMatch ?? 0,
+      educationScore: match.educationMatch ?? 0,
+      recommendation: recommendations[match.screeningStatus],
+      matchedRequirements: required.filter(skill => skill.required && skill.matchType === 'Matched').map(skill => skill.name),
+      missingRequirements: required.filter(skill => skill.required && skill.matchType === 'Missing').map(skill => skill.name),
+      strengths: match.matchedStrengths,
+      gaps: match.potentialGaps,
+      explanation: match.screeningStatus,
+      actionableSuggestions: match.potentialGaps,
+    });
   }
 }
 
@@ -429,6 +425,9 @@ export class HeuristicRuleBasedProvider implements AIProviderInterface {
       weaknesses: ['Add quantifiable business and system scale impact metrics'],
       suggestions: ['Highlight system throughput or latency achievements'],
       missingKeywords: ['Microservices Architecture', 'CI/CD Automation'],
+      experience: [],
+      education: [],
+      projects: [],
     };
   }
 
@@ -535,10 +534,10 @@ export class CompositeAIProvider implements AIProviderInterface {
   }
 
   async analyzeResume(rawText: string): Promise<AIResumeAnalysisOutput> {
-    // 1. Try Python microservice if reachable
+    // 1. Try the AI microservice if reachable
     if (this.microservice.isConfigured()) {
       try {
-        return await this.microservice.analyzeResume(rawText);
+        return { ...await this.microservice.analyzeResume(rawText), provider: this.microservice.name };
       } catch (err: any) {
         console.warn('[CompositeAIProvider] Microservice attempt failed, checking direct LLM provider:', err?.message);
       }
@@ -547,7 +546,7 @@ export class CompositeAIProvider implements AIProviderInterface {
     // 2. Try direct Groq if configured
     if (this.groq.isConfigured()) {
       try {
-        return await this.groq.analyzeResume(rawText);
+        return { ...await this.groq.analyzeResume(rawText), provider: this.groq.name };
       } catch (err: any) {
         console.warn('[CompositeAIProvider] Groq direct attempt failed:', err?.message);
       }
@@ -556,14 +555,14 @@ export class CompositeAIProvider implements AIProviderInterface {
     // 3. Try Gemini if configured
     if (this.gemini.isConfigured()) {
       try {
-        return await this.gemini.analyzeResume(rawText);
+        return { ...await this.gemini.analyzeResume(rawText), provider: this.gemini.name };
       } catch (err: any) {
         console.warn('[CompositeAIProvider] Gemini attempt failed:', err?.message);
       }
     }
 
     // 4. Reliable Heuristic Fallback
-    return this.heuristic.analyzeResume(rawText);
+    return { ...await this.heuristic.analyzeResume(rawText), provider: this.heuristic.name };
   }
 
   async matchJob(

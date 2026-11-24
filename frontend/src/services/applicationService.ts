@@ -28,10 +28,10 @@ export const applicationService = {
     return []
   },
 
-  saveApplications(apps: Application[]) {
+  saveApplications(apps: Application[], notify = true) {
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(apps))
-      window.dispatchEvent(new Event('hiresmart_applications_updated'))
+      if (notify) window.dispatchEvent(new Event('hiresmart_applications_updated'))
     }
   },
 
@@ -152,7 +152,7 @@ export const applicationService = {
             : [{ status: "Applied", date: item.createdAt || new Date().toISOString() }],
           notes: "",
         }))
-        this.saveApplications(mapped)
+        this.saveApplications(mapped, false)
         return mapped
       }
     } catch (err) {

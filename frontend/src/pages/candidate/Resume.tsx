@@ -134,7 +134,7 @@ export default function CandidateResume() {
       </div>
 
       <div className="max-w-4xl mx-auto">
-        <AnimatePresence mode="wait">
+        <AnimatePresence initial={false}>
           {/* EMPTY / ERROR STATE */}
           {(uploadState === "empty" || uploadState === "error") && (
             <MotionSpotlightCard
@@ -318,7 +318,7 @@ export default function CandidateResume() {
                         className="space-y-2 pt-2"
                       >
                         <Button size="lg" className="w-full group" onClick={() => navigate("/candidate/profile")}>
-                          Review & Save Profile <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                          View Profile <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </Button>
                         <Button size="lg" variant="outline" className="w-full group" onClick={() => navigate("/candidate/resume/analysis")}>
                           View AI Analysis

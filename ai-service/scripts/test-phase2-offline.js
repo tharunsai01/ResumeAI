@@ -152,6 +152,22 @@ async function asyncChecks() {
   } catch (e) { console.log("  FAIL retry", e.message); process.exitCode = 1; }
 
   try {
+    let attempts = 0;
+    const client = { chat: { completions: { create: async () => {
+      if (++attempts === 1) {
+        throw Object.assign(new Error("invalid JSON"), {
+          status: 400,
+          error: { error: { code: "json_validate_failed" } },
+        });
+      }
+      return { choices: [{ message: { content: validReply } }] };
+    } } } };
+    const retried = await extractResume("some resume text", { client, now: NOW });
+    assert.equal(retried.meta.attempts, 2);
+    passed++; console.log("  ok   Groq JSON rejection triggers one retry");
+  } catch (e) { console.log("  FAIL provider retry", e.message); process.exitCode = 1; }
+
+  try {
     const bad = fakeClient(["nope", "still nope"]);
     await extractResume("some resume text", { client: bad, now: NOW });
     throw new Error("should have thrown");

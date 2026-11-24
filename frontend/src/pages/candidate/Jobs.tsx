@@ -20,7 +20,7 @@ export default function CandidateJobs() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { savedJobs, toggleSaveJob, hasApplied } = useJobActions()
-  const activeResume = resumeService.getActiveResumeAnalysis()
+  const activeResume = React.useMemo(() => resumeService.getActiveResumeAnalysis(), [])
 
   const [loading, setLoading] = React.useState(true)
   const [allJobs, setAllJobs] = React.useState<JobMatchResult[]>([])

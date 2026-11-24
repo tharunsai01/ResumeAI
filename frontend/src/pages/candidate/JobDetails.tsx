@@ -8,7 +8,9 @@ import { Badge } from "../../components/ui/Badge"
 import { Button } from "../../components/ui/Button"
 import { MatchScore } from "../../components/shared/MatchScore"
 import { jobService } from "../../services/jobService"
-import type { JobMatchResult } from "../../services/jobService"
+import type { Job, JobMatchResult } from "../../types/job"
+import { env } from "../../config/env"
+import { httpClient } from "../../services/api/httpClient"
 import { useJobActions } from "../../hooks/useJobActions"
 import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
@@ -24,38 +26,72 @@ export default function CandidateJobDetails() {
   const isApplyModalOpen = searchParams.get("apply") === "true"
 
   const { isJobSaved, toggleSaveJob, hasApplied, applyToJob } = useJobActions()
-  const activeResume = resumeService.getActiveResumeAnalysis()
+  const activeResume = React.useMemo(() => resumeService.getActiveResumeAnalysis(), [])
   
   const [loading, setLoading] = React.useState(true)
-  const [matchData, setMatchData] = React.useState<JobMatchResult | null>(null)
+  const [job, setJob] = React.useState<Job | null>(null)
+  const [matchData, setMatchData] = React.useState<(Omit<JobMatchResult, "experienceMatch" | "roleSimilarity" | "educationMatch"> & {
+    experienceMatch?: number | null
+    roleSimilarity?: number | null
+  }) | null>(null)
+  const [matchStatus, setMatchStatus] = React.useState("")
+  const [resumeFileName, setResumeFileName] = React.useState("")
   
   // Apply Modal State
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isSuccess, setIsSuccess] = React.useState(false)
 
   React.useEffect(() => {
-    const fetchJobDetails = async () => {
+    let mounted = true
+    setLoading(true)
+    setJob(null)
+    setMatchData(null)
+    setMatchStatus("")
+    setResumeFileName("")
+
+    async function fetchJobDetails() {
       try {
         if (!jobId) return
-        const job = await jobService.getJobById(jobId)
-        if (job) {
-          const match = jobService.calculateJobMatch(activeResume, job)
-          setMatchData(match)
-        }
-      } finally {
+        const currentJob: Job | undefined = await jobService.getJobById(jobId)
+        if (!mounted || !currentJob) return
+        setJob(currentJob)
         setLoading(false)
+        if (env.useMock) {
+          setMatchData(jobService.calculateJobMatch(activeResume, currentJob))
+          return
+        }
+        setMatchStatus("Calculating your resume match…")
+        const { data: resume } = await httpClient.get<{ data: { _id: string; fileName: string } }>("/resumes/active")
+        if (!mounted) return
+        setResumeFileName(resume.fileName)
+        const { data } = await httpClient.post<{ data: {
+          overallScore: number; skillMatchPercentage: number; experienceMatch?: number | null; roleSimilarity?: number | null;
+          matchedSkills: string[]; missingSkills: string[]; strengths: string[]; actionableRecommendations: string[];
+        } }>(`/ai/match/${encodeURIComponent(resume._id)}/${encodeURIComponent(jobId)}`, undefined, { timeoutMs: 100000 })
+        if (!mounted) return
+        setMatchData({
+          job: currentJob, overallMatch: data.overallScore, skillMatch: data.skillMatchPercentage,
+          experienceMatch: data.experienceMatch, roleSimilarity: data.roleSimilarity,
+          matchedSkills: data.matchedSkills, missingSkills: data.missingSkills,
+          explanation: { strengths: data.strengths, improvements: data.actionableRecommendations },
+        })
+      } catch {
+        if (mounted) setMatchStatus("Resume match unavailable. Upload a resume or try again.")
+      } finally {
+        if (mounted) setLoading(false)
       }
     }
-    fetchJobDetails()
+    void fetchJobDetails()
+    return () => { mounted = false }
   }, [jobId, activeResume])
 
   const handleApply = async () => {
-    if (!matchData) return
+    if (!job) return
     setIsSubmitting(true)
     // Simulate network delay
     // Simulate fetching
     setIsSubmitting(false)
-    applyToJob(matchData.job, matchData.overallMatch)
+    applyToJob(job, matchData?.overallMatch ?? 0)
     setIsSuccess(true)
   }
 
@@ -78,7 +114,7 @@ export default function CandidateJobDetails() {
     )
   }
 
-  if (!matchData) {
+  if (!job) {
     return (
       <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
         <div className="text-center p-12">
@@ -89,7 +125,6 @@ export default function CandidateJobDetails() {
     )
   }
 
-  const { job } = matchData
   const saved = isJobSaved(job.id)
   const applied = hasApplied(job.id)
 
@@ -155,6 +190,7 @@ export default function CandidateJobDetails() {
                   </div>
                 </div>
 
+                {matchData && (
                 <div className="flex flex-col items-center justify-center p-4 bg-brand-light rounded-xl border border-brand-gray/50 shrink-0 w-full md:w-auto min-w-[160px]">
                   <MatchScore score={matchData.overallMatch} size="lg" />
                   <p className={cn(
@@ -168,6 +204,7 @@ export default function CandidateJobDetails() {
                      matchData.overallMatch >= 60 ? "Potential Match" : "Low Match"}
                   </p>
                 </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -230,6 +267,7 @@ export default function CandidateJobDetails() {
           </div>
 
           {/* AI Match Sidebar */}
+          {matchData ? (
           <div className="space-y-6">
             <motion.div variants={slideUp}>
               <Card className="border-brand-indigo/20 bg-brand-indigo/5 relative overflow-hidden">
@@ -252,16 +290,16 @@ export default function CandidateJobDetails() {
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span className="font-medium text-brand-navy">Experience Match</span>
-                        <span className="font-semibold text-brand-indigo">{matchData.experienceMatch}%</span>
+                        <span className="font-semibold text-brand-indigo">{matchData.experienceMatch == null ? "—" : `${matchData.experienceMatch ?? 0}%`}</span>
                       </div>
-                      <div className="w-full bg-brand-gray/50 h-1.5 rounded-full"><div className="bg-brand-indigo h-full rounded-full" style={{ width: `${matchData.experienceMatch}%` }}/></div>
+                      <div className="w-full bg-brand-gray/50 h-1.5 rounded-full"><div className="bg-brand-indigo h-full rounded-full" style={{ width: `${matchData.experienceMatch ?? 0}%` }}/></div>
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span className="font-medium text-brand-navy">Role Similarity</span>
-                        <span className="font-semibold text-brand-indigo">{matchData.roleSimilarity}%</span>
+                        <span className="font-semibold text-brand-indigo">{matchData.roleSimilarity == null ? "—" : `${matchData.roleSimilarity ?? 0}%`}</span>
                       </div>
-                      <div className="w-full bg-brand-gray/50 h-1.5 rounded-full"><div className="bg-brand-indigo h-full rounded-full" style={{ width: `${matchData.roleSimilarity}%` }}/></div>
+                      <div className="w-full bg-brand-gray/50 h-1.5 rounded-full"><div className="bg-brand-indigo h-full rounded-full" style={{ width: `${matchData.roleSimilarity ?? 0}%` }}/></div>
                     </div>
                   </div>
 
@@ -323,6 +361,7 @@ export default function CandidateJobDetails() {
               </Card>
             </motion.div>
           </div>
+          ) : <p role="status">{matchStatus}</p>}
         </div>
       </motion.div>
 
@@ -373,13 +412,13 @@ export default function CandidateJobDetails() {
                             <UploadCloud className="w-5 h-5 text-brand-indigo" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-medium text-brand-navy truncate">Rahul_Kumar_Resume.pdf</p>
+                            <p className="text-sm font-medium text-brand-navy truncate">{resumeFileName || "Active resume"}</p>
                             <p className="text-xs text-brand-navy/60">Parsed by HireSmart AI</p>
                           </div>
                         </div>
                         <div className="text-left sm:text-right shrink-0">
-                          <p className="text-sm font-semibold text-brand-indigo">{activeResume.score}% Profile Score</p>
-                          <p className="text-xs font-semibold text-semantic-success">{matchData.overallMatch}% Job Match</p>
+
+                          {matchData && <p className="text-xs font-semibold text-semantic-success">{matchData.overallMatch}% Job Match</p>}
                         </div>
                       </div>
                     </div>

@@ -36,7 +36,7 @@ export async function analyzeResume(
   resume.aiAnalysis = {
     ...analysis,
     analyzedAt: new Date(),
-    provider: provider.name,
+    provider: analysis.provider ?? provider.name,
   } as any;
   resume.analysisStatus = 'completed';
   await resume.save();
@@ -59,7 +59,7 @@ export async function analyzeResume(
     targetType: 'Resume',
     targetId: resumeId,
     status: 'success',
-    details: { qualityScore: analysis.qualityScore, provider: provider.name },
+    details: { qualityScore: analysis.qualityScore, provider: analysis.provider ?? provider.name },
   });
 
   return analysis;

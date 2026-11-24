@@ -6,7 +6,7 @@ export const config = {
   groq: {
     apiKey: process.env.GROQ_API_KEY || "",
     // Change the model in .env (GROQ_MODEL) if Groq retires this one.
-    model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+    model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
     temperature: 0, // deterministic output -> stable scores
     seed: 42,
     maxTokens: 3000,

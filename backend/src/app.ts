@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'node:path';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -35,7 +36,7 @@ app.use(
       ) {
         return callback(null, true);
       }
-      return callback(null, true);
+      return callback(null, false);
     },
     credentials: true,
   }),
@@ -62,6 +63,16 @@ app.use(
     message: { success: false, error: { message: 'Too many requests, please try again later' } },
   }),
 );
+
+
+const docs = path.resolve(__dirname, '../docs');
+app.get(/^\/api\/docs$/, (_req, res) => res.redirect('/api/docs/'));
+app.use('/api/docs', (_req, res, next) => {
+  res.setHeader('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'; connect-src 'self'; frame-ancestors 'none'");
+  next();
+});
+app.use('/api/docs', express.static(docs));
+app.use('/api/docs/assets', express.static(path.dirname(require.resolve('swagger-ui-dist/package.json'))));
 
 app.use('/api/v1', routes);
 

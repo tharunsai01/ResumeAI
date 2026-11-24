@@ -60,7 +60,8 @@ async function requestFacts(resumeText, client) {
   const maxAttempts = 1 + config.groq.retries;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    let content;
+    let content = "";
+    let problem = "";
     try {
       const completion = await client.chat.completions.create({
         model: config.groq.model,
@@ -72,20 +73,23 @@ async function requestFacts(resumeText, client) {
       });
       content = completion.choices?.[0]?.message?.content ?? "";
     } catch (err) {
-      throw new ExtractionError("API_ERROR", explainApiError(err));
+      if (err?.error?.error?.code !== "json_validate_failed" && err?.error?.code !== "json_validate_failed") {
+        throw new ExtractionError("API_ERROR", explainApiError(err));
+      }
+      problem = "the provider rejected the generated JSON";
     }
 
-    let problem = "";
     try {
+      if (problem) throw new SyntaxError(problem);
       const parsed = ExtractionSchema.safeParse(parseJson(content));
       if (parsed.success) return { facts: parsed.data, attempts: attempt };
       problem = issuesToText(parsed.error);
     } catch {
-      problem = "the output was not valid JSON";
+      problem ||= "the output was not valid JSON";
     }
 
     lastProblem = problem;
-    messages.push({ role: "assistant", content });
+    if (content) messages.push({ role: "assistant", content });
     messages.push({ role: "user", content: buildRetryPrompt(problem) });
   }
 

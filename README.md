@@ -297,21 +297,29 @@ Open your browser at `http://localhost:5173`.
 
 ## 7. Running Tests
 
-### A. Run All Backend Tests (103 Tests)
+### A. Run Backend Tests
 Executes both integration and full workflow end-to-end tests:
 ```bash
 cd backend
 npm run test:all
 ```
-*Output: 40/40 integration tests + 63/63 workflow tests = 103/103 PASSED.*
 
-### B. Run Playwright Browser Automation (6 Suites)
+### B. Run Browser Tests
 Executes real browser workflows in headless Chromium:
 ```bash
 cd frontend
-pnpm exec playwright test tests/browser-workflow.spec.ts
+npx playwright install chromium
+npm run test:browser
 ```
-*Output: 6/6 browser suites passed in Chromium = 6/6 PASSED.*
+For the Selenium smoke test, start and seed the local Compose stack using the commands in section 8. Then run from the repository root with Python and Chrome available:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install selenium
+RESUMEAI_BASE_URL=http://localhost:5173 .venv/bin/python frontend/tests/selenium_smoke.py
+```
+
+The test uses the seeded candidate to upload a synthetic DOCX and open the stored analysis.
 
 ### C. Build Verification
 ```bash
@@ -328,14 +336,22 @@ npm run build
 
 ## 8. Running with Docker Compose
 
-To run MongoDB, the Backend API, and the Frontend together in isolated containers:
-```bash
-docker compose up --build -d
-```
-- **Frontend App**: `http://localhost:5173`
-- **Backend API Gateway**: `http://localhost:5000/api/v1`
-- **MongoDB**: `localhost:27017`
+Docker Compose starts MongoDB, the backend, the AI service, and the Vite frontend served by Nginx.
 
+1. Copy `.env.example` to a root `.env` if you do not already have one.
+2. Generate a shared secret with `openssl rand -hex 24` and set `AI_SERVICE_KEY` in that file.
+3. Set `GROQ_API_KEY` in that same file for live resume extraction.
+
+```bash
+docker compose up --build -d --wait
+docker compose ps
+# Optional: seed an empty local demo database. This resets demo data.
+# docker compose exec -e NODE_ENV=development backend node dist/seed/seed.js
+curl --fail http://localhost:5173/api/v1/health
+docker compose exec ai-service node -e 'fetch("http://127.0.0.1:8000/v1/status", {headers: {"x-internal-key": process.env.AI_SERVICE_KEY}}).then(r => r.json()).then(console.log)'
+```
+
+Open http://localhost:5173 for the demo. The backend forwards resume analysis and matching requests to the internal AI service and can fall back to the configured direct provider or rule-based scoring if the service fails. Check the AI service logs for successful requests during the demo.
 ---
 
 ## 9. Default Seeded Credentials

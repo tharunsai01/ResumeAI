@@ -361,7 +361,7 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
   // =================================================================
   // 9. CROSS-PORTAL WORKFLOW: RECRUITER & CANDIDATE INTERACTION
   // =================================================================
-  test('9. Cross-Portal Interaction: Recruiter reviews platform, candidate applies, applications sync', async ({ page }) => {
+  test('9. Recruiter and candidate portals open in independent sessions', async ({ page, browser, baseURL }) => {
     // 1. Recruiter logs in
     await page.goto('/');
     await page.getByRole('button', { name: /sign in/i }).first().click();
@@ -375,41 +375,29 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
     await page.goto('/recruiter/jobs');
     await expect(page.locator('h1')).toContainText(/job/i);
 
-    // Recruiter logs out
-    const recLogout = page.getByRole('button', { name: /sign out|log out/i }).first();
-    if (await recLogout.isVisible()) {
-      await recLogout.click();
-    } else {
-      await page.evaluate(() => localStorage.clear());
-      await page.goto('/');
-    }
+    const candidateContext = await browser.newContext({ baseURL });
+    try {
+      const candidatePage = await candidateContext.newPage();
+      // 3. Candidate registers & logs in
+      const applicantEmail = `applicant_${Date.now()}_${Math.random().toString(36).slice(2, 6)}@hiresmart.test`;
+      await candidatePage.goto('/');
+      await candidatePage.getByRole('button', { name: /sign in/i }).first().click();
+      await candidatePage.getByRole('button', { name: /create one/i }).click();
+      await candidatePage.getByPlaceholder('Full Name').fill('Applicant QA Candidate');
+      await candidatePage.getByPlaceholder('Email Address').fill(applicantEmail);
+      await candidatePage.getByPlaceholder('Password').fill(testPassword);
+      await candidatePage.getByRole('button', { name: /create account/i }).click();
+      await expect(candidatePage).toHaveURL(/\/candidate\/dashboard/, { timeout: 15000 });
 
-    // 3. Candidate registers & logs in
-    const applicantEmail = `applicant_${Date.now()}_${Math.random().toString(36).slice(2, 6)}@hiresmart.test`;
-    await page.goto('/');
-    await page.getByRole('button', { name: /sign in/i }).first().click();
-    await page.getByRole('button', { name: /create one/i }).click();
-    await page.getByPlaceholder('Full Name').fill('Applicant QA Candidate');
-    await page.getByPlaceholder('Email Address').fill(applicantEmail);
-    await page.getByPlaceholder('Password').fill(testPassword);
-    await page.getByRole('button', { name: /create account/i }).click();
-    await expect(page).toHaveURL(/\/candidate\/dashboard/, { timeout: 15000 });
+      // 4. Candidate navigates to jobs and explores
+      await candidatePage.goto('/candidate/jobs');
+      await expect(candidatePage.locator('h1').first()).toContainText(/job|opportunity/i);
 
-    // 4. Candidate navigates to jobs and explores
-    await page.goto('/candidate/jobs');
-    await expect(page.locator('h1').first()).toContainText(/job|opportunity/i);
-
-    // 5. Navigate to candidate applications
-    await page.goto('/candidate/applications');
-    await expect(page.locator('h1').first()).toContainText(/application/i);
-
-    // Candidate logs out
-    const candLogout = page.getByRole('button', { name: /sign out|log out/i }).first();
-    if (await candLogout.isVisible()) {
-      await candLogout.click();
-    } else {
-      await page.evaluate(() => localStorage.clear());
-      await page.goto('/');
+      // 5. Navigate to candidate applications
+      await candidatePage.goto('/candidate/applications');
+      await expect(candidatePage.locator('h1').first()).toContainText(/application/i);
+    } finally {
+      await candidateContext.close();
     }
   });
 

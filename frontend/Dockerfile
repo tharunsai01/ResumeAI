@@ -2,18 +2,18 @@
 # HireSmart AI - Frontend Vite & React Dockerfile
 # ==========================================
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci || npm install
+RUN npm ci
 
 COPY . .
 
-ARG VITE_API_URL=/api/v1
+ARG VITE_API_BASE_URL=/api/v1
 ARG VITE_USE_MOCK=false
-ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ENV VITE_USE_MOCK=$VITE_USE_MOCK
 
 RUN npm run build
@@ -31,11 +31,12 @@ RUN printf 'server {\n\
     server_name localhost;\n\
     root /usr/share/nginx/html;\n\
     index index.html;\n\
+    client_max_body_size 11m;\n\
     location / {\n\
         try_files $uri $uri/ /index.html;\n\
     }\n\
     location /api/ {\n\
-        proxy_pass http://server:5000;\n\
+        proxy_pass http://backend:5000;\n\
         proxy_http_version 1.1;\n\
         proxy_set_header Upgrade $http_upgrade;\n\
         proxy_set_header Connection "upgrade";\n\

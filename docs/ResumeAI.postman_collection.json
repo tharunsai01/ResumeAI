@@ -1,0 +1,74 @@
+{
+  "info": {
+    "name": "ResumeAI demo checks",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:35173"
+    }
+  ],
+  "item": [
+    {
+      "name": "Gateway and database health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Backend and database are ready\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().data.database).to.eql(\"connected\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "OpenAPI document",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/docs/openapi.json"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Resume analysis is documented\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().paths).to.have.property(\"/ai/resume/analyze/{resumeId}\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Protected resume route",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/resumes/active"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Anonymous resume access is blocked\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

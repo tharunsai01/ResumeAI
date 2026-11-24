@@ -1,0 +1,12 @@
+services:
+  https:
+    image: nginx:alpine
+    depends_on:
+      - frontend
+    ports:
+      - "127.0.0.1:${HTTPS_PORT:-35443}:443"
+    volumes:
+      - ./deploy/nginx/https.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${TLS_DIRECTORY:?Set TLS_DIRECTORY}:/tls:ro
+    networks:
+      - hiresmart-network

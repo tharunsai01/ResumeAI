@@ -28,6 +28,7 @@ export interface ResumeProject {
 }
 
 export interface ResumeAnalysisResult {
+  provider?: string
   score: number
   breakdown: {
     skills: number

@@ -37,28 +37,70 @@ export const resumeService = {
    * Asynchronously fetches resume analysis results by ID.
    */
   async getResumeAnalysis(analysisId?: string): Promise<ResumeAnalysisResult> {
-    if (!env.useMock && analysisId) {
-      try {
-        const res = await httpClient.get<{ success: boolean; data: any }>(`/resumes/${analysisId}`)
-        if (res?.data?.aiAnalysis) {
-          const ai = res.data.aiAnalysis
-          return {
-            score: ai.qualityScore ?? 85,
-            breakdown: ai.breakdown || mockResumeAnalysis.breakdown,
-            personalInfo: mockResumeAnalysis.personalInfo,
-            skills: ai.skills || mockResumeAnalysis.skills,
-            experience: mockResumeAnalysis.experience,
-            education: mockResumeAnalysis.education,
-            projects: mockResumeAnalysis.projects,
-            insights: {
-              strengths: ai.strengths || [],
-              improvements: ai.suggestions || [],
-              summary: ai.summary || "",
-            },
+    if (!env.useMock) {
+      const currentUser = authService.getCurrentUser()
+      const { data } = await httpClient.get<{
+        success: boolean
+        data: {
+          analysisStatus: string
+          aiAnalysis?: {
+            provider?: string
+            qualityScore: number
+            breakdown: ResumeAnalysisResult["breakdown"]
+            skills: ResumeAnalysisResult["skills"]
+            strengths: string[]
+            suggestions: string[]
+            summary: string
+            experience?: ResumeAnalysisResult["experience"]
+            education?: Partial<ResumeAnalysisResult["education"][number]>[]
+            projects?: ResumeAnalysisResult["projects"]
+          }
+          parsedData?: {
+            totalExperienceYears?: number
+            experience?: ResumeAnalysisResult["experience"]
+            education?: Partial<ResumeAnalysisResult["education"][number]>[]
+            projects?: ResumeAnalysisResult["projects"]
           }
         }
-      } catch (err) {
-        console.warn("[ResumeService] Live analysis retrieval error, using fallback:", err)
+      }>(`/resumes/${analysisId ? encodeURIComponent(analysisId) : "active"}`)
+      const { aiAnalysis: ai, parsedData } = data
+      if (data.analysisStatus !== "completed" || !ai) {
+        throw new Error("This resume hasn't been analyzed yet.")
+      }
+      // Prefer AI-extracted sections over deterministic parser (which often returns empty arrays)
+      const aiExp = ai.experience ?? []
+      const aiEdu = ai.education ?? []
+      const aiProj = ai.projects ?? []
+      const experience = aiExp.length > 0 ? aiExp : (parsedData?.experience ?? [])
+      const rawEducation = aiEdu.length > 0 ? aiEdu : (parsedData?.education ?? [])
+      const education = rawEducation.map(item => ({
+        degree: item.degree ?? "",
+        institution: item.institution ?? "",
+        duration: item.duration ?? "",
+      }))
+      const projects = aiProj.length > 0
+        ? aiProj.map(p => ({ name: p.name ?? "", techStack: (p as any).techStack ?? [], description: (p as any).description ?? "" }))
+        : (parsedData?.projects ?? [])
+      return {
+        provider: ai.provider,
+        score: ai.qualityScore,
+        breakdown: ai.breakdown,
+        personalInfo: {
+          name: currentUser?.name ?? "",
+          email: currentUser?.email ?? "",
+          experience: parsedData?.totalExperienceYears ? `${parsedData.totalExperienceYears} years` : "—",
+          education: education[0]?.degree || "—",
+          location: "—",
+        },
+        skills: ai.skills,
+        experience,
+        education,
+        projects,
+        insights: {
+          strengths: ai.strengths,
+          improvements: ai.suggestions,
+          summary: ai.summary,
+        },
       }
     }
     await delay(800)
@@ -97,7 +139,7 @@ export const resumeService = {
    */
   async analyzeResume(fileId: string): Promise<{ success: boolean; analysisId: string }> {
     if (!env.useMock) {
-      await httpClient.post<{ success: boolean; data: any }>(`/ai/resume/analyze/${fileId}`)
+      await httpClient.post<{ success: boolean; data: any }>(`/ai/resume/analyze/${fileId}`, undefined, { timeoutMs: 50000 })
       return { success: true, analysisId: fileId }
     }
     await delay(4000)

@@ -11,5 +11,5 @@ export type { ResumeAnalysisResult }
 export const api = {
   uploadResume: (file: File) => resumeService.uploadResume(file),
   analyzeResume: (fileId: string) => resumeService.analyzeResume(fileId),
-  getResumeAnalysis: (analysisId: string) => resumeService.getResumeAnalysis(analysisId),
+  getResumeAnalysis: (analysisId?: string) => resumeService.getResumeAnalysis(analysisId),
 }
