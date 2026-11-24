@@ -1,0 +1,24 @@
+Backend Developer - Payments Platform (Fintech)
+
+About the role
+We are looking for a Backend Developer to join our payments team in Bengaluru. You will build and maintain the services that process thousands of transactions every minute.
+
+Responsibilities
+- Design, build and maintain REST APIs in Java and Spring Boot
+- Write efficient SQL queries and design database schemas
+- Deploy services using Docker on AWS
+- Review code and write automated tests
+
+Requirements
+- 2-4 years of professional experience in backend development
+- Strong knowledge of Java, Spring Boot and REST API design
+- Experience with SQL databases such as PostgreSQL
+- Familiarity with Git and CI/CD pipelines
+- B.Tech/B.E. in Computer Science or a related field
+
+Nice to have
+- Experience with Kafka or other message queues
+- Knowledge of Kubernetes
+- Redis for caching
+
+Great communication skills and a team-first attitude are a plus.

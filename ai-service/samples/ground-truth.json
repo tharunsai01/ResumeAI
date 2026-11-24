@@ -1,0 +1,16 @@
+{
+    "resumes": [
+      {
+        "id": "clean-rahul.txt",
+        "skills": ["Java", "Python", "C++", "JavaScript", "TypeScript", "React", "Node.js", "Express", "Spring Boot", "REST API", "MongoDB", "SQL", "AWS", "Docker", "Linux", "Git", "FastAPI"]
+      },
+      {
+        "id": "my-test.docx",
+        "skills": ["Java", "Python", "C++", "JavaScript", "TypeScript", "React", "Node.js", "Express", "Spring Boot", "REST API", "MongoDB", "SQL", "AWS", "Docker", "Linux", "Git", "FastAPI"]
+      },
+      {
+        "id": "injected-candidate.txt",
+        "skills": ["HTML", "CSS", "JavaScript", "React"]
+      }
+    ]
+  }

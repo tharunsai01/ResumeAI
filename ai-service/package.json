@@ -1,0 +1,39 @@
+{
+    "name": "hiresmart-ai-service",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "src/index.js",
+    "scripts": {
+        "test:phase1": "node scripts/test-phase1.js",
+        "test:phase2": "node scripts/test-phase2.js",
+        "test:phase2:offline": "node scripts/test-phase2-offline.js",
+        "test:phase3": "node scripts/test-phase3.js",
+        "test:phase3:offline": "node scripts/test-phase3-offline.js",
+        "test:phase4": "node scripts/test-phase4.js",
+        "test:phase4:offline": "node scripts/test-phase4-offline.js",
+        "test:phase5": "node scripts/test-phase5.js",
+        "test:phase5:offline": "node scripts/test-phase5-offline.js",
+        "test:phase6": "node scripts/test-phase6.js",
+        "test:phase6:offline": "node scripts/test-phase6-offline.js",
+        "test:phase7": "node scripts/test-phase7.js",
+        "test:phase7:offline": "node scripts/test-phase7-offline.js",
+        "start": "node src/server/start.js",
+        "dev": "node --watch src/server/start.js",
+        "test:phase8": "node scripts/test-phase8.js",
+        "test:phase8:offline": "node scripts/test-phase8-offline.js"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "dependencies": {
+        "@huggingface/transformers": "^4.3.2",
+        "dotenv": "^18.0.10",
+        "express": "^5.3.0",
+        "groq-sdk": "^1.6.0",
+        "mammoth": "^1.13.0",
+        "multer": "^2.5.0",
+        "pdfjs-dist": "^4.10.38",
+        "zod": "^4.6.7"
+    }
+}
