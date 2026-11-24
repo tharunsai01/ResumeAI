@@ -1,835 +1,688 @@
-# HireSmart AI
+<div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:080B1A,35:172554,70:4F46E5,100:06B6D4&text=HireSmart%20AI&fontColor=FFFFFF&fontSize=58&fontAlignY=38&desc=Intelligent%20Recruitment%20%7C%20Explainable%20AI%20%7C%20Human-Centred%20Hiring&descAlignY=58&descSize=16&animation=fadeIn" width="100%" alt="HireSmart AI animated header"/>
+  <br/>
+  <a href="https://github.com/tharunsai01/ResumeAI"><img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=19&duration=2800&pause=900&color=38BDF8&center=true&vCenter=true&width=720&lines=Resume+Intelligence+%2B+Semantic+Matching;Evidence-Based+Candidate+Screening;Three+Role-Based+Recruitment+Portals;Human-in-the-Loop+AI+Hiring" alt="Animated project tagline"/></a>
+  <br/><br/>
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=0B1020" alt="React 19"/>
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
+  <img src="https://img.shields.io/badge/Node.js-20%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js"/>
+  <img src="https://img.shields.io/badge/Express-5-FFFFFF?style=for-the-badge&logo=express&logoColor=111827" alt="Express 5"/>
+  <img src="https://img.shields.io/badge/MongoDB-7-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB"/>
+  <img src="https://img.shields.io/badge/AI-ONNX%20%7C%20LLM-8B5CF6?style=for-the-badge&logo=openai&logoColor=white" alt="AI stack"/>
+  <br/><br/>
+  <a href="#-project-overview">Overview</a> • <a href="#-architecture">Architecture</a> • <a href="#-workflows">Workflows</a> • <a href="#-ai-engine">AI Engine</a> • <a href="#-security">Security</a> • <a href="#-setup">Setup</a>
+</div>
 
-**An AI-assisted recruitment platform for resume understanding, job matching, candidate discovery, and hiring workflow management.**
-
-HireSmart AI connects candidates, recruiters, and platform administrators through role-specific portals. It combines structured resume extraction, explainable job matching, semantic similarity, application tracking, and hiring pipeline tools in one full-stack application.
-
-> **AI is decision support, not the hiring decision-maker.** The platform provides match evidence, score breakdowns, strengths, and gaps. Recruiters retain responsibility for reviewing candidates and making hiring decisions.
-
----
-
-## Table of Contents
-
-- [Project Overview](#1-project-overview)
-- [Objectives](#2-project-objectives)
-- [System Architecture](#3-system-architecture)
-- [Technology Stack](#4-technology-stack)
-- [Core Features](#5-core-features)
-- [End-to-End Platform Workflow](#6-end-to-end-platform-workflow)
-- [Dashboard Workflows](#7-dashboard-workflows)
-- [AI Screening and Matching](#8-ai-screening-and-matching)
-- [Security Implementation](#9-security-implementation)
-- [AI Decision Principles](#10-ai-decision-principles)
-- [Key Innovations](#11-key-innovations)
-- [Data and Auditability](#12-data-management-and-auditability)
-- [Project Structure](#13-project-structure)
-- [Installation and Local Setup](#14-installation-and-local-setup)
-- [Environment Configuration](#15-environment-configuration)
-- [Docker Setup](#16-docker-setup)
-- [Testing and Verification](#17-testing-and-verification)
-- [API and Technical Documentation](#18-api-and-technical-documentation)
-- [Known Limitations and Future Scope](#19-known-limitations-and-future-scope)
+<div align="center">
+  <h3>Recruitment, redesigned around evidence.</h3>
+  <p>HireSmart AI is a full-stack recruitment platform that transforms resumes and job descriptions into structured, explainable hiring insights—while keeping every final hiring decision with people.</p>
+</div>
 
 ---
 
-## 1. Project Overview
+## ✦ Project Overview
 
-HireSmart AI is a full-stack recruitment and talent-matching system designed to make the hiring lifecycle more organized, data-informed, and explainable.
+HireSmart AI bridges high-volume hiring and transparent candidate evaluation. It is designed as a **human-in-the-loop decision-support system**, not an automated rejection engine. The platform combines structured PDF/DOCX resume extraction, evidence-backed skill analysis, hybrid semantic and rule-based matching, job discovery, application tracking, recruiter workflows, and administrative governance.
 
-Traditional recruitment often involves manually reviewing large numbers of resumes, comparing candidate qualifications against job requirements, coordinating interviews, and maintaining application records across disconnected tools. HireSmart AI brings these activities into a single platform.
+| Candidate experience | Recruiter experience | Administrator experience |
+|:--|:--|:--|
+| Upload and analyze resumes, inspect skill gaps, discover jobs, apply, and track application timelines. | Publish jobs, extract requirements, screen applicants individually or in bulk, review blind profiles, manage the hiring pipeline, and schedule interviews. | Govern platform health, moderate users and jobs, resolve complaints, curate skills, inspect audit logs, and review AI evaluations. |
 
-The system provides three primary user experiences:
+**Core principle:** AI can organize evidence and explain relevance. It does not make the final employment decision.
 
-- **Candidate Portal:** Candidates create profiles, upload resumes, discover jobs, receive recommendations, apply to openings, and track their applications.
-- **Recruiter Portal:** Recruiters manage job postings, discover candidates, run AI-assisted screening, review match explanations, manage hiring stages, and coordinate interviews.
-- **Administrator Portal:** Administrators oversee platform activity, manage users and complaints, maintain the skill taxonomy, inspect audit records, and review AI evaluation and system-health information.
+## ✦ Objectives
 
-The application is organized as a React frontend, an Express API backend, a MongoDB database, and a separately deployable Node.js AI service. The backend remains the central application and authorization layer.
+- **Structured extraction:** Convert PDF/DOCX resumes and pasted job descriptions into normalized, schema-validated data.
+- **Transparent matching:** Use an explainable 50/20/10/20 model instead of opaque ranking.
+- **Human authority:** Keep AI advisory; never automatically reject a candidate.
+- **Adversarial resilience:** Detect prompt injection, invisible Unicode, keyword stuffing, and spoofed file extensions.
+- **Fairness and privacy:** Sanitize PII before external inference and support blind candidate profiles.
+- **Operational visibility:** Provide sanitized audit logs, health diagnostics, and automated verification across services.
 
-## 2. Project Objectives
+## ✦ Architecture
 
-1. **Improve resume processing:** Extract structured information such as skills, education, experience, projects, and role history from supported resume formats.
-2. **Make job matching explainable:** Compare candidate evidence with job requirements and expose the factors contributing to each match score.
-3. **Support better recruiter workflows:** Bring job creation, candidate review, screening, pipeline management, and interview coordination into one workspace.
-4. **Help candidates discover relevant roles:** Provide searchable job listings, recommendations, bookmarks, and application tracking.
-5. **Protect candidate and platform data:** Apply authentication, role-based access, input validation, upload verification, and security monitoring.
-6. **Promote responsible AI use:** Reduce unnecessary exposure of personal identifiers during screening and keep hiring decisions under human control.
-7. **Provide administrative oversight:** Give platform administrators tools for user governance, complaint handling, audit review, and AI evaluation.
+HireSmart AI uses a **gateway-centred three-service architecture**. The Express backend is the central authority for authentication, authorization, persistence, and orchestration. The browser never calls the internal AI microservice directly.
 
-## 3. System Architecture
+<div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=0:06B6D4,50:6366F1,100:8B5CF6" width="100%" alt="Section divider"/>
+</div>
 
-HireSmart AI uses a modular, service-oriented full-stack architecture.
-
-### High-level architecture
-
-```text
-                         CANDIDATE / RECRUITER / ADMIN
-                                      |
-                                      v
-                         React + TypeScript SPA
-                         Vite | Tailwind CSS
-                                      |
-                              HTTPS / REST API
-                                      |
-                                      v
-                       Node.js + Express Backend
-                  Authentication | RBAC | Validation
-                 Controllers | Domain Services | API Routes
-                         /                 \
-                        /                   \
-                       v                     v
-                MongoDB Database       AI Service (Node.js)
-              Users and Profiles       Resume Processing
-              Jobs and Applications    Text / Skill Extraction
-              Resumes and Interviews   Injection Scanning
-              Notifications             Matching / Evaluation
-              Complaints and Logs               |
-                                                v
-                                      Configured AI Provider
-                                      Groq / Embedding Model
+```mermaid
+flowchart TB
+    U["Candidate • Recruiter • Admin"] --> FE["React 19 + TypeScript + Vite 8"]
+    FE -->|"REST /api/v1 • JWT • Cookie"| API["Express 5 API Gateway"]
+    API -->|"Mongoose 9"| DB[("MongoDB 7 • hiresmart")]
+    API -->|"x-internal-key • sanitized payload"| AI["Node.js AI Microservice"]
+    API --> P["CompositeAIProvider"]
+    P --> AI
+    P --> G["Groq Direct"]
+    P --> GM["Google Gemini"]
+    P --> H["Deterministic Heuristic Fallback"]
+    AI --> L["Groq LLM • Structured Extraction"]
+    AI --> E["ONNX MiniLM • Embeddings"]
+    AI --> S["Injection Scanner • Blind Profile • Evaluation"]
+    style FE fill:#172554,stroke:#38BDF8,color:#fff
+    style API fill:#312E81,stroke:#818CF8,color:#fff
+    style DB fill:#064E3B,stroke:#34D399,color:#fff
+    style AI fill:#4C1D95,stroke:#C4B5FD,color:#fff
+    style P fill:#1E293B,stroke:#94A3B8,color:#fff
 ```
 
-### Architecture responsibilities
+| Service | Runtime / port | Responsibility |
+|:--|:--|:--|
+| Frontend | React + Vite / 5173 | Role-specific interfaces, navigation, forms, dashboards, charts, and API clients |
+| Backend | Express + TypeScript / 5000 | API gateway, authentication, RBAC, validation, business logic, persistence, and provider orchestration |
+| AI service | Express + Node.js / 8000 | Resume and job extraction, injection scanning, semantic embeddings, matching, blind profiles, and evaluation |
+| Database | MongoDB / 27017 | 17 Mongoose models for identity, profiles, jobs, applications, interviews, notifications, governance, and evaluation |
 
-| Layer | Responsibility |
-|---|---|
-| Frontend | Role-specific user interfaces, navigation, forms, dashboards, visualizations, and API communication |
-| Backend API | Authentication, authorization, validation, business rules, persistence, and coordination between application modules |
-| AI service | Resume parsing, text cleaning, injection scanning, structured extraction, semantic matching, scoring, recommendations, and AI evaluation utilities |
-| MongoDB | Persistent storage for users, profiles, resumes, jobs, applications, interviews, notifications, skills, complaints, evaluations, and audit records |
-| External AI / model providers | Configurable language-model and embedding capabilities used by AI workflows |
+### Resilient four-tier AI provider chain
 
-### Request lifecycle
+The backend `CompositeAIProvider` routes AI operations through ordered providers:
 
-1. A user performs an action in the frontend.
-2. The frontend sends a request to the backend API under `/api/v1`.
-3. Backend middleware checks the request, session, role permissions, and payload.
-4. The relevant controller and service execute the business operation.
-5. The backend reads from or writes to MongoDB and calls the AI service when analysis is required.
-6. The AI service returns structured results; the backend applies application rules and persists appropriate records.
-7. The API returns a consistent response and the frontend refreshes the relevant view.
+1. **HttpAiMicroserviceProvider** — dedicated AI service endpoints, configured through `AI_SERVICE_URL` and `AI_SERVICE_KEY`.
+2. **GroqDirectProvider** — direct Groq JSON chat completion using the configured `GROQ_API_KEY`.
+3. **GeminiProvider** — Google Gemini JSON-generation fallback using `GEMINI_API_KEY`.
+4. **HeuristicRuleBasedProvider** — deterministic in-process matching when external providers are unavailable.
 
-The frontend supports live API mode and a development mock mode. Live mode is configured with `VITE_USE_MOCK=false`.
+This layered design helps preserve core matching workflows when an external provider or the AI microservice cannot be reached. Provider-specific extraction still requires valid credentials and model availability.
 
-## 4. Technology Stack
+## ✦ Technology Stack
 
-### Frontend
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=react,ts,vite,tailwind,nodejs,express,mongodb,docker,jenkins,nginx,git,github&perline=6" alt="Technology stack icons"/>
+</div>
 
-| Technology | Purpose |
-|---|---|
-| React 19 | Component-based user interface |
-| TypeScript | Type-safe frontend development |
-| Vite | Development server and production build |
-| Tailwind CSS 4 | Utility-first styling |
-| React Router DOM 7 | Client-side routing and protected routes |
-| Framer Motion | UI transitions and animations |
-| Lucide React | Icons |
-| Recharts | Dashboard charts and data visualization |
-| Playwright | Browser-based workflow tests |
+| Layer | Technologies |
+|:--|:--|
+| **Frontend** | React 19, TypeScript, Vite 8, Tailwind CSS 4, React Router DOM 7, Framer Motion 13, Recharts 3, Lucide React, OGL |
+| **Backend** | Node.js, Express 5, TypeScript, Mongoose 9, Zod 4, JWT, bcryptjs, Google Auth Library, Multer, pdf-parse, Mammoth, Nodemailer, Helmet, express-rate-limit |
+| **AI service** | Node.js ESM, Express 5, Groq SDK, Hugging Face Transformers.js, ONNX Runtime, PDF.js, Mammoth, Zod |
+| **AI models** | `openai/gpt-oss-20b` (configured Groq model), `onnx-community/all-MiniLM-L6-v2-ONNX` |
+| **Database** | MongoDB 7+ with 17 Mongoose models |
+| **Testing** | TypeScript integration/E2E suites, Playwright Chromium, Python Selenium smoke test, AI service phase 1–8 scripts |
+| **Infrastructure** | Docker, Docker Compose, Nginx, TLS overlay, Kubernetes manifests, Jenkins, shell CI scripts |
 
-### Backend
+## ✦ Core Features
 
-| Technology | Purpose |
-|---|---|
-| Node.js | Server-side JavaScript runtime |
-| Express 5 | REST API framework |
-| TypeScript | Type-safe backend development |
-| MongoDB 7 | Document database |
-| Mongoose 9 | MongoDB object modelling |
-| JSON Web Tokens | Access-token authentication |
-| bcryptjs | Password hashing |
-| Zod | Request and data validation |
-| Multer | Multipart file upload handling |
-| Helmet | HTTP security headers |
-| express-rate-limit | API request rate limiting |
-| CORS / cookie-parser | Cross-origin policy and cookie handling |
-| Google Auth Library | Google OAuth token verification |
-| pdf-parse / Mammoth | PDF and DOCX text extraction support |
+<details open>
+<summary><strong>01 · Identity, Authentication & Access</strong></summary>
 
-### AI service
+- Candidate, recruiter, and admin role-isolated portals.
+- Email/password authentication with bcrypt password hashing.
+- JWT access tokens and rotating HTTP-only refresh-cookie sessions.
+- Google OAuth 2.0 popup and authorization-code callback flows.
+- OAuth state validation, account/profile provisioning, and admin privilege-escalation protection.
+- Frontend protected routes and backend authentication/authorization middleware.
+</details>
 
-| Technology | Purpose |
-|---|---|
-| Node.js (ES modules) | Standalone AI service runtime |
-| Express 5 | AI service HTTP interface |
-| Groq SDK | Configurable LLM-based extraction and analysis |
-| Hugging Face Transformers.js | Local embedding / semantic model support |
-| PDF.js | PDF text extraction |
-| Mammoth | DOCX text extraction |
-| Zod | Structured AI output validation |
-| SHA-256 | Resume fingerprinting and duplicate detection |
+<details>
+<summary><strong>02 · Resume Intelligence & Candidate Insights</strong></summary>
 
-### Infrastructure and tooling
+- PDF and DOCX resume uploads with file-signature validation.
+- Resume text extraction, normalization, and structured LLM extraction.
+- Skill, education, experience, project, and role evidence analysis.
+- Resume quality scoring and review-before-save profile updates.
+- Skill-gap analysis, proficiency levels, market-demand insights, and career-path comparisons.
+- SHA-256 resume fingerprinting and duplicate detection.
+</details>
 
-- Docker and Docker Compose for multi-service local orchestration.
-- MongoDB container with persistent volume and health check.
-- Jenkins pipeline definition for build/test automation workflows.
-- npm for dependency management and scripts.
+<details>
+<summary><strong>03 · Job Discovery & Job Intelligence</strong></summary>
 
-## 5. Core Features
+- Recruiter job creation, editing, publishing, and closing.
+- Structured job requirement extraction from pasted job descriptions.
+- Required/preferred skills, experience ranges, and education expectations.
+- Candidate job search, filters, bookmarks, and personalized recommendations.
+</details>
 
-### 5.1 Authentication and account management
+<details>
+<summary><strong>04 · AI Screening & Talent Matching</strong></summary>
 
-- Candidate, recruiter, and administrator account roles.
-- Registration and login flows.
-- JWT-based access authentication and HTTP-only refresh-cookie handling.
-- Google OAuth integration.
-- Role-aware route protection and login restrictions.
-- Profile and account management.
-- Session cleanup and user-specific client-data isolation on logout.
+- Single-candidate and bulk screening.
+- Weighted skills, experience, education, and role-similarity scoring.
+- Local ONNX semantic embeddings combined with deterministic rules.
+- Blind-screened candidate profiles.
+- Persistent match results with score breakdowns, strengths, gaps, and suggestions.
+- Recruiter-controlled thresholds and review.
+</details>
 
-### 5.2 Resume management and analysis
+<details>
+<summary><strong>05 · Hiring Pipeline & Interviews</strong></summary>
 
-- Resume upload and management.
-- PDF and DOCX parsing.
-- Extraction of candidate details, skills, education, work experience, and projects.
-- Structured extraction output validated against a schema.
-- Resume review before extracted profile information is saved.
-- Resume fingerprinting for duplicate detection.
-- Resume analysis and skill evidence used by matching workflows.
+- Kanban-style applicant lifecycle: Applied → Screened → Shortlisted → Interview → Hired / Rejected.
+- Recruiter notes and stage history.
+- Interview scheduling, external meeting links, feedback, and ratings.
+- In-app notifications and application timeline visibility.
+</details>
 
-### 5.3 Job discovery and applications
+<details>
+<summary><strong>06 · Administration & Governance</strong></summary>
 
-- Job search and filtering.
-- Job details and eligibility information.
-- Job bookmarking.
-- Application submission using a candidate's resume.
-- Application history and status tracking.
-- Candidate-facing job recommendations.
+- Platform metrics and system-health monitoring.
+- User and job moderation; suspended accounts lose protected API access.
+- Complaint submission, triage, and resolution notes.
+- Skill taxonomy maintenance and unknown-skill review.
+- Audit-log search and pagination.
+- AI fairness, stability, extraction, and security evaluation views.
+</details>
 
-### 5.4 Recruiter and hiring operations
+## ✦ Workflows
 
-- Job creation, editing, publishing, and closing.
-- Candidate discovery and filtering.
-- AI-assisted candidate screening and ranking.
-- Match score breakdowns, strengths, and potential gaps.
-- Applicant management.
-- Hiring pipeline and stage updates.
-- Interview scheduling, meeting details, feedback, and status tracking.
-- Recruitment analytics.
+### End-to-end recruitment lifecycle
 
-### 5.5 Platform administration
-
-- Platform overview and dashboard metrics.
-- User search, filtering, moderation, suspension, and reactivation.
-- Complaint review and resolution.
-- Skill taxonomy management.
-- Audit-log inspection.
-- AI evaluation and fairness-related metrics.
-- System-health information.
-
-### 5.6 Shared platform capabilities
-
-- Notifications.
-- Candidate and recruiter profile management.
-- Help, support, and complaint workflows.
-- Live API and mock-data development modes.
-- Seed data for local development and testing.
-
-## 6. End-to-End Platform Workflow
-
-### A. Candidate journey
-
-1. The candidate visits the public landing page.
-2. The candidate registers or signs in using the available authentication options.
-3. The backend validates the account and establishes the session.
-4. The candidate completes their profile or uploads a resume.
-5. The resume is checked, parsed, cleaned, and analyzed.
-6. Extracted information is presented for review before being saved to the candidate profile.
-7. The candidate explores jobs using search and filters.
-8. The platform can recommend relevant opportunities based on candidate and job information.
-9. The candidate bookmarks interesting jobs or submits an application.
-10. The application becomes available to the relevant recruiter.
-11. The candidate tracks application progress and interview information through the portal.
-
-### B. Recruiter journey
-
-1. The recruiter signs in and opens the recruiter dashboard.
-2. The recruiter creates or manages job postings.
-3. Candidates apply to published jobs.
-4. The recruiter opens the applicant list or candidate discovery area.
-5. The recruiter runs AI-assisted screening for a job.
-6. The system analyzes candidate evidence against the job requirements and generates match scores and explanations.
-7. The recruiter reviews the score breakdown, strengths, gaps, and candidate profile.
-8. The recruiter makes the decision to shortlist, move forward, reject, or otherwise update the application.
-9. Selected candidates move through the hiring pipeline.
-10. The recruiter schedules interviews, records feedback, and updates interview outcomes.
-11. Recruitment analytics reflect the available hiring activity.
-
-### C. Administrator journey
-
-1. The administrator signs in with the authorized admin role.
-2. The administrator reviews platform-level metrics and activity.
-3. The administrator manages users and account status.
-4. The administrator reviews and resolves complaints.
-5. The administrator maintains the skill taxonomy.
-6. The administrator inspects security and administrative audit logs.
-7. The administrator reviews AI evaluation information and system-health metrics.
-
-### Workflow summary
-
-```text
-Candidate Registration
-        |
-        v
-Profile Creation / Resume Upload
-        |
-        v
-Resume Validation and Parsing
-        |
-        v
-Structured Candidate Profile
-        |
-        v
-Job Discovery and Recommendations
-        |
-        v
-Application Submission
-        |
-        v
-Recruiter Applicant Management
-        |
-        v
-AI-Assisted Screening and Ranking
-        |
-        v
-Human Recruiter Review
-        |
-        v
-Hiring Pipeline
-        |
-        v
-Interview Scheduling and Feedback
-        |
-        v
-Final Application Status
+```mermaid
+flowchart TD
+    A["Sign up / Sign in"] --> B["Candidate Profile"]
+    B --> C["Upload PDF / DOCX"]
+    C --> D["Validate • Parse • Sanitize"]
+    D --> E["Extract Structured Resume Evidence"]
+    E --> F["Candidate Reviews Extracted Profile"]
+    F --> G["Discover / Get Recommended Jobs"]
+    G --> H["Apply to Job"]
+    H --> I["Recruiter Applicant Workspace"]
+    I --> J["AI-Assisted Screening"]
+    J --> K["Explainable Match Result"]
+    K --> L["Human Recruiter Review"]
+    L --> M["Shortlist / Pipeline"]
+    M --> N["Interview & Feedback"]
+    N --> O["Final Human Decision"]
+    A -.-> P["Admin Governance & Audit"]
+    P -.-> I
+    style J fill:#312E81,stroke:#A78BFA,color:#fff
+    style L fill:#064E3B,stroke:#34D399,color:#fff
+    style O fill:#164E63,stroke:#22D3EE,color:#fff
 ```
 
-The administrator workflow runs alongside this lifecycle and provides platform governance, moderation, complaint handling, audit review, and operational oversight.
+### Workflow at a glance
 
-## 7. Dashboard Workflows
+| Stage | Candidate | Recruiter | Platform |
+|:--|:--|:--|:--|
+| Onboarding | Register / sign in | Register / sign in | Authenticate and authorize |
+| Preparation | Profile and resume | Organization and job setup | Validate and persist records |
+| Discovery | Search and recommendations | Talent pool and applicants | Index/filter relevant data |
+| Evaluation | Review skills and job fit | Run screening and inspect evidence | Extract, score, explain, audit |
+| Selection | Track application | Shortlist and manage pipeline | Persist stage history |
+| Interview | View schedule and status | Schedule and record feedback | Notify relevant users |
+| Governance | Raise support issue | Raise support issue | Admin moderation and audit |
 
-The platform uses separate dashboards so each role sees the information and actions relevant to its responsibilities.
+## ✦ Dashboard Workflows
 
-### 7.1 Candidate dashboard workflow
+<details>
+<summary><strong>Candidate Dashboard · Routes & capabilities</strong></summary>
 
-**Dashboard purpose:** Help candidates manage their career profile, discover opportunities, and follow their applications.
+| Page / route | What the candidate can do |
+|:--|:--|
+| `/candidate/dashboard` | Review application counts, shortlisted/interview metrics, profile completion, and recent statuses |
+| `/candidate/resume` | Upload PDF/DOCX, switch active resume, download files, and inspect security status |
+| `/candidate/resume/analysis` | Review resume quality, strengths, weaknesses, and extracted profile data before saving |
+| `/candidate/jobs` | Search and filter by keyword, category, experience, and work mode |
+| `/candidate/jobs/:jobId` | Inspect job details, run a pre-application fit check, and apply |
+| `/candidate/recommended` | Explore personalized job recommendations |
+| `/candidate/applications` | Track application statuses |
+| `/candidate/applications/:applicationId` | View status history and interview details |
+| `/candidate/skills` | Inspect competency charts, proficiency, demand, missing skills, and career paths |
+| `/candidate/profile` | Manage personal, education, experience, skill, and link information |
+| `/candidate/profile/preview` | Preview the candidate profile |
+| `/candidate/settings` | Manage settings and preferences |
+| `/candidate/complaint` · `/candidate/help` | Submit support requests and access help |
+</details>
 
-| Area | Workflow and actions |
-|---|---|
-| Overview | Review application activity, interview information, profile strength, and recent updates |
-| Resume | Upload, view, manage, and review parsed resume information |
-| Jobs | Search and filter available jobs, inspect job details, and explore opportunities |
-| Recommended | Review job recommendations and open relevant job details |
-| Applications | View submitted applications and follow their current status |
-| Application details | Inspect an individual application and its available progress information |
-| Skills | Review extracted skills, skill categories, proficiency information, and skill insights |
-| Profile | Update personal, education, experience, and professional profile information |
-| Notifications | Review platform updates and application-related notifications |
-| Support / Complaint | Submit an issue or complaint and follow its resolution where available |
+<details>
+<summary><strong>Recruiter Dashboard · Routes & capabilities</strong></summary>
 
-**Typical navigation:** Dashboard → Resume/Profile → Jobs/Recommended → Job Details → Apply → Applications → Application Details.
+| Page / route | What the recruiter can do |
+|:--|:--|
+| `/recruiter/dashboard` | Review active jobs, applicants, screened candidates, and interviews |
+| `/recruiter/jobs` | View and manage job postings |
+| `/recruiter/jobs/create` | Create a job with structured requirements |
+| `/recruiter/jobs/:jobId` | Inspect a job and applicant statistics |
+| `/recruiter/jobs/:jobId/edit` | Update job information |
+| `/recruiter/candidates` | Search and filter the talent pool |
+| `/recruiter/candidates/:candidateId` | Inspect candidate information |
+| `/recruiter/screening` | Open the AI screening hub |
+| `/recruiter/screening/:jobId` | Run single/bulk screening and review ranked candidates |
+| `/recruiter/screening/:jobId/:candidateId` | Inspect an individual match explanation |
+| `/recruiter/shortlist` · `/recruiter/hiring` | Manage shortlisted applicants and hiring stages |
+| `/recruiter/interviews` | Schedule and manage interviews |
+| `/recruiter/interviews/:interviewId` | Record feedback, ratings, and outcomes |
+| `/recruiter/analytics` | Inspect recruitment funnel metrics |
+</details>
 
-### 7.2 Recruiter dashboard workflow
+<details>
+<summary><strong>Admin Dashboard · Routes & capabilities</strong></summary>
 
-**Dashboard purpose:** Help recruiters manage vacancies and move applicants through a consistent hiring process.
+| Page / route | What the administrator can do |
+|:--|:--|
+| `/admin` | Review platform-wide users, jobs, applications, resumes, and trends |
+| `/admin/users` · `/admin/users/:userId` | Search, inspect, suspend, and reactivate users |
+| `/admin/complaints` · `/admin/complaints/:complaintId` | Triage complaints and record resolution notes |
+| `/admin/skills` | Manage taxonomy and review unknown skills |
+| `/admin/audit-logs` | Search and paginate audit events |
+| `/admin/ai-evaluation` | Review AI fairness, stability, extraction, and security evaluation records |
+| `/admin/system-health` | Inspect API, MongoDB, AI service, latency, memory, and uptime information |
+</details>
 
-| Area | Workflow and actions |
-|---|---|
-| Overview | Review active jobs, candidate volume, AI screening activity, and interview metrics |
-| Job management | View, create, edit, publish, and close job postings |
-| Create job | Enter role details, skills, experience, education, and other job requirements |
-| Candidates | Discover and inspect candidate profiles and applicant records |
-| Candidate profile | Review candidate information and relevant application context |
-| Screening | Run AI-assisted screening and compare candidate match results |
-| Job screening | Review ranked candidates and match explanations for a selected job |
-| Hiring pipeline | Move applicants through stages such as Applied, Screened, Shortlisted, Interview, Hired, and Rejected |
-| Interviews | Schedule interviews, manage meeting information, and record feedback or outcomes |
-| Analytics | Review recruitment and job-related metrics |
-| Recruiter profile | Maintain recruiter or organization information |
+## ✦ AI Engine
 
-**Typical navigation:** Dashboard → Create/Manage Jobs → Candidates → Screening → Candidate Review → Hiring Pipeline → Interviews → Analytics.
+### Explainable weighted matching
 
-### 7.3 Administrator dashboard workflow
+The matching engine uses a calibrated weighted formula:
 
-**Dashboard purpose:** Provide oversight of platform usage, user activity, governance, and operational health.
-
-| Area | Workflow and actions |
-|---|---|
-| Overview | Review user, job, application, and platform activity metrics |
-| User management | Search, filter, inspect, suspend, and reactivate user accounts |
-| User details | Review an individual account and its available administrative information |
-| Complaints | Review submitted complaints and support issues |
-| Complaint details | Inspect a complaint, add resolution information, and update its status |
-| Skills | Maintain the platform skill taxonomy and review skill records |
-| Audit logs | Inspect recorded administrative and security-related events |
-| AI evaluation | Review model evaluation, fairness-related measurements, and screening diagnostics |
-| System health | Inspect API and infrastructure health indicators |
-| Help / Privacy | Access platform guidance and privacy information |
-
-**Typical navigation:** Admin Dashboard → Users → User Details / Moderation → Complaints → Skills → Audit Logs → AI Evaluation → System Health.
-
-> Dashboard labels and available actions may vary with permissions and the current application state. The tables describe the implemented role-oriented workflows rather than promising that every metric is available in every deployment.
-
-## 8. AI Screening and Matching
-
-The AI workflow converts resume content into structured candidate evidence and compares that evidence with a job description.
-
-### 8.1 Resume intelligence pipeline
-
-1. **File validation:** Check supported file type, file signature, and configured size/page limits.
-2. **Text extraction:** Extract readable text from PDF or DOCX documents.
-3. **Text normalization:** Clean extracted content and remove invisible or zero-width characters.
-4. **Security inspection:** Scan for instruction-like or prompt-injection content; redact flagged lines before model processing.
-5. **Structured extraction:** Use the configured language model to extract candidate facts into a validated schema.
-6. **Skill normalization:** Normalize skill names and map recognized skills to the application's taxonomy.
-7. **Evidence calculation:** Derive experience and skill evidence from roles, projects, dates, and resume content.
-8. **Analysis storage:** Return structured analysis and metadata for use by the application.
-
-Scanned image-only PDFs may not be readable because OCR is not currently part of the documented parsing flow.
-
-### 8.2 Job matching formula
-
-The default weighted matching model uses four components:
+<div align="center">
+  <h2>50% · 20% · 10% · 20%</h2>
+  <p><strong>Skills · Experience · Education · Role Similarity</strong></p>
+</div>
 
 ```text
 Overall Match =
-    (Skills Match       × 0.50)
-  + (Experience Match   × 0.20)
-  + (Education Match    × 0.10)
-  + (Role Similarity    × 0.20)
+  (Skills Match      × 0.50) +
+  (Experience Match  × 0.20) +
+  (Education Match   × 0.10) +
+  (Role Similarity   × 0.20)
 ```
 
-| Component | Weight | What it evaluates |
-|---|---:|---|
-| Skills match | 50% | Evidence for required and preferred job skills |
-| Experience match | 20% | Candidate experience compared with the job's experience requirement |
-| Education match | 10% | Alignment between the stated education requirement and candidate education |
-| Role similarity | 20% | Similarity between candidate role information and the target role |
+| Dimension | Weight | Evaluation focus |
+|:--|:--:|:--|
+| Skills | **50%** | Required and preferred skill evidence |
+| Experience | **20%** | Dated role history and required experience range |
+| Education | **10%** | Degree/education requirement alignment |
+| Role similarity | **20%** | Semantic and rule-based role relevance |
 
-The matching service also supports semantic similarity when the embedding model is available. If embeddings cannot be generated, the semantic layer falls back to the rule-based matching path.
+### Evidence-based skill scoring
 
-### 8.3 Skill evidence and score explanations
+Skill scores are based on evidence, not only keyword frequency:
 
-- Required skills have greater influence than preferred skills within the skills component.
-- Skills can be classified as matched, partial, or missing based on available evidence.
-- A skill merely listed without supporting evidence is not treated as equivalent to demonstrated experience.
-- Overlapping employment periods are handled to avoid counting the same time twice.
-- Experience claims are compared with experience derived from dated roles where available.
-- The result can include matched strengths and potential gaps to help recruiters understand the score.
+| Evidence | Contribution |
+|:--|--:|
+| Skill mentioned | +30 |
+| Listed in skills section | +10 |
+| Used per experience role | +12, capped at 25 |
+| Used per project | +10, capped at 20 |
+| Years in roles using the skill | +5/year, capped at 15 |
 
-### 8.4 Screening categories
+Additional anti-inflation controls:
 
-The AI service defines configurable screening thresholds. The current defaults include an 80-point screening threshold and a 60-point potential-match minimum. These are configurable system values, not a guarantee of candidate quality or a final hiring decision.
+- Required skills contribute **80%** of the skill score; preferred skills contribute **20%**.
+- Partial matches receive **0.5** credit.
+- Listed-only skills above the configured cap of **12** are down-weighted to reduce keyword stuffing.
+- When dated roles exist, effective experience uses the lower of stated and computed years.
+- Overlapping employment periods are not double-counted.
 
-### 8.5 AI provider resilience
+### Hybrid semantic role similarity
 
-The repository contains a separate AI service and backend-side AI integration. The application is designed to use configured AI capabilities and retain deterministic matching paths when optional semantic or external model capabilities are unavailable. Exact provider availability depends on environment configuration and service health.
+Role relevance combines local ONNX MiniLM semantic similarity (**60%**) with rule-based role similarity (**40%**). Cosine similarity is calibrated from the configured range `[0.2, 0.7]` into a 0–100 score.
 
-## 9. Security Implementation
+### Screening bands
 
-Security is applied across authentication, API access, file ingestion, AI processing, and administrative oversight.
+| Classification | Default score |
+|:--|:--:|
+| **Strong Match** | ≥ 80 |
+| **Potential Match** | ≥ 60 and < 80 |
+| **Low Match** | < 60 |
 
-### 9.1 Authentication and authorization
+Thresholds and matching weights are configurable. A score is a relevance signal—not a probability of job success.
 
-- JWT access-token authentication.
-- HTTP-only refresh-cookie handling and refresh lifecycle.
-- Password hashing with bcryptjs.
-- Role-based authorization for candidate, recruiter, and admin operations.
-- Protected frontend routes and backend authorization checks.
-- Role-aware sign-in restrictions.
-- Suspended-account checks.
-- Google OAuth integration with state/nonce handling in the sign-in flow.
+## ✦ Security
 
-### 9.2 API and transport protections
+Security is implemented across identity, API access, file ingestion, AI inference, and auditability.
 
-- Helmet security headers.
-- CORS allow-list configuration with credential support.
-- API rate limiting, with production-specific limits.
-- JSON request-size limits.
-- Zod request validation.
-- Centralized error and not-found handling.
-- Disabled Express `X-Powered-By` header.
+| Security layer | Implementation |
+|:--|:--|
+| Password protection | bcryptjs password hashing |
+| Session security | Short-lived JWT access token; HTTP-only refresh cookie; SHA-256 hashed refresh-token storage and rotation |
+| RBAC | Backend `authenticate` and `authorize(...roles)`; account status checked on protected requests |
+| OAuth | Google OAuth 2.0 state validation and protection against admin privilege escalation |
+| Internal service auth | `x-internal-key` required for AI service requests; constant-time `crypto.timingSafeEqual` comparison |
+| File verification | PDF/DOCX magic-byte validation; extension/content mismatch rejection; UUID-based storage names |
+| Upload limits | Backend upload cap 10 MB; AI parser cap 5 MB |
+| PII protection | `sanitizePii()` masks emails, phone numbers, and URLs before outbound AI calls |
+| Prompt-injection defence | Pattern scanner, suspicious-line redaction, and security findings |
+| HTTP hardening | Helmet, strict CORS allowlists, disabled `X-Powered-By`, CSP for API docs, and rate limiting |
+| Data governance | Sanitized audit events and role-isolated access |
 
-### 9.3 Resume upload protections
+### Prompt-injection defence
 
-- File extension and content-signature checks.
-- PDF and DOCX magic-byte verification.
-- Upload size limits.
-- PDF page-count limits in the AI parsing service.
-- Rejection of unsupported or empty files.
-- SHA-256 file hashing for fingerprinting and duplicate detection.
-- Explicit handling of documents from which sufficient text cannot be extracted.
+The AI service checks for eight instruction-pattern categories plus invisible/zero-width character anomalies:
 
-### 9.4 Prompt-injection protection
+`override-instructions` · `role-hijack` · `system-prompt-reference` · `score-manipulation` · `hire-directive` · `chat-markup` · `output-directive` · `concealment`
 
-Resume content is treated as untrusted input. The AI service scans for patterns such as:
+Flagged lines are replaced with `[REMOVED: instruction-like content]` before LLM inference. Suspicious content is surfaced for review rather than silently treating the resume as invalid.
 
-- Attempts to override previous instructions.
-- Attempts to impersonate system, developer, or assistant roles.
-- Instructions to manipulate a candidate's score or ranking.
-- Directives telling the model to hire or shortlist a candidate.
-- Suspicious chat-control markup.
-- Concealment or output-control instructions.
-- Unusual invisible-character usage.
+### Blind screening & privacy
 
-Flagged lines are redacted before text is sent to the language model. The scanner reports findings and risk levels for review; a flagged resume is not automatically rejected solely because the scan found instruction-like content.
+The blind-profile workflow pseudonymizes candidates (for example, `Candidate XXXX`) and redacts selected identifiers such as names, contacts, locations, company names, institution names, and—by default—education dates. Scoring itself uses job-related evidence rather than direct identifiers. Free-text can still contain identifying clues, so blind screening reduces exposure but does not guarantee anonymity.
 
-### 9.5 Privacy-aware screening
+## ✦ AI Decision Principles
 
-The AI matching implementation documents that scoring uses skills, years of experience, degree text, and role titles rather than name, email, location, company, or institution identifiers.
+1. **Human authority:** AI screening produces evidence and recommendations; it does not automatically reject candidates or make the final hiring decision.
+2. **Explainability:** Results include component scores, matched/missing skills, strengths, and gaps—not just a single percentage.
+3. **Deterministic stability:** Configured model settings and deterministic scoring rules reduce avoidable run-to-run variation.
+4. **Job-related evaluation:** Matching focuses on skills, experience, education, and role relevance rather than direct personal identifiers.
+5. **Privacy by design:** Selected PII is sanitized before external AI calls; blind profiles reduce exposure during review.
+6. **Adversarial resilience:** Suspicious resume instructions are flagged and sanitized, with security findings available for oversight.
+7. **Reviewable governance:** Evaluation utilities support fairness, stability, extraction, and security testing; these measurements do not alone prove legal compliance or absence of bias.
 
-The AI service also provides blind-profile construction that removes or redacts selected direct identifiers and organization names from recruiter-facing screening data. Free-text content may still contain identifying clues, so blind screening should be treated as a risk-reduction measure rather than a guarantee of anonymity.
+## ✦ Key Innovations
 
-### 9.6 Audit and data isolation
+- **Evidence-weighted skill intelligence:** Distinguishes demonstrated skills in roles and projects from unsupported keyword lists.
+- **Local ONNX semantic matching:** Combines MiniLM embeddings with deterministic rules without requiring an external embedding API.
+- **Four-tier AI orchestration:** Falls back from the AI microservice to direct Groq, Gemini, and deterministic in-process matching.
+- **Adversarial resume defence:** Scans prompt injection, removes suspicious instructions from model input, and records findings.
+- **Blind candidate review:** Pseudonymized profiles help reduce exposure to direct identifiers.
+- **Built-in AI evaluation toolkit:** Supports counterfactual fairness variants, score stability, injection attack testing, and blind-profile leakage checks.
+- **Explicit profile consent flow:** Extracted resume fields require candidate review before overwriting profile data.
+- **Live-mode isolation:** New candidate accounts begin with clean profiles; logout clears client-side user data.
 
-- AI-related audit events capture analysis, scoring, screening, injection detection, and evaluation activity.
-- AI audit events are designed not to include raw resume text, candidate names, email addresses, or locations.
-- Administrative actions and security events can be inspected through the admin audit-log interface.
-- User-specific browser data is cleared during logout to reduce cross-account data leakage.
+## ✦ Data Management & Auditability
 
-## 10. AI Decision Principles
+The `hiresmart` MongoDB database uses 17 Mongoose models:
 
-HireSmart AI follows a human-centred decision-support approach.
+| Domain | Models |
+|:--|:--|
+| Identity & authentication | `User`, `RefreshToken`, `AuthToken` |
+| Profiles & talent | `CandidateProfile`, `RecruiterProfile`, `Resume`, `Skill` |
+| Hiring workflow | `Job`, `Application`, `MatchResult`, `Shortlist`, `Interview`, `ScreeningSettings` |
+| Governance & communication | `Notification`, `Complaint`, `AuditLog`, `AIEvaluation` |
 
-### 10.1 Human oversight
+**Audit controls**
+- Backend audit records cover authentication, resumes, AI screening, moderation, skills, and evaluation events.
+- Sensitive keys such as passwords, tokens, secrets, and raw resume text are scrubbed from audit payloads.
+- AI audit events include `RESUME_ANALYZED`, `MATCH_SCORED`, `SCREENING_RUN`, `JOB_EXTRACTED`, `INJECTION_DETECTED`, and `EVALUATION_RUN`.
+- Opaque references and request IDs support event correlation without copying raw resume content into AI audit details.
+- Resume SHA-256 fingerprints and unique candidate/job application constraints help prevent duplicates.
 
-AI-generated scores and recommendations support recruiter review. The recruiter remains responsible for shortlisting, interviewing, rejecting, or hiring a candidate.
-
-### 10.2 Explainability
-
-The platform aims to show more than a single percentage. Screening results can include component scores, matched skills, strengths, and potential gaps so a recruiter can understand the basis of a match.
-
-### 10.3 Job-related evaluation
-
-The matching logic focuses on job-related evidence such as skills, experience, education, and role relevance. The scoring implementation explicitly avoids using direct personal identifiers such as name, email, and location as matching inputs.
-
-### 10.4 Privacy-aware processing
-
-Blind-profile functionality reduces exposure of selected personal and organizational identifiers during screening. Access to candidate information is also separated by application roles.
-
-### 10.5 Security and robustness
-
-Resume content is treated as untrusted data. Prompt-injection scanning, text sanitization, structured output validation, and deterministic matching paths help reduce the impact of malicious or malformed inputs.
-
-### 10.6 Configurable and reviewable evaluation
-
-Matching weights and thresholds are configurable in the AI service. Evaluation utilities include measurements related to skill extraction, score stability, fairness variants, and security attack scenarios. These tools support review; they do not by themselves establish that a model is unbiased or legally compliant.
-
-### 10.7 No automated final hiring decision
-
-A match score is not a probability of job performance and must not be treated as an automatic hire/reject instruction. Recruiters should review the candidate's underlying evidence and apply consistent, job-related criteria.
-
-## 11. Key Innovations
-
-1. **Explainable weighted matching:** A transparent 50/20/10/20 scoring model separates skills, experience, education, and role relevance.
-2. **Evidence-aware skill scoring:** The system distinguishes skills with supporting evidence from skills that are only listed.
-3. **Semantic matching support:** Embedding-based similarity can supplement structured matching when the model is available.
-4. **Prompt-injection-aware resume processing:** Suspicious instruction-like text is detected and redacted before LLM processing.
-5. **Blind-screening profile support:** Selected personal and organizational identifiers can be removed from recruiter-facing screening data.
-6. **Structured LLM extraction:** Model output is validated against schemas before it becomes application data.
-7. **Human-in-the-loop hiring:** AI assists with prioritization and explanation while recruiters retain decision authority.
-8. **AI audit events:** Screening and security activities can be recorded without placing raw resume text or direct personal identifiers in AI event details.
-9. **Role-based end-to-end workflow:** Candidate, recruiter, and administrator operations are connected through shared application data.
-10. **Multi-service deployment:** The frontend, backend, database, and AI service can be orchestrated together using Docker Compose.
-
-## 12. Data Management and Auditability
-
-MongoDB is the primary persistence layer. The application models cover the main recruitment lifecycle, including:
-
-- User accounts and role-specific profiles.
-- Resumes and extracted candidate information.
-- Jobs and skill requirements.
-- Applications and screening results.
-- Interviews and notifications.
-- Complaints and support records.
-- Skill taxonomy and AI evaluation data.
-- Administrative and AI audit events.
-
-The backend uses Mongoose models and service-layer operations to manage application data. AI results and their score breakdowns can be associated with the relevant application or screening context.
-
-For detailed system and API information, see the [architecture documentation](docs/architecture.md), [API documentation](docs/api.md) when present, and [full-stack test report](docs/FULL_STACK_TEST_REPORT.md).
-
-## 13. Project Structure
+## ✦ Project Structure
 
 ```text
 ResumeAI/
-├── ai-service/                 # Standalone AI processing and matching service
+├── frontend/
 │   ├── src/
-│   │   ├── audit/              # AI audit event construction and hashing
-│   │   ├── blind/              # Blind-screening profiles and redaction
-│   │   ├── evaluation/         # Evaluation and fairness/security metrics
-│   │   ├── extraction/         # Structured resume extraction
-│   │   ├── jobs/               # Job-description extraction
-│   │   ├── llm/                # LLM request utilities
-│   │   ├── matching/           # Weighted matching and scoring
-│   │   ├── parsing/            # PDF/DOCX parsing and text cleaning
-│   │   ├── recommend/          # Job recommendation logic
-│   │   ├── security/           # Prompt-injection scanning
-│   │   ├── semantic/           # Embedding-based similarity
-│   │   └── index.js            # AI service exports and pipelines
-│   ├── scripts/                # AI service test scripts
-│   └── package.json
-│
-├── backend/                    # Express REST API
+│   │   ├── components/       # Shared UI, auth, protected routes, layouts
+│   │   ├── config/           # Frontend environment configuration
+│   │   ├── context/          # Authentication and domain contexts
+│   │   ├── data/             # Offline mock datasets
+│   │   ├── hooks/            # Reusable React hooks
+│   │   ├── pages/            # Public, candidate, recruiter, admin views
+│   │   ├── services/         # API clients and HTTP client
+│   │   └── types/            # TypeScript domain interfaces
+│   └── tests/                # Playwright and Selenium browser tests
+├── backend/
+│   ├── docs/                 # OpenAPI specification and Swagger assets
 │   ├── src/
-│   │   ├── config/             # Environment and database configuration
-│   │   ├── constants/          # Shared domain constants
-│   │   ├── controllers/        # HTTP request handlers
-│   │   ├── middleware/         # Auth, validation, and error handling
-│   │   ├── models/             # Mongoose schemas
-│   │   ├── routes/             # Versioned API routes
-│   │   ├── seed/               # Development database seed
-│   │   ├── services/           # Business logic and AI integration
-│   │   ├── utils/              # Shared helpers and response utilities
-│   │   └── validators/         # Zod schemas
-│   ├── tests/                  # Backend unit, integration, and workflow tests
-│   └── package.json
-│
-├── frontend/                   # React + TypeScript SPA
+│   │   ├── config/           # Database and environment configuration
+│   │   ├── controllers/      # REST request handlers
+│   │   ├── middleware/       # Authentication, authorization, validation
+│   │   ├── models/           # 17 Mongoose models
+│   │   ├── routes/           # Versioned /api/v1 routes
+│   │   ├── seed/             # Development database seed
+│   │   ├── services/         # Business logic and AI provider orchestration
+│   │   ├── utils/            # API, token, and file helpers
+│   │   └── validators/       # Zod validation schemas
+│   ├── tests/                # Integration and end-to-end suites
+│   └── uploads/resumes/      # Local resume storage
+├── ai-service/
+│   ├── scripts/              # Phase 1–8 tests and model download
+│   ├── samples/              # Sample resumes and fixtures
 │   ├── src/
-│   │   ├── components/         # Shared UI components and layouts
-│   │   ├── contexts/           # Authentication and domain contexts
-│   │   ├── hooks/              # Reusable React hooks
-│   │   ├── pages/              # Public, candidate, recruiter, and admin pages
-│   │   ├── services/           # API clients and domain services
-│   │   ├── types/              # TypeScript types
-│   │   └── App.tsx              # Application routes and layout
-│   ├── tests/                  # Playwright browser tests
-│   └── package.json
-│
-├── docs/                        # Architecture, presentation, and test documentation
-├── scripts/                     # Project-level scripts
-├── .env.example                 # Root environment template
-├── docker-compose.yml           # Multi-service orchestration
-├── Jenkinsfile                  # Jenkins pipeline definition
-└── README.md
+│   │   ├── audit/            # PII-free AI audit events
+│   │   ├── blind/            # Pseudonymization and redaction
+│   │   ├── evaluation/       # Fairness, stability, security tests
+│   │   ├── extraction/       # Resume LLM extraction and schemas
+│   │   ├── jobs/              # Job description extraction
+│   │   ├── matching/          # Weighted scoring and parsers
+│   │   ├── parsing/           # PDF/DOCX extraction and cleaning
+│   │   ├── recommend/         # Job recommendation logic
+│   │   ├── security/          # Prompt-injection scanner
+│   │   ├── semantic/          # ONNX embeddings and cosine scoring
+│   │   ├── server/            # Express app and internal-key auth
+│   │   ├── skillgap/          # Skill-gap and career-path analysis
+│   │   └── taxonomy/          # Skill aliases and normalization
+│   └── API.md
+├── deploy/
+│   ├── kubernetes/            # Kubernetes manifests
+│   └── nginx/                 # HTTPS reverse-proxy configuration
+├── docs/                      # Architecture, API, test report, Postman
+├── scripts/                   # CI scripts
+├── docker-compose.yml
+├── docker-compose.https.yml
+├── Jenkinsfile
+└── .env.example
 ```
 
-## 14. Installation and Local Setup
+## ✦ Setup
 
 ### Prerequisites
 
-- Node.js 20 or later (the repository has also been tested with Node.js 24).
+- Node.js 20+ (AI service requires Node.js 18+).
+- MongoDB 7+.
 - npm.
-- MongoDB 7 or a compatible MongoDB instance.
-- Git.
-- Optional: Groq credentials and any configured AI provider/model assets required by the AI features.
+- Python 3 only if running the optional Selenium smoke test.
 
-### 14.1 Clone the repository
+### 1 · Clone the repository
 
 ```bash
 git clone https://github.com/tharunsai01/ResumeAI.git
 cd ResumeAI
 ```
 
-### 14.2 Configure environment variables
-
-Create the environment files described in [Environment Configuration](#15-environment-configuration). Do not commit real credentials or secrets.
-
-### 14.3 Install backend dependencies
+### 2 · Install dependencies
 
 ```bash
-cd backend
-npm install
+cd backend && npm install
+cd ../ai-service && npm install
+cd ../frontend && npm install
 ```
 
-### 14.4 Install frontend dependencies
+### 3 · Configure environment files
 
-```bash
-cd ../frontend
-npm install
-```
+Create local environment files using the repository templates:
 
-### 14.5 Install AI service dependencies
+- `backend/.env.example` → `backend/.env`
+- `ai-service/.env.example` → `ai-service/.env`
+- `frontend/.env.example` → `frontend/.env`
+- Root `.env.example` → root `.env` for Docker Compose
 
-```bash
-cd ../ai-service
-npm install
-```
-
-### 14.6 Start MongoDB
-
-Start a local MongoDB instance and ensure the configured `MONGODB_URI` is reachable.
-
-### 14.7 Seed development data (optional)
+### 4 · Seed development data (optional)
 
 ```bash
 cd backend
 npm run seed
 ```
 
-Use seed data only in a development or test database.
+The seed script refuses to run when `NODE_ENV=production`.
 
-### 14.8 Start the services
+### 5 · Start the services
 
-Run each service in a separate terminal:
-
-**Terminal 1 — Backend API**
+Run each service in its own terminal:
 
 ```bash
+# Terminal 1 — AI service
+cd ai-service
+npm start
+
+# Terminal 2 — Backend API
 cd backend
 npm run dev
-```
 
-**Terminal 2 — Frontend**
-
-```bash
+# Terminal 3 — Frontend
 cd frontend
 npm run dev
 ```
 
-**Terminal 3 — AI service**
+Open the frontend at [http://localhost:5173](http://localhost:5173).
+
+### 6 · Verify service health
+
+```bash
+curl http://localhost:8000/health
+curl http://localhost:5000/health
+curl http://localhost:5000/api/v1/health
+```
+
+## ✦ Environment Configuration
+
+<details>
+<summary><strong>Backend · backend/.env</strong></summary>
+
+```env
+NODE_ENV=development
+PORT=5000
+MONGODB_URI=mongodb://127.0.0.1:27017/hiresmart
+CLIENT_URL=http://localhost:5173
+JWT_ACCESS_SECRET=replace_with_a_random_secret_at_least_32_chars
+JWT_ACCESS_MINUTES=15
+JWT_REFRESH_DAYS=7
+AI_SERVICE_URL=http://127.0.0.1:8000
+AI_SERVICE_KEY=replace_with_a_random_secret_at_least_16_chars
+GROQ_API_KEY=
+GEMINI_API_KEY=
+OPENAI_API_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=http://localhost:5173/oauth/callback
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+EMAIL_FROM=HireSmart AI <no-reply@hiresmart.local>
+```
+</details>
+
+<details>
+<summary><strong>AI Service · ai-service/.env</strong></summary>
+
+```env
+PORT=8000
+AI_SERVICE_KEY=must_match_backend_and_be_at_least_16_chars
+GROQ_API_KEY=your_groq_api_key
+GROQ_MODEL=openai/gpt-oss-20b
+ALLOW_TXT_UPLOADS=false
+# Optional: MAX_CONCURRENT_LLM=2
+# Optional: MAX_LLM_QUEUE=50
+# Optional embedding overrides: EMBEDDING_MODEL, EMBEDDING_DTYPE, EMBEDDING_CACHE_DIR
+```
+</details>
+
+<details>
+<summary><strong>Frontend · frontend/.env</strong></summary>
+
+```env
+VITE_API_BASE_URL=http://localhost:5000/api/v1
+VITE_USE_MOCK=false
+VITE_GOOGLE_CLIENT_ID=
+```
+</details>
+
+> **Security note:** Never commit real API keys, OAuth secrets, SMTP credentials, database passwords, or JWT secrets. Variables prefixed with `VITE_` are bundled for browser access and must never contain private credentials.
+
+## ✦ Docker Deployment
+
+The root Compose stack orchestrates MongoDB, the AI service, backend API, and frontend. The frontend container serves the Vite build through Nginx and proxies API traffic to the backend.
+
+```bash
+# Prepare root environment
+cp .env.example .env
+# Set AI_SERVICE_KEY and provider credentials in .env
+
+# Build and start
+docker compose up --build -d --wait
+
+# Inspect services
+docker compose ps
+
+# Verify frontend proxy -> backend
+curl --fail http://localhost:5173/api/v1/health
+```
+
+Optional HTTPS overlay (TLS terminates on port `35443`):
+
+```bash
+TLS_DIRECTORY=/path/to/certs docker compose -f docker-compose.yml -f docker-compose.https.yml up -d
+```
+
+Kubernetes manifests are located in `deploy/kubernetes/`. Nginx TLS configuration is in `deploy/nginx/https.conf`.
+
+## ✦ Testing & Verification
+
+### Production builds
+
+```bash
+npm --prefix backend run build
+npm --prefix frontend run build
+```
+
+### Backend · 104 automated tests
+
+```bash
+cd backend
+npm run test
+npm run test:e2e
+npm run test:all
+```
+
+### AI service · phase 1–8 verification
 
 ```bash
 cd ai-service
-npm run dev
+npm run test:phase1
+for phase in 2 3 4 5 6 7 8; do npm run "test:phase${phase}:offline"; done
 ```
 
-The backend API is configured for port `5000`, the Vite frontend for port `5173`, and the AI service for port `8000` in the Docker service configuration. Check the service configuration and local environment if a port has been customized.
-
-Open the frontend at [http://localhost:5173](http://localhost:5173).
-
-Check backend health at [http://localhost:5000/health](http://localhost:5000/health).
-
-## 15. Environment Configuration
-
-The repository includes a root `.env.example`. Create a local `.env` from that template and configure values for your environment.
-
-Common variables include:
-
-| Variable | Purpose |
-|---|---|
-| `PORT` | Backend listening port |
-| `NODE_ENV` | Runtime environment |
-| `MONGODB_URI` | MongoDB connection string |
-| `CLIENT_URL` | Allowed frontend origin |
-| `JWT_ACCESS_SECRET` | Secret used to sign access tokens |
-| `JWT_REFRESH_SECRET` | Secret used for refresh-token signing, where configured |
-| `JWT_ACCESS_MINUTES` | Access-token lifetime |
-| `JWT_REFRESH_DAYS` | Refresh-token lifetime |
-| `AI_SERVICE_URL` | Backend-to-AI-service URL |
-| `AI_SERVICE_KEY` | Shared key for AI service communication |
-| `GROQ_API_KEY` | Optional Groq provider credential |
-| `GROQ_MODEL` | Configured Groq model identifier |
-| `GEMINI_API_KEY` | Optional Gemini credential where supported by backend integration |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `GOOGLE_REDIRECT_URI` | Registered OAuth callback URI |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Optional SMTP configuration |
-| `VITE_API_BASE_URL` | Frontend API base URL |
-| `VITE_USE_MOCK` | Enables or disables frontend mock mode |
-
-**Important configuration notes**
-
-- Keep real API keys, OAuth secrets, SMTP passwords, database credentials, and JWT secrets out of source control.
-- Use long, unique, randomly generated secrets in non-development environments.
-- Configure OAuth redirect URIs to exactly match the provider console.
-- The Docker Compose configuration requires `AI_SERVICE_KEY`.
-- Frontend variables prefixed with `VITE_` are exposed to the browser bundle. Never put private credentials in frontend environment variables.
-- Use `VITE_USE_MOCK=false` for backend-connected operation.
-
-## 16. Docker Setup
-
-The root `docker-compose.yml` defines the main services:
-
-| Service | Role |
-|---|---|
-| `mongodb` | MongoDB database with persistent storage and health check |
-| `backend` | Express API server |
-| `frontend` | Built React application served by its container |
-| `ai-service` | Resume processing and AI matching service |
-
-Create the root `.env` and set the required `AI_SERVICE_KEY` and other environment-specific secrets, then run:
+### Browser automation · Playwright
 
 ```bash
-docker compose up --build
-```
-
-To stop the services:
-
-```bash
-docker compose down
-```
-
-To stop the services and remove the named database/upload volumes (this deletes persisted local container data):
-
-```bash
-docker compose down -v
-```
-
-Do not use the volume-removal command if you need to preserve local MongoDB or uploaded-resume data.
-
-## 17. Testing and Verification
-
-### Backend
-
-From the `backend/` directory:
-
-```bash
-npm run test:unit
-npm test
-npm run test:e2e
-npm run test:all
-npm run build
-```
-
-### Frontend browser tests
-
-From the `frontend/` directory:
-
-```bash
+cd frontend
 npx playwright install chromium
 npm run test:browser
-npm run build
-npm run lint
 ```
 
-### AI service tests
-
-From the `ai-service/` directory, phase-based scripts are available:
+Optional Selenium smoke test:
 
 ```bash
-npm run test:phase1
-npm run test:phase2
-npm run test:phase3
-npm run test:phase4
-npm run test:phase5
-npm run test:phase6
-npm run test:phase7
-npm run test:phase8
+python -m venv .venv
+.venv/bin/python -m pip install selenium
+RESUMEAI_BASE_URL=http://localhost:5173 .venv/bin/python frontend/tests/selenium_smoke.py
 ```
 
-Offline variants are also provided for phases that support them (for example, `npm run test:phase2:offline`). Review each script and its environment requirements before running it.
+### Recorded verification
 
-### Recorded full-stack verification
+The supplied project documentation records successful frontend and backend production builds, **104/104 backend integration and workflow tests**, and a passing Playwright landing-page check. The detailed test history and endpoint matrix are in [docs/FULL_STACK_TEST_REPORT.md](docs/FULL_STACK_TEST_REPORT.md). Re-run the suites against the current commit and environment before relying on those results for a release.
 
-The repository's [Full-Stack Test Report](docs/FULL_STACK_TEST_REPORT.md) records a verification run dated November 24, 2026, with **113 tests reported passing**: 104 backend integration/workflow tests and 9 Playwright browser suites. Treat this as the result of that recorded run, not as a guarantee that every future commit or deployment has passed the same tests. Re-run the relevant suites after code or environment changes.
+## ✦ API & Technical Documentation
 
-## 18. API and Technical Documentation
+| Resource | Description |
+|:--|:--|
+| [Swagger UI](http://localhost:5000/api/docs) | Interactive backend API documentation when the backend is running |
+| [Backend route index](http://localhost:5000/api/v1) | Live JSON index of mounted API resources |
+| [AI Service API](ai-service/API.md) | Internal microservice API contract |
+| [Architecture](docs/architecture.md) | Architecture notes |
+| [API summary](docs/api.md) | Endpoint summary |
+| [Full-stack test report](docs/FULL_STACK_TEST_REPORT.md) | Verification history and endpoint matrix |
+| [Postman collection](docs/ResumeAI.postman_collection.json) | Importable API collection |
 
-- [System Architecture](docs/architecture.md)
-- [Full-Stack Test Report](docs/FULL_STACK_TEST_REPORT.md)
-- [Presentation Notes](docs/PRESENTATION.md)
-- [AI Service API Notes](ai-service/API.md)
+## ✦ Known Limitations & Future Scope
 
-The backend API is mounted under `/api/v1`. A health endpoint is available at `/health`. API documentation assets are served by the backend under `/api/docs` when included in the deployment.
+| Current limitation | Planned direction |
+|:--|:--|
+| Admin evaluation endpoint currently records deterministic benchmark metrics instead of orchestrating the AI service evaluation runner. | Connect the admin evaluation API to `POST /v1/evaluation/run` with progress tracking. |
+| AI microservice screening does not score non-empty cover letters; the provider chain falls back to another provider. | Align cover-letter support across providers. |
+| Resume files use local disk or Docker volume storage. | Add S3, GCS, or Cloudflare R2 with pre-signed URLs and lifecycle policies. |
+| Without SMTP configuration, development verification/reset links are logged rather than emailed. | Configure a transactional email provider such as SES, SendGrid, or Resend. |
+| Interviews store external meeting URLs; native video calling is not included. | Add WebRTC and calendar synchronization. |
+| Legacy backend LinkedIn routes remain although frontend LinkedIn sign-in flows were removed. | Remove unused routes and keep auth surfaces consistent. |
+| `next-app/` is an unintegrated Next.js starter scaffold. | Integrate intentionally or remove the unused scaffold. |
+| CI script invokes a backend `test:unit` command not currently declared in the backend package scripts. | Align CI commands with the actual package scripts. |
 
-## 19. Known Limitations and Future Scope
+## ✦ Responsible Use
 
-The following areas should be validated against deployment requirements before treating the project as a production hiring platform:
-
-- **Production hosting and operations:** The repository includes Docker orchestration, but production cloud deployment, monitoring, backups, and disaster recovery require environment-specific setup.
-- **Email delivery:** SMTP-related configuration exists, but reliable production delivery, provider setup, bounce handling, and email verification operations must be configured and verified.
-- **Resume object storage:** The documented application uses backend-managed upload storage; managed object storage and lifecycle policies can be added for production scale.
-- **OCR:** Scanned image-only resumes are not supported by the current text-extraction path.
-- **Live video interviews:** Interview scheduling and meeting information are supported; a native embedded WebRTC video experience is not part of the current documented scope.
-- **Billing:** Subscription and payment-gateway functionality is not part of the current documented scope.
-- **Production AI governance:** Fairness metrics and evaluation utilities support testing and monitoring, but require representative datasets, periodic review, documented thresholds, and human governance to support responsible deployment.
-- **Provider availability:** AI extraction and semantic functionality depend on configured providers, credentials, model availability, and service health. Verify the fallback behavior in the target environment.
+HireSmart AI is a recruitment decision-support tool. AI scores may be incomplete, sensitive to resume quality, or unsuitable for a particular role. Recruiters must review underlying evidence, apply consistent job-related criteria, and retain responsibility for every employment decision. Fairness and security evaluation utilities support governance but do not, by themselves, establish that a system is unbiased or legally compliant.
 
 ---
 
-## Responsible Use
-
-HireSmart AI is intended to assist recruitment workflows, not to replace professional judgment. AI scores can be incomplete, affected by resume quality, or unsuitable for a particular role. Recruiters should review source evidence, consider relevant context, provide appropriate human oversight, and avoid using automated scores as the sole basis for employment decisions.
+<div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=130&section=footer&color=0:06B6D4,45:4F46E5,100:080B1A" width="100%" alt="Animated footer wave"/>
+  <h3>Built for smarter hiring. Designed for human decisions.</h3>
+  <sub>HireSmart AI · Resume Intelligence · Explainable Matching · Responsible Recruitment</sub>
+  <br/><br/>
+  <a href="#hiresmart-ai">Back to top ↑</a>
+</div>
