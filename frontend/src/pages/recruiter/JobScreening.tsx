@@ -7,7 +7,9 @@ import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { aiScreeningService, AI_SCREENING_THRESHOLD } from "../../services/aiScreeningService"
-import { recruiterCandidateService } from "../../services/recruiterCandidateService"
+import { jobService } from "../../services/jobService"
+import { env } from "../../config/env"
+import type { ScreeningJob, DetailedScreeningCandidate } from "../../types/screening"
 import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
@@ -28,13 +30,15 @@ export default function RecruiterJobScreening() {
   const navigate = useNavigate()
   const { jobId } = useParams()
   
-  const job = aiScreeningService.getScreeningJobById(jobId || "") || aiScreeningService.getScreeningJobs()[0]
+  const [job, setJob] = React.useState<Pick<ScreeningJob, "id" | "title">>()
   const [loading, setLoading] = React.useState(true)
-  const [candidates, setCandidates] = React.useState(() => aiScreeningService.getScreeningCandidates(jobId))
+  const [candidates, setCandidates] = React.useState<DetailedScreeningCandidate[]>([])
   const [isScreening, setIsScreening] = React.useState(false)
   const [screeningProgress, setScreeningProgress] = React.useState(0)
-  const [screeningComplete, setScreeningComplete] = React.useState(job.pending === 0)
-  
+  const [error, setError] = React.useState("")
+  const screened = candidates.filter(candidate => candidate.screeningStatus !== "Not Screened").length
+  const screeningComplete = candidates.length > 0 && screened === candidates.length
+
   // Filters
   const [searchTerm, setSearchTerm] = React.useState("")
   const [qualFilter, setQualFilter] = React.useState("All")
@@ -54,22 +58,53 @@ export default function RecruiterJobScreening() {
 
   React.useEffect(() => {
     let active = true
-    void recruiterCandidateService.fetchLiveCandidates().then(() => {
-      if (!active) return
-      setCandidates(aiScreeningService.getScreeningCandidates(jobId))
-      setLoading(false)
-    })
+    setLoading(true)
+    setError("")
+    setCandidates([])
+    setJob(undefined)
+    void (async () => {
+      try {
+        const selectedJob = env.useMock
+          ? aiScreeningService.getScreeningJobById(jobId || "")
+          : await jobService.getRecruiterJobById(jobId || "")
+        if (!selectedJob) throw new Error("Screening job not found.")
+        const results = await aiScreeningService.getScreeningCandidates(selectedJob.id, selectedJob.title)
+        if (active) {
+          setJob(selectedJob)
+          setCandidates(results)
+        }
+      } catch (err) {
+        if (active) setError(err instanceof Error ? err.message : "Unable to load screening.")
+      } finally {
+        if (active) setLoading(false)
+      }
+    })()
     return () => { active = false }
   }, [jobId])
 
-  const runScreening = () => {
+  const runScreening = async () => {
+    if (!job || isScreening) return
+    setError("")
     setIsScreening(true)
-    setScreeningProgress(100)
-    setScreeningComplete(true)
-    job.pending = 0
-    job.screened = job.applications
-    setIsScreening(false)
-    showToast("AI Screening completed instantly.")
+    setScreeningProgress(0)
+    try {
+      if (env.useMock) {
+        setCandidates(current => current.map(candidate => ({ ...candidate, screeningStatus: "Screened" })))
+      } else {
+        const pending = candidates.filter(candidate => candidate.screeningStatus === "Not Screened")
+        const failed = await aiScreeningService.screenApplications(pending.map(candidate => candidate.id), setScreeningProgress)
+        setCandidates(await aiScreeningService.getScreeningCandidates(job.id, job.title))
+        if (failed) {
+          setError(`Screening failed for ${failed} of ${pending.length} applications. Run screening again to retry.`)
+          return
+        }
+      }
+      showToast("AI screening completed.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to complete screening.")
+    } finally {
+      setIsScreening(false)
+    }
   }
 
   const filteredAndSorted = React.useMemo(() => {
@@ -83,8 +118,8 @@ export default function RecruiterJobScreening() {
       const matchesStatus = statusFilter === "All" || cand.status === statusFilter
       
       let matchesQual = true
-      if (qualFilter === "Qualified") matchesQual = cand.overallMatch >= AI_SCREENING_THRESHOLD
-      else if (qualFilter === "Below Threshold") matchesQual = cand.overallMatch < AI_SCREENING_THRESHOLD
+      if (qualFilter === "Qualified") matchesQual = cand.screeningStatus !== "Not Screened" && cand.overallMatch >= AI_SCREENING_THRESHOLD
+      else if (qualFilter === "Below Threshold") matchesQual = cand.screeningStatus !== "Not Screened" && cand.overallMatch < AI_SCREENING_THRESHOLD
       
       let matchesScore = true
       if (scoreFilter === "90+") matchesScore = cand.overallMatch >= 90
@@ -105,18 +140,25 @@ export default function RecruiterJobScreening() {
     return result
   }, [candidates, searchTerm, statusFilter, scoreFilter, sortBy])
 
-  const handleShortlist = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation()
-    setCandidates(candidates.map(c => c.id === id ? { ...c, status: "Shortlisted" } : c))
-    showToast("Candidate shortlisted.")
+  const updateStatus = async (id: string, status: "shortlisted" | "rejected") => {
+    setError("")
+    try {
+      await aiScreeningService.updateScreeningStatus(id, status)
+      setCandidates(current => current.map(candidate => candidate.id === id
+        ? { ...candidate, status: status === "shortlisted" ? "Shortlisted" : "Rejected" }
+        : candidate))
+      setCandidateToReject(null)
+      showToast(status === "shortlisted" ? "Candidate shortlisted." : "Candidate rejected.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to update candidate status.")
+    }
   }
 
-  const handleReject = () => {
-    if (candidateToReject) {
-      setCandidates(candidates.map(c => c.id === candidateToReject.id ? { ...c, status: "Rejected" } : c))
-      showToast("Candidate rejected.")
-      setCandidateToReject(null)
-    }
+  if (!job) {
+    return <DashboardShell type="recruiter" userName="Recruiter">
+      <p role={loading ? "status" : "alert"}>{loading ? "Loading screening…" : error}</p>
+      <Button onClick={() => navigate("/recruiter/screening")}>Back to Jobs</Button>
+    </DashboardShell>
   }
 
   return (
@@ -148,12 +190,12 @@ export default function RecruiterJobScreening() {
           </div>
           <div className="text-left sm:text-right shrink-0">
             <div className="text-sm font-medium text-brand-navy/60">
-              <span className="text-brand-navy font-bold">{job.screened}</span> / {job.applications} Screened
+              <span className="text-brand-navy font-bold">{screened}</span> / {candidates.length} Screened
             </div>
             <div className="w-32 h-2 bg-brand-gray/20 rounded-full mt-1.5 sm:ml-auto overflow-hidden">
               <div 
                 className={cn("h-full bg-brand-indigo rounded-full transition-all duration-500")}
-                style={{ width: `${(job.screened / job.applications) * 100}%` }}
+                style={{ width: `${candidates.length ? (screened / candidates.length) * 100 : 0}%` }}
               />
             </div>
           </div>
@@ -195,7 +237,7 @@ export default function RecruiterJobScreening() {
                 {/* ACTION BUTTON */}
                 <div className="shrink-0 w-full md:w-auto">
                   {!screeningComplete && !isScreening ? (
-                    <Button onClick={runScreening} className="w-full md:w-auto bg-gradient-to-r from-brand-indigo to-brand-blue py-5 sm:py-6 px-6 sm:px-8 text-sm sm:text-base shadow-lg shadow-brand-indigo/20 hover:shadow-xl hover:shadow-brand-indigo/30 transition-all hover:-translate-y-0.5 group">
+                    <Button disabled={!candidates.length} onClick={runScreening} className="w-full md:w-auto bg-gradient-to-r from-brand-indigo to-brand-blue py-5 sm:py-6 px-6 sm:px-8 text-sm sm:text-base shadow-lg shadow-brand-indigo/20 hover:shadow-xl hover:shadow-brand-indigo/30 transition-all hover:-translate-y-0.5 group">
                       <Zap className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" /> 
                       Run AI Screening
                     </Button>
@@ -217,6 +259,7 @@ export default function RecruiterJobScreening() {
           </PremiumCard>
         </motion.div>
 
+        {error && <p role="alert" className="text-semantic-error">{error}</p>}
         {/* INFO BANNER */}
         <motion.div variants={slideUp} className="bg-brand-blue/5 border border-brand-blue/10 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -234,7 +277,7 @@ export default function RecruiterJobScreening() {
               <div className="text-[10px] font-semibold text-brand-navy/50 uppercase tracking-wider">AI Qualified</div>
             </div>
             <div className="text-center">
-              <div className="text-xl font-bold text-brand-navy/60">{candidates.filter(c => c.overallMatch < AI_SCREENING_THRESHOLD).length}</div>
+              <div className="text-xl font-bold text-brand-navy/60">{candidates.filter(c => c.screeningStatus !== "Not Screened" && c.overallMatch < AI_SCREENING_THRESHOLD).length}</div>
               <div className="text-[10px] font-semibold text-brand-navy/50 uppercase tracking-wider">Below Threshold</div>
             </div>
           </div>
@@ -303,7 +346,7 @@ export default function RecruiterJobScreening() {
                     <tr><td colSpan={6} className="px-4 sm:px-6 py-12 text-center text-brand-navy/40"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></td></tr>
                   ) : filteredAndSorted.length > 0 ? (
                     filteredAndSorted.map((cand, index) => {
-                      const isQualified = cand.overallMatch >= AI_SCREENING_THRESHOLD
+                      const isQualified = cand.screeningStatus !== "Not Screened" && cand.overallMatch >= AI_SCREENING_THRESHOLD
                       return (
                       <tr key={cand.id} className="hover:bg-brand-light/50 transition-colors group cursor-pointer" onClick={() => navigate(`/recruiter/screening/${jobId}/${cand.id}`)}>
                         <td className="px-4 sm:px-6 py-3.5 sm:py-4 whitespace-nowrap">
@@ -322,14 +365,14 @@ export default function RecruiterJobScreening() {
                           <div className="text-xs text-brand-navy/60 mt-0.5 truncate">{cand.role}</div>
                         </td>
                         <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center bg-brand-indigo/[0.01] whitespace-nowrap">
-                          <CandidateMatchScore score={cand.overallMatch} size="sm" showLabel={false} className="mx-auto" />
+                          {cand.screeningStatus === "Not Screened" ? "—" : <CandidateMatchScore score={cand.overallMatch} size="sm" showLabel={false} className="mx-auto" />}
                         </td>
                         <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
                           <span className={cn(
                             "text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border",
                             isQualified ? "bg-semantic-success/10 text-semantic-success border-semantic-success/20" : "bg-brand-gray/10 text-brand-navy/50 border-brand-gray/20"
                           )}>
-                            {isQualified ? "QUALIFIED" : "BELOW THRESHOLD"}
+                            {cand.screeningStatus === "Not Screened" ? "PENDING" : isQualified ? "QUALIFIED" : "BELOW THRESHOLD"}
                           </span>
                         </td>
                         <td className="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
@@ -355,7 +398,7 @@ export default function RecruiterJobScreening() {
                                   Reject
                                 </Button>
                                 {isQualified ? (
-                                  <Button size="sm" className="text-xs bg-brand-indigo hover:bg-brand-blue" onClick={(e) => handleShortlist(e, cand.id)}>
+                                  <Button size="sm" className="text-xs bg-brand-indigo hover:bg-brand-blue" onClick={(e) => { e.stopPropagation(); void updateStatus(cand.id, "shortlisted") }}>
                                     Shortlist
                                   </Button>
                                 ) : (
@@ -387,7 +430,7 @@ export default function RecruiterJobScreening() {
         isOpen={!!candidateToReject}
         candidateName={candidateToReject?.name}
         onClose={() => setCandidateToReject(null)}
-        onConfirm={handleReject}
+        onConfirm={() => { if (candidateToReject) void updateStatus(candidateToReject.id, "rejected") }}
       />
     </DashboardShell>
   )

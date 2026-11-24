@@ -9,7 +9,7 @@ import { httpClient } from "./api/httpClient"
 import type { Job } from "../types/job"
 import { jobService } from "./jobService"
 import { applicationService } from "./applicationService"
-import { recruiterCandidateService } from "./recruiterCandidateService"
+import type { AppStatus } from "../types/recruiter"
 import {
   screeningJobs,
   initialScreeningCandidates,
@@ -21,6 +21,32 @@ import type { ScreeningJob, DetailedScreeningCandidate } from "../types/screenin
 export const AI_SCREENING_THRESHOLD = DEFAULT_AI_SCREENING_THRESHOLD
 
 export type { ScreeningJob, DetailedScreeningCandidate }
+
+interface ScreeningApplication {
+  _id: string
+  candidate?: { fullName?: string }
+  createdAt: string
+  status: string
+  matchResult?: {
+    computedAt?: string
+    overallScore?: number
+    skillsScore?: number
+    experienceScore?: number
+    educationScore?: number
+    matchedSkills?: string[]
+    strengths?: string[]
+    gaps?: string[]
+  }
+}
+
+const screeningStatuses: Record<string, AppStatus> = {
+  applied: "Applied",
+  screened: "Screening",
+  shortlisted: "Shortlisted",
+  interview: "Interview",
+  rejected: "Rejected",
+  hired: "Hired",
+}
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -42,33 +68,69 @@ export const aiScreeningService = {
   /**
    * Retrieves candidate screening profiles.
    */
-  getScreeningCandidates(_jobId?: string): DetailedScreeningCandidate[] {
-    if (!env.useMock) {
-      const candidates = recruiterCandidateService.getCandidates()
-      if (candidates.length > 0) {
-        return candidates.map(c => ({
-          id: c.id,
-          name: c.name,
-          role: c.appliedRole || c.title,
-          location: c.location,
-          experience: c.experience,
-          skills: c.skills.map(s => ({ name: s.name, proficiency: s.proficiency, matchType: "Matched" as const })),
-          overallMatch: c.matchScore,
-          skillMatch: Math.min(100, c.matchScore + 2),
-          experienceMatch: Math.max(60, c.matchScore - 5),
-          educationMatch: 90,
-          roleSimilarity: c.matchScore,
-          keywordMatch: c.matchScore,
-          status: c.status,
-          screeningStatus: c.screeningStatus,
-          appliedDate: c.appliedDate,
-          matchedStrengths: ["Strong technical foundation", "Matches core requirements"],
-          potentialGaps: [],
-        }))
+  async getScreeningCandidates(jobId: string, jobTitle: string): Promise<DetailedScreeningCandidate[]> {
+    if (env.useMock) return [...initialScreeningCandidates]
+
+    const { data } = await httpClient.get<{ data: ScreeningApplication[] }>(`/applications/job/${jobId}`)
+    return data.filter(app => app.status !== "withdrawn").map(app => {
+      const result = app.matchResult
+      return {
+        id: app._id,
+        name: app.candidate?.fullName || "Candidate",
+        role: jobTitle,
+        location: "",
+        experience: "",
+        skills: (result?.matchedSkills ?? []).map(name => ({
+          name, proficiency: "", matchType: "Matched",
+        })),
+        overallMatch: result?.overallScore ?? 0,
+        skillMatch: result?.skillsScore ?? 0,
+        experienceMatch: result?.experienceScore ?? 0,
+        educationMatch: result?.educationScore ?? 0,
+        roleSimilarity: 0,
+        keywordMatch: 0,
+        status: screeningStatuses[app.status] ?? "Applied",
+        screeningStatus: result?.computedAt ? "Screened" : "Not Screened",
+        appliedDate: app.createdAt,
+        matchedStrengths: result?.strengths ?? [],
+        potentialGaps: result?.gaps ?? [],
       }
-      return []
+    })
+  },
+
+  async fetchScreeningJobs(): Promise<ScreeningJob[]> {
+    if (env.useMock) return this.getScreeningJobs()
+
+    const jobs = await jobService.getRecruiterJobs()
+    return Promise.all(jobs.map(async job => {
+      const candidates = await this.getScreeningCandidates(job.id, job.title)
+      const screened = candidates.filter(candidate => candidate.screeningStatus !== "Not Screened")
+      return {
+        id: job.id, title: job.title, location: job.location,
+        applications: candidates.length, screened: screened.length,
+        pending: candidates.length - screened.length,
+        strongMatches: screened.filter(candidate => candidate.overallMatch >= AI_SCREENING_THRESHOLD).length,
+      }
+    }))
+  },
+
+  async screenApplications(applicationIds: string[], onProgress: (progress: number) => void) {
+    let failed = 0
+    for (const [index, id] of applicationIds.entries()) {
+      try {
+        await httpClient.post(`/ai/screen/${id}`, undefined, { timeoutMs: 90_000 })
+      } catch {
+        failed++
+      }
+      onProgress(Math.round(((index + 1) / applicationIds.length) * 100))
     }
-    return [...initialScreeningCandidates]
+    return failed
+  },
+
+  async updateScreeningStatus(applicationId: string, status: "shortlisted" | "rejected") {
+    if (!env.useMock) {
+      await httpClient.patch(`/applications/${applicationId}/status`, { status })
+    }
   },
 
   /**

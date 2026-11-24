@@ -11,7 +11,8 @@ import { aiScreeningService } from "../../services/aiScreeningService"
 
 export default function RecruiterScreening() {
   const navigate = useNavigate()
-  const screeningJobs = aiScreeningService.getScreeningJobs()
+  const [screeningJobs, setScreeningJobs] = React.useState<Awaited<ReturnType<typeof aiScreeningService.fetchScreeningJobs>>>([])
+  const [loadError, setLoadError] = React.useState(false)
   const [loading, setLoading] = React.useState(true)
 
   // Filter state
@@ -21,7 +22,12 @@ export default function RecruiterScreening() {
   const [locationFilter, setLocationFilter] = React.useState("All")
 
   React.useEffect(() => {
-    setLoading(false)
+    let active = true
+    void aiScreeningService.fetchScreeningJobs()
+      .then(jobs => { if (active) setScreeningJobs(jobs) })
+      .catch(() => { if (active) setLoadError(true) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
   }, [])
 
   const totalApplications = screeningJobs.reduce((acc, job) => acc + job.applications, 0)
@@ -37,7 +43,7 @@ export default function RecruiterScreening() {
       if (city) locs.add(city)
     })
     return ["All", ...Array.from(locs)]
-  }, [])
+  }, [screeningJobs])
 
   // Filtered jobs list
   const filteredJobs = React.useMemo(() => {
@@ -58,7 +64,7 @@ export default function RecruiterScreening() {
 
       return matchesSearch && matchesStatus && matchesLocation
     })
-  }, [searchTerm, statusFilter, locationFilter])
+  }, [screeningJobs, searchTerm, statusFilter, locationFilter])
 
   const activeFilterCount = (searchTerm ? 1 : 0) + (statusFilter !== "All" ? 1 : 0) + (locationFilter !== "All" ? 1 : 0)
 
@@ -109,7 +115,7 @@ export default function RecruiterScreening() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-display font-semibold text-brand-navy">Select Job for Screening</h2>
-              <p className="text-xs text-brand-navy/60 mt-0.5">Showing {filteredJobs.length} of {screeningJobs.length} roles</p>
+              <p className="text-xs text-brand-navy/60 mt-0.5">{loadError ? "Unable to load screening jobs." : `Showing ${filteredJobs.length} of ${screeningJobs.length} roles`}</p>
             </div>
             
             <div className="flex items-center gap-2">

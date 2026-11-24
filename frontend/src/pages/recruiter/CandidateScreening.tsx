@@ -9,6 +9,8 @@ import { staggerContainer, slideUp } from "../../lib/animations"
 import { aiScreeningService, AI_SCREENING_THRESHOLD } from "../../services/aiScreeningService"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
+import { jobService } from "../../services/jobService"
+import { env } from "../../config/env"
 import { cn } from "../../lib/utils"
 
 export default function RecruiterCandidateScreening() {
@@ -20,25 +22,46 @@ export default function RecruiterCandidateScreening() {
   const [candidateToReject, setCandidateToReject] = React.useState(false)
   const [shortlistMsg, setShortlistMsg] = React.useState<string | null>(null)
 
-  const reqs = aiScreeningService.getJobRequirements(jobId || "")
+  const [error, setError] = React.useState("")
+
+  const [requiredSkills, setRequiredSkills] = React.useState<string[]>([])
 
   React.useEffect(() => {
-    setLoading(false)
-    
-  }, [])
+    let active = true
+    setLoading(true)
+    setError("")
+    void (async () => {
+      const id = jobId || ""
+      const job = env.useMock ? undefined : await jobService.getRecruiterJobById(id)
+      const candidates = await aiScreeningService.getScreeningCandidates(id, job?.title || "")
+      if (active) {
+        setCandidate(candidates.find(item => item.id === candidateId))
+        setRequiredSkills(env.useMock ? aiScreeningService.getJobRequirements(id).requiredSkills : job?.skills ?? [])
+      }
+    })()
+      .catch(() => {
+        if (active) {
+          setCandidate(undefined)
+          setError("Unable to load candidate screening.")
+        }
+      })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [jobId, candidateId])
 
-  const handleShortlist = () => {
-    if (candidate) {
-      setCandidate({ ...candidate, status: "Shortlisted" })
-      setShortlistMsg("Candidate shortlisted successfully.")
-      setTimeout(() => setShortlistMsg(null), 3000)
-    }
-  }
-
-  const handleReject = () => {
-    if (candidate) {
-      setCandidate({ ...candidate, status: "Rejected" })
+  const updateStatus = async (status: "shortlisted" | "rejected") => {
+    if (!candidate) return
+    setError("")
+    try {
+      await aiScreeningService.updateScreeningStatus(candidate.id, status)
+      setCandidate({ ...candidate, status: status === "shortlisted" ? "Shortlisted" : "Rejected" })
       setCandidateToReject(false)
+      if (status === "shortlisted") {
+        setShortlistMsg("Candidate shortlisted successfully.")
+        setTimeout(() => setShortlistMsg(null), 3000)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to update candidate status.")
     }
   }
 
@@ -50,7 +73,14 @@ export default function RecruiterCandidateScreening() {
     )
   }
 
-  if (!candidate) return <DashboardShell type="recruiter" userName="Recruiter"><div className="p-12 text-center">Candidate not found</div></DashboardShell>
+  if (!candidate) return <DashboardShell type="recruiter" userName="Recruiter"><div className="p-12 text-center">{error || "Candidate not found"}</div></DashboardShell>
+
+  if (candidate.screeningStatus === "Not Screened") return (
+    <DashboardShell type="recruiter" userName="Recruiter">
+      <p>Screening is pending for {candidate.name}.</p>
+      <Button onClick={() => navigate(`/recruiter/screening/${jobId}`)}>Back to Screening</Button>
+    </DashboardShell>
+  )
 
   const isQualified = candidate.overallMatch >= AI_SCREENING_THRESHOLD
   const recommendation = isQualified 
@@ -61,6 +91,7 @@ export default function RecruiterCandidateScreening() {
     <DashboardShell type="recruiter" userName="Recruiter">
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-6xl mx-auto space-y-6 pb-12">
         
+        {error && <p role="alert">{error}</p>}
         {/* HEADER & NOTIFICATION */}
         <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <button onClick={() => navigate(`/recruiter/screening/${jobId}`)} className="flex items-center text-sm font-medium text-brand-navy/60 hover:text-brand-indigo transition-colors">
@@ -86,7 +117,7 @@ export default function RecruiterCandidateScreening() {
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-2xl sm:text-3xl font-display font-bold text-brand-navy break-words">{candidate.name}</h1>
-                  <p className="text-brand-navy/60 font-medium text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">{candidate.role} • {candidate.experience} exp</p>
+                  <p className="text-brand-navy/60 font-medium text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">{candidate.role}{candidate.experience ? ` • ${candidate.experience} exp` : ""}</p>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
@@ -100,7 +131,7 @@ export default function RecruiterCandidateScreening() {
                 <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full sm:w-auto">
                   {candidate.status !== "Shortlisted" && candidate.status !== "Rejected" && (
                     isQualified ? (
-                      <Button onClick={handleShortlist} className="w-full sm:w-auto bg-brand-navy hover:bg-brand-navy/90 text-sm h-9">
+                      <Button onClick={() => void updateStatus("shortlisted")} className="w-full sm:w-auto bg-brand-navy hover:bg-brand-navy/90 text-sm h-9">
                         Shortlist Candidate
                       </Button>
                     ) : (
@@ -114,9 +145,9 @@ export default function RecruiterCandidateScreening() {
                       Reject Candidate
                     </Button>
                   )}
-                  <Button variant="ghost" onClick={() => navigate(`/recruiter/candidates/${candidate.id}`)} className="w-full sm:w-auto text-brand-indigo hover:bg-brand-indigo/10 text-sm h-9">
+                  {env.useMock && <Button variant="ghost" onClick={() => navigate(`/recruiter/candidates/${candidate.id}`)} className="w-full sm:w-auto text-brand-indigo hover:bg-brand-indigo/10 text-sm h-9">
                     <User className="w-4 h-4 mr-2" /> View Full Profile
-                  </Button>
+                  </Button>}
                 </div>
               </div>
             </PremiumCardContent>
@@ -141,8 +172,10 @@ export default function RecruiterCandidateScreening() {
                     { label: "Skills Match", score: candidate.skillMatch },
                     { label: "Experience Match", score: candidate.experienceMatch },
                     { label: "Education Match", score: candidate.educationMatch },
-                    { label: "Role Similarity", score: candidate.roleSimilarity },
-                    { label: "Keyword Alignment", score: candidate.keywordMatch }
+                    ...(env.useMock ? [
+                      { label: "Role Similarity", score: candidate.roleSimilarity },
+                      { label: "Keyword Alignment", score: candidate.keywordMatch },
+                    ] : [])
                   ].map(stat => (
                     <div key={stat.label}>
                       <div className="flex justify-between text-sm font-semibold text-brand-navy mb-2">
@@ -212,7 +245,7 @@ export default function RecruiterCandidateScreening() {
                   <div>
                     <h4 className="text-sm font-semibold text-brand-navy mb-4 border-b border-brand-gray/20 pb-2">Required by Job</h4>
                     <div className="space-y-3">
-                      {reqs.requiredSkills.map(skill => {
+                      {requiredSkills.map(skill => {
                         const cSkill = candidate.skills.find(s => s.name === skill)
                         return (
                           <div key={skill} className="flex items-center justify-between">
@@ -324,7 +357,7 @@ export default function RecruiterCandidateScreening() {
         isOpen={candidateToReject}
         candidateName={candidate?.name}
         onClose={() => setCandidateToReject(false)}
-        onConfirm={handleReject}
+        onConfirm={() => void updateStatus("rejected")}
       />
     </DashboardShell>
   )
