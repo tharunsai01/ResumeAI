@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
+import { env } from "../../config/env"
+import { httpClient } from "../../services/api/httpClient"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
 import { AdminStatCard } from "../../components/admin/AdminStatCard"
@@ -12,7 +16,47 @@ import { SystemHealthOverview } from "../../components/admin/dashboard/SystemHea
 import { SkillTaxonomyOverview } from "../../components/admin/dashboard/SkillTaxonomyOverview"
 import { QuickActions } from "../../components/admin/dashboard/QuickActions"
 
+interface DashboardStats {
+  users: { total: number }
+  jobs: { active: number }
+  complaints: { pending: number }
+  resumes: { total: number }
+  systemHealth: { database: string }
+}
+
+function LiveAdminDashboard() {
+  const [stats, setStats] = useState<DashboardStats>()
+  const [error, setError] = useState(false)
+  useEffect(() => {
+    let active = true
+    void httpClient.get<{ data: DashboardStats }>("/admin/stats")
+      .then(({ data }) => { if (active) setStats(data) })
+      .catch(() => { if (active) setError(true) })
+    return () => { active = false }
+  }, [])
+
+  return (
+    <AdminShell>
+      <AdminPageHeader title="Dashboard" description="Platform activity from the live demo database." />
+      {error && <p role="alert">Unable to load platform statistics.</p>}
+      {!stats && !error && <p role="status">Loading platform statistics…</p>}
+      {stats && <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <AdminStatCard title="Total Users" value={stats.users.total} icon={Users} />
+        <AdminStatCard title="Active Jobs" value={stats.jobs.active} icon={Briefcase} />
+        <AdminStatCard title="Open Complaints" value={stats.complaints.pending} icon={AlertOctagon} />
+        <AdminStatCard title="Resumes Processed" value={stats.resumes.total} icon={FileText} />
+        <p>Database {stats.systemHealth.database}</p>
+      </div>}
+      <div className="flex gap-4 text-brand-indigo font-medium">
+        <Link to="/admin/users">Manage users</Link>
+        <Link to="/admin/audit-logs">View audit logs</Link>
+      </div>
+    </AdminShell>
+  )
+}
+
 export default function AdminDashboard() {
+  if (!env.useMock) return <LiveAdminDashboard />
   const { totalUsers, activeUsers, activeJobs, openComplaints, resumesProcessed, aiEvaluationStatus } = adminDashboardService.getStats()
 
   return (
