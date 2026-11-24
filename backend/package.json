@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "seed": "tsx src/seed/seed.ts",
+    "test:unit": "tsx --test tests/fileValidation.test.ts",
     "test": "tsx tests/integration.test.ts",
     "test:e2e": "tsx tests/e2e-workflow.test.ts",
     "test:all": "tsx tests/integration.test.ts && tsx tests/e2e-workflow.test.ts"

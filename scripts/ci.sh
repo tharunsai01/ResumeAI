@@ -18,6 +18,7 @@ export JWT_ACCESS_SECRET="$(openssl rand -hex 32)"
   cd backend
   npm ci
   npm run build
+  npm run test:unit
   npm run seed
   npm run test:all
 )

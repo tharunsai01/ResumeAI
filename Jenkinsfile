@@ -1,8 +1,10 @@
 pipeline {
   agent any
   options {
-    timestamps()
     disableConcurrentBuilds()
+  }
+  triggers {
+    githubPush()
   }
   stages {
     stage('Build and test') {
