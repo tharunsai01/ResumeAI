@@ -29,7 +29,7 @@ export const recruiterCandidateService = {
         if (res?.data && Array.isArray(res.data)) {
           const mapped: RecruiterCandidate[] = res.data.map((c: any) => ({
             id: c._id || c.id,
-            name: c.fullName || (c.userId?.firstName ? `${c.userId.firstName} ${c.userId.lastName}` : "Candidate"),
+            name: c.name || c.fullName || (c.userId?.firstName ? `${c.userId.firstName} ${c.userId.lastName}` : "Candidate"),
             title: c.headline || "Software Engineer",
             email: c.email || c.userId?.email || "",
             location: c.location || "Remote",

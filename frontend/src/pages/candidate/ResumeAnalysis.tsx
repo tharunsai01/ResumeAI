@@ -1,7 +1,7 @@
 import * as React from "react"
 import { motion } from "framer-motion"
 import { ArrowLeft, BrainCircuit, Sparkles, AlertTriangle, CheckCircle2, ChevronRight, Briefcase, GraduationCap, FolderDot, Code2 } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
 import { MatchScore } from "../../components/shared/MatchScore"
@@ -13,14 +13,19 @@ import { cn } from "../../lib/utils"
 
 export default function CandidateResumeAnalysis() {
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const resumeId = params.get("resumeId") ?? undefined
   const [data, setData] = React.useState<ResumeAnalysisResult | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
 
   React.useEffect(() => {
     const fetchData = async () => {
+      setLoading(true)
+      setError("")
+      setData(null)
       try {
-        const res = await api.getResumeAnalysis()
+        const res = await api.getResumeAnalysis(resumeId)
         setData(res)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Could not load your resume analysis.")
@@ -29,7 +34,7 @@ export default function CandidateResumeAnalysis() {
       }
     }
     fetchData()
-  }, [])
+  }, [resumeId])
 
   if (loading || !data) {
     return (

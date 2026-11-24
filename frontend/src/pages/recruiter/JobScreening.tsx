@@ -7,6 +7,7 @@ import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { aiScreeningService, AI_SCREENING_THRESHOLD } from "../../services/aiScreeningService"
+import { recruiterCandidateService } from "../../services/recruiterCandidateService"
 import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
 import { RejectCandidateModal } from "./components/RejectCandidateModal"
@@ -52,8 +53,14 @@ export default function RecruiterJobScreening() {
   }
 
   React.useEffect(() => {
-    setLoading(false)
-  }, [])
+    let active = true
+    void recruiterCandidateService.fetchLiveCandidates().then(() => {
+      if (!active) return
+      setCandidates(aiScreeningService.getScreeningCandidates(jobId))
+      setLoading(false)
+    })
+    return () => { active = false }
+  }, [jobId])
 
   const runScreening = () => {
     setIsScreening(true)

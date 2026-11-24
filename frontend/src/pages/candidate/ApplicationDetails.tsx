@@ -8,6 +8,8 @@ import { Badge } from "../../components/ui/Badge"
 import { Button } from "../../components/ui/Button"
 import { MatchScore } from "../../components/shared/MatchScore"
 import { useJobActions, type AppliedJob } from "../../hooks/useJobActions"
+import { env } from "../../config/env"
+import { httpClient } from "../../services/api/httpClient"
 import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
@@ -25,6 +27,7 @@ export default function CandidateApplicationDetails() {
   const { updateApplicationNote, withdrawApplication } = useJobActions()
   const activeResume = resumeService.getActiveResumeAnalysis()
 
+  const [attachedResume, setAttachedResume] = React.useState<{ _id: string; fileName?: string; aiAnalysis?: { qualityScore?: number } } | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [application, setApplication] = React.useState<AppliedJob | null>(null)
   const [matchData, setMatchData] = React.useState<JobMatchResult | null>(null)
@@ -45,7 +48,13 @@ export default function CandidateApplicationDetails() {
     setError(null)
 
     try {
+      setAttachedResume(null)
+      if (!env.useMock) {
+        const { data } = await httpClient.get<{ data: { resume?: typeof attachedResume } }>(`/applications/${encodeURIComponent(applicationId)}`)
+        setAttachedResume(data.resume ?? null)
+      }
       const appRecord = applicationService.getApplication(applicationId)
+        ?? (!env.useMock ? (await applicationService.fetchLiveApplications()).find(app => app.id === applicationId) : undefined)
       if (!appRecord) {
         // Genuinely not found - loading completes, application stays null
         setApplication(null)
@@ -365,12 +374,14 @@ export default function CandidateApplicationDetails() {
                         <FileText className="w-5 h-5 text-brand-indigo" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-brand-navy break-all">Rahul_Kumar_Resume.pdf</p>
-                        <p className="text-xs text-brand-navy/60 mt-1">Profile Score: {activeResume.score}%</p>
+                        <p className="text-sm font-medium text-brand-navy break-all">{env.useMock ? "Rahul_Kumar_Resume.pdf" : attachedResume?.fileName || "Resume filename unavailable"}</p>
+                        {(env.useMock || attachedResume?.aiAnalysis?.qualityScore != null) && (
+                          <p className="text-xs text-brand-navy/60 mt-1">Resume Score: {env.useMock ? activeResume.score : attachedResume?.aiAnalysis?.qualityScore}%</p>
+                        )}
                       </div>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full" onClick={() => navigate("/candidate/resume")}>
+                  <Button variant="outline" className="w-full" disabled={!env.useMock && !attachedResume?._id} onClick={() => navigate(env.useMock ? "/candidate/resume" : `/candidate/resume/analysis?resumeId=${encodeURIComponent(attachedResume?._id || "")}`)}>
                     View Resume
                   </Button>
                 </CardContent>
