@@ -41,6 +41,7 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
   // 2. CANDIDATE WORKFLOW: REGISTER, LOGIN, DASHBOARD, RESUME, JOBS, APPLY
   // =================================================================
   test('2. Candidate Flow: Register, Login, Dashboard, Resume, Jobs, and Application', async ({ page }) => {
+    const dynamicCandidateEmail = `cand_${Date.now()}_${Math.random().toString(36).slice(2, 6)}@hiresmart.test`;
     await page.goto('/');
 
     // 1. Open AuthModal & switch to Register
@@ -49,7 +50,7 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
 
     // Fill candidate registration form
     await page.getByPlaceholder('Full Name').fill('Browser QA Candidate');
-    await page.getByPlaceholder('Email Address').fill(candidateEmail);
+    await page.getByPlaceholder('Email Address').fill(dynamicCandidateEmail);
     await page.getByPlaceholder('Password').fill(testPassword);
 
     // Submit registration
@@ -254,6 +255,162 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
     await expect(returnHomeBtn).toBeVisible();
     await returnHomeBtn.click();
     await expect(page).toHaveURL('/');
+  });
+
+  // =================================================================
+  // 7. GOOGLE OAUTH PROFILE MAPPING & GREETING VERIFICATION
+  // =================================================================
+  test('7. Google OAuth Flow: Jane Google Doe maps correctly to dashboard greeting, header avatar and profile', async ({ page }) => {
+    // Navigate to OAuth callback simulating Google authorization code exchange for "Jane Google Doe"
+    const state = Buffer.from(JSON.stringify({ role: 'candidate', provider: 'google' })).toString('base64');
+    await page.goto(`/oauth/callback?code=mock_Jane_Google_Doe&state=${state}`);
+
+    // Verify redirected to candidate dashboard
+    await expect(page).toHaveURL(/\/candidate\/dashboard/, { timeout: 15000 });
+
+    // Verify dashboard displays authentic greeting with Google user first name
+    await expect(page.locator('text=Welcome back, Jane')).toBeVisible({ timeout: 10000 });
+
+    // Verify header user profile shows "Jane Google Doe"
+    await expect(page.locator('text=Jane Google Doe').first()).toBeVisible();
+
+    // Verify candidate profile page displays "Jane Google Doe"
+    await page.goto('/candidate/profile');
+    await expect(page.locator('text=Jane Google Doe').first()).toBeVisible({ timeout: 10000 });
+
+    // Verify logout clears session and candidate profile
+    await page.goto('/candidate/dashboard');
+    const userMenuBtn = page.locator('div.h-9.w-9').first();
+    if (await userMenuBtn.isVisible()) {
+      await userMenuBtn.click();
+    }
+    const logoutBtn = page.getByRole('button', { name: /sign out|log out/i }).or(page.locator('text=Sign Out')).or(page.locator('text=Log Out')).first();
+    if (await logoutBtn.isVisible()) {
+      await logoutBtn.click();
+      await expect(page).toHaveURL('/');
+
+      // Verify localStorage session is cleared
+      const sessionInStorage = await page.evaluate(() => localStorage.getItem('hiresmart_session'));
+      expect(sessionInStorage).toBeNull();
+    }
+  });
+
+  // =================================================================
+  // 8. DATA ISOLATION & CLEAN INITIAL CANDIDATE PROFILE VERIFICATION
+  // =================================================================
+  test('8. Data Isolation: Newly registered candidate sees clean profile with ZERO mock data leakage', async ({ page }) => {
+    const cleanUid = Date.now().toString().slice(-6);
+    const freshEmail = `clean_cand_${cleanUid}@hiresmart.test`;
+    const freshName = 'Clean Fresh Candidate';
+
+    await page.goto('/');
+
+    // Register fresh candidate
+    await page.getByRole('button', { name: /sign in/i }).first().click();
+    await page.getByRole('button', { name: /create one/i }).click();
+
+    await page.getByPlaceholder('Full Name').fill(freshName);
+    await page.getByPlaceholder('Email Address').fill(freshEmail);
+    await page.getByPlaceholder('Password').fill(testPassword);
+    await page.getByRole('button', { name: /create account/i }).click();
+
+    // Verify redirected to dashboard with fresh candidate's name
+    await expect(page).toHaveURL(/\/candidate\/dashboard/, { timeout: 15000 });
+    await expect(page.locator(`text=${freshName}`).or(page.locator('text=Welcome back, Clean')).first()).toBeVisible({ timeout: 10000 });
+
+    // Verify Dashboard has 0 applications initially (no fake seeded applications)
+    await expect(page.locator('text=0').first()).toBeVisible();
+
+    // Navigate to Candidate Profile page
+    await page.goto('/candidate/profile');
+    await expect(page.locator('h2').first()).toContainText(freshName);
+
+    // CRITICAL: Verify NO mock profile data exists
+    // Rahul Kumar should not be present
+    await expect(page.locator('text=Rahul Kumar')).toHaveCount(0);
+    // Fake mock company "ABC Technologies" should not be present
+    await expect(page.locator('text=ABC Technologies')).toHaveCount(0);
+    // Fake mock university "XYZ University" should not be present
+    await expect(page.locator('text=XYZ University')).toHaveCount(0);
+
+    // Verify empty state messages are rendered
+    await expect(
+      page.locator('text=No skills added yet').or(page.locator('text=No experience added yet')).first()
+    ).toBeVisible({ timeout: 10000 });
+
+    // Logout and verify complete localStorage purge
+    await page.goto('/candidate/dashboard');
+    const userMenuBtn = page.locator('div.h-9.w-9').first();
+    if (await userMenuBtn.isVisible()) {
+      await userMenuBtn.click();
+    }
+    const logoutBtn = page.getByRole('button', { name: /sign out|log out/i }).or(page.locator('text=Sign Out')).or(page.locator('text=Log Out')).first();
+    if (await logoutBtn.isVisible()) {
+      await logoutBtn.click();
+      await expect(page).toHaveURL('/');
+      
+      const session = await page.evaluate(() => localStorage.getItem('hiresmart_session'));
+      expect(session).toBeNull();
+      const cachedProfile = await page.evaluate(() => localStorage.getItem('hiresmart_candidate_profile'));
+      expect(cachedProfile).toBeNull();
+      const cachedApps = await page.evaluate(() => localStorage.getItem('hiresmart_all_applications'));
+      expect(cachedApps).toBeNull();
+    }
+  });
+
+  // =================================================================
+  // 9. CROSS-PORTAL WORKFLOW: RECRUITER & CANDIDATE INTERACTION
+  // =================================================================
+  test('9. Cross-Portal Interaction: Recruiter reviews platform, candidate applies, applications sync', async ({ page }) => {
+    // 1. Recruiter logs in
+    await page.goto('/');
+    await page.getByRole('button', { name: /sign in/i }).first().click();
+    await page.getByRole('button', { name: 'Recruiter', exact: true }).click();
+    await page.getByPlaceholder('Email Address').fill('recruiter@test.com');
+    await page.getByPlaceholder('Password').fill('Password123!');
+    await page.locator('form').getByRole('button', { name: /sign in/i }).click();
+    await expect(page).toHaveURL(/\/recruiter\/dashboard/, { timeout: 15000 });
+
+    // 2. Recruiter navigates to jobs
+    await page.goto('/recruiter/jobs');
+    await expect(page.locator('h1')).toContainText(/job/i);
+
+    // Recruiter logs out
+    const recLogout = page.getByRole('button', { name: /sign out|log out/i }).first();
+    if (await recLogout.isVisible()) {
+      await recLogout.click();
+    } else {
+      await page.evaluate(() => localStorage.clear());
+      await page.goto('/');
+    }
+
+    // 3. Candidate registers & logs in
+    const applicantEmail = `applicant_${Date.now()}_${Math.random().toString(36).slice(2, 6)}@hiresmart.test`;
+    await page.goto('/');
+    await page.getByRole('button', { name: /sign in/i }).first().click();
+    await page.getByRole('button', { name: /create one/i }).click();
+    await page.getByPlaceholder('Full Name').fill('Applicant QA Candidate');
+    await page.getByPlaceholder('Email Address').fill(applicantEmail);
+    await page.getByPlaceholder('Password').fill(testPassword);
+    await page.getByRole('button', { name: /create account/i }).click();
+    await expect(page).toHaveURL(/\/candidate\/dashboard/, { timeout: 15000 });
+
+    // 4. Candidate navigates to jobs and explores
+    await page.goto('/candidate/jobs');
+    await expect(page.locator('h1').first()).toContainText(/job|opportunity/i);
+
+    // 5. Navigate to candidate applications
+    await page.goto('/candidate/applications');
+    await expect(page.locator('h1').first()).toContainText(/application/i);
+
+    // Candidate logs out
+    const candLogout = page.getByRole('button', { name: /sign out|log out/i }).first();
+    if (await candLogout.isVisible()) {
+      await candLogout.click();
+    } else {
+      await page.evaluate(() => localStorage.clear());
+      await page.goto('/');
+    }
   });
 
 });

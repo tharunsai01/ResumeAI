@@ -346,7 +346,11 @@ async function handleOAuthUser(params: OAuthUserProfile) {
       user.linkedinId = sub;
       user.authProvider = 'linkedin';
     }
-    if (avatarUrl && !user.avatarUrl) {
+    // Synchronize latest profile name and avatar from Google / OAuth provider
+    if (name && (user.fullName !== name || user.fullName === 'Google Verified User' || !user.fullName)) {
+      user.fullName = name;
+    }
+    if (avatarUrl && (!user.avatarUrl || user.avatarUrl !== avatarUrl)) {
       user.avatarUrl = avatarUrl;
     }
     user.isVerified = true;
@@ -388,11 +392,13 @@ export async function googleAuth(input: GoogleInput, meta: Meta) {
   // Scenario 1: Authorization Code Flow
   if (input.code) {
     if (input.code.startsWith('mock_') && env.NODE_ENV !== 'production') {
+      const codeSuffix = input.code.replace('mock_', '');
+      const parsedName = codeSuffix && !codeSuffix.match(/^\d+$/) ? codeSuffix.replace(/_/g, ' ') : 'Google Verified User';
       const email = `google.user.${Date.now()}@example.com`;
       return handleOAuthUser({
         sub: `g_${Date.now()}`,
         email,
-        name: 'Google Verified User',
+        name: parsedName,
         provider: 'google',
         role: input.role,
         companyName: input.companyName,
@@ -444,10 +450,12 @@ export async function googleAuth(input: GoogleInput, meta: Meta) {
       throw ApiError.unauthorized('Google account email is not verified');
     }
 
+    const resolvedName = (profile.name && profile.name.trim()) || [profile.given_name, profile.family_name].filter(Boolean).join(' ').trim() || profile.email.split('@')[0];
+
     return handleOAuthUser({
       sub: profile.sub,
       email: profile.email.toLowerCase(),
-      name: profile.name || profile.email.split('@')[0],
+      name: resolvedName,
       avatarUrl: profile.picture,
       provider: 'google',
       role: input.role,
@@ -468,10 +476,12 @@ export async function googleAuth(input: GoogleInput, meta: Meta) {
     if (!profile.sub || !profile.email) {
       throw ApiError.unauthorized('Google profile does not contain a verified email');
     }
+    const resolvedName = (profile.name && profile.name.trim()) || [profile.given_name, profile.family_name].filter(Boolean).join(' ').trim() || profile.email.split('@')[0];
+
     return handleOAuthUser({
       sub: profile.sub,
       email: profile.email.toLowerCase(),
-      name: profile.name || profile.email.split('@')[0],
+      name: resolvedName,
       avatarUrl: profile.picture,
       provider: 'google',
       role: input.role,
@@ -511,10 +521,12 @@ export async function googleAuth(input: GoogleInput, meta: Meta) {
     throw ApiError.unauthorized('Google account email is not verified');
   }
 
+  const resolvedName = (payload.name && payload.name.trim()) || [payload.given_name, payload.family_name].filter(Boolean).join(' ').trim() || payload.email.split('@')[0];
+
   return handleOAuthUser({
     sub: payload.sub,
     email: payload.email.toLowerCase(),
-    name: payload.name ?? payload.email.split('@')[0],
+    name: resolvedName,
     avatarUrl: payload.picture,
     provider: 'google',
     role: input.role,

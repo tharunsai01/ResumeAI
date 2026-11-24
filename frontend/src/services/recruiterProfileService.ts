@@ -21,31 +21,75 @@ const RECRUITER_PROFILE_KEY = "hiresmart_recruiter_profile"
 
 export const recruiterProfileService = {
   getProfile(): RecruiterProfile {
+    const currentUser = authService.getCurrentUser()
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(RECRUITER_PROFILE_KEY)
       if (stored) {
         try {
-          return JSON.parse(stored)
+          const parsed = JSON.parse(stored)
+          if (currentUser && currentUser.role === "recruiter") {
+            const isMockName = parsed.fullName === "Rahul Sharma" || !parsed.fullName
+            const isMockEmail = parsed.email === "rahul@hiresmart.ai" || !parsed.email
+            const emailMismatch = parsed.email && parsed.email !== currentUser.email && !isMockEmail
+            if (isMockName || isMockEmail || emailMismatch) {
+              parsed.fullName = currentUser.name || parsed.fullName
+              parsed.email = currentUser.email || parsed.email
+              if (currentUser.company && !parsed.company) {
+                parsed.company = currentUser.company
+              }
+              if (currentUser.avatarUrl && !parsed.avatar) {
+                parsed.avatar = currentUser.avatarUrl
+              }
+              this.saveProfile(parsed)
+              return parsed
+            }
+          }
+          return parsed
         } catch (e) {
           console.error("Failed to parse recruiter profile", e)
         }
       }
 
       // Initialize from current auth session if recruiter is signed in
-      const currentUser = authService.getCurrentUser()
       if (currentUser && currentUser.role === "recruiter") {
         const initialized: RecruiterProfile = {
-          ...defaultRecruiterProfile,
-          id: currentUser.id || defaultRecruiterProfile.id,
-          fullName: currentUser.name || defaultRecruiterProfile.fullName,
-          email: currentUser.email || defaultRecruiterProfile.email,
-          company: currentUser.company || defaultRecruiterProfile.company
+          id: currentUser.id || "rec_live",
+          fullName: currentUser.name || (env.useMock ? defaultRecruiterProfile.fullName : ""),
+          email: currentUser.email || (env.useMock ? defaultRecruiterProfile.email : ""),
+          phone: env.useMock ? defaultRecruiterProfile.phone : "",
+          company: currentUser.company || (env.useMock ? defaultRecruiterProfile.company : ""),
+          designation: env.useMock ? defaultRecruiterProfile.designation : "Recruiter",
+          location: env.useMock ? defaultRecruiterProfile.location : "",
+          about: env.useMock ? defaultRecruiterProfile.about : "",
+          avatar: currentUser.avatarUrl || "",
         }
-        this.saveProfile(initialized)
+        if (typeof window !== "undefined") {
+          localStorage.setItem(RECRUITER_PROFILE_KEY, JSON.stringify(initialized))
+        }
         return initialized
       }
     }
     return defaultRecruiterProfile
+  },
+
+  syncWithUser(user: { name?: string; email?: string; company?: string; avatarUrl?: string | null }): void {
+    if (!user || typeof window === "undefined") return
+    const stored = localStorage.getItem(RECRUITER_PROFILE_KEY)
+    let profile: RecruiterProfile
+    if (stored) {
+      try {
+        profile = JSON.parse(stored)
+      } catch {
+        profile = { ...defaultRecruiterProfile }
+      }
+    } else {
+      profile = { ...defaultRecruiterProfile }
+    }
+    if (user.name) profile.fullName = user.name
+    if (user.email) profile.email = user.email
+    if (user.company) profile.company = user.company
+    if (user.avatarUrl) profile.avatar = user.avatarUrl
+    this.saveProfile(profile)
   },
 
   async fetchLiveProfile(): Promise<RecruiterProfile> {
@@ -54,18 +98,22 @@ export const recruiterProfileService = {
       const res = await httpClient.get<{ success: boolean; data: any }>("/recruiter/profile")
       if (res?.data) {
         const p = res.data
+        const currentUser = authService.getCurrentUser()
         const mapped: RecruiterProfile = {
-          ...defaultRecruiterProfile,
-          id: p._id || p.id || defaultRecruiterProfile.id,
-          fullName: p.fullName || defaultRecruiterProfile.fullName,
-          email: p.user?.email || defaultRecruiterProfile.email,
-          phone: p.phone || defaultRecruiterProfile.phone,
-          company: p.companyName || defaultRecruiterProfile.company,
-          designation: p.designation || p.jobTitle || defaultRecruiterProfile.designation,
-          location: p.location || defaultRecruiterProfile.location,
-          about: p.description || p.companyOverview || defaultRecruiterProfile.about,
+          id: p._id || p.id || currentUser?.id || "rec_live",
+          fullName: p.user?.fullName || p.fullName || currentUser?.name || "",
+          email: p.user?.email || p.email || currentUser?.email || "",
+          phone: p.phone || "",
+          company: p.companyName || currentUser?.company || "",
+          designation: p.designation || p.jobTitle || "Recruiter",
+          location: p.location || "",
+          about: p.description || p.companyOverview || "",
+          avatar: p.user?.avatarUrl || p.logoUrl || currentUser?.avatarUrl || "",
         }
-        this.saveProfile(mapped)
+        if (typeof window !== "undefined") {
+          localStorage.setItem(RECRUITER_PROFILE_KEY, JSON.stringify(mapped))
+          window.dispatchEvent(new Event("hiresmart_recruiter_profile_updated"))
+        }
         return mapped
       }
     } catch (err) {

@@ -34,11 +34,23 @@ export default function RecruiterHiringPipeline() {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
+    let isMounted = true
+    pipelineService.fetchLivePipeline().then(liveData => {
+      if (isMounted && liveData) {
+        setCandidates(liveData)
+      }
+    }).catch(err => {
+      console.warn("Could not fetch live pipeline:", err)
+    })
+
     const handleUpdate = () => {
       setCandidates(pipelineService.getCandidates())
     }
     window.addEventListener("hiresmart_pipeline_updated", handleUpdate)
-    return () => window.removeEventListener("hiresmart_pipeline_updated", handleUpdate)
+    return () => {
+      isMounted = false
+      window.removeEventListener("hiresmart_pipeline_updated", handleUpdate)
+    }
   }, [])
 
   React.useEffect(() => {

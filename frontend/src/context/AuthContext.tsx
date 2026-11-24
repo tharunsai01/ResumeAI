@@ -13,9 +13,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Initial load
-    setUser(authService.getCurrentUser())
+    // Initial load from session storage
+    const current = authService.getCurrentUser()
+    setUser(current)
     setIsLoading(false)
+
+    // Rehydrate and verify with live backend if authenticated
+    if (current) {
+      authService.getMe().then(liveUser => {
+        if (liveUser) {
+          setUser(liveUser)
+        }
+      }).catch(() => {})
+    }
 
     // Listen to changes (login, logout, multi-tab sync)
     const handleAuthChange = () => {

@@ -61,6 +61,7 @@ export const recruiterCandidateService = {
             screeningStatus: "Screened" as AIScreeningStatus,
             applicationHistory: [],
           }))
+          this.saveCandidates(mapped)
           return mapped
         }
       } catch (err) {
@@ -72,7 +73,7 @@ export const recruiterCandidateService = {
 
   /**
    * Retrieves all candidates available to the recruiter (cached / mock).
-   * Loads from localStorage when available, or seeds with default mock records.
+   * Loads from localStorage when available, or seeds with default mock records in mock mode.
    */
   getCandidates(): RecruiterCandidate[] {
     if (typeof window !== "undefined") {
@@ -84,10 +85,14 @@ export const recruiterCandidateService = {
           console.error("Failed to parse stored recruiter candidates", e)
         }
       }
-      // Seed initial mock candidates into localStorage
+      if (!env.useMock) {
+        return []
+      }
+      // Seed initial mock candidates into localStorage in mock mode
       this.saveCandidates(initialRecruiterCandidates)
+      return initialRecruiterCandidates
     }
-    return [...initialRecruiterCandidates]
+    return env.useMock ? [...initialRecruiterCandidates] : []
   },
 
   /**

@@ -59,8 +59,25 @@ export default function RecruiterCandidates() {
   const [shortlistMsg, setShortlistMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    setCandidates(recruiterCandidateService.getCandidates())
-    setLoading(false)
+    let isMounted = true
+    const load = async () => {
+      setLoading(true)
+      const data = await recruiterCandidateService.fetchLiveCandidates()
+      if (isMounted) {
+        setCandidates(data)
+        setLoading(false)
+      }
+    }
+    load()
+
+    const handleUpdate = () => {
+      setCandidates(recruiterCandidateService.getCandidates())
+    }
+    window.addEventListener("hiresmart_recruiter_candidates_updated", handleUpdate)
+    return () => {
+      isMounted = false
+      window.removeEventListener("hiresmart_recruiter_candidates_updated", handleUpdate)
+    }
   }, [])
 
   const filteredAndSorted = React.useMemo(() => {

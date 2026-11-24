@@ -242,6 +242,34 @@ async function main() {
     }
   })
 
+  await runTest("POST /auth/google maps name 'Jane Google Doe' to user, JWT, /auth/me and candidate profile", async () => {
+    const res = await request("POST", "/api/v1/auth/google", {
+      code: "mock_Jane_Google_Doe",
+      role: "candidate",
+    })
+    if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}: ${JSON.stringify(res.json)}`)
+    const googleUser = res.json?.data?.user
+    if (googleUser?.fullName !== "Jane Google Doe") {
+      throw new Error(`Expected fullName 'Jane Google Doe', got '${googleUser?.fullName}'`)
+    }
+    const token = res.json?.data?.accessToken
+    if (!token) throw new Error("Missing accessToken in Google OAuth response")
+
+    // Verify /auth/me returns the Google account name
+    const meRes = await request("GET", "/api/v1/auth/me", null, token)
+    if (meRes.status !== 200) throw new Error(`Expected 200 from /auth/me, got ${meRes.status}`)
+    if (meRes.json?.data?.user?.fullName !== "Jane Google Doe") {
+      throw new Error(`Expected /auth/me user.fullName 'Jane Google Doe', got '${meRes.json?.data?.user?.fullName}'`)
+    }
+
+    // Verify /candidates/profile returns populated user with Google account name
+    const profileRes = await request("GET", "/api/v1/candidates/profile", null, token)
+    if (profileRes.status !== 200) throw new Error(`Expected 200 from /candidates/profile, got ${profileRes.status}`)
+    if (profileRes.json?.data?.user?.fullName !== "Jane Google Doe") {
+      throw new Error(`Expected profile.user.fullName 'Jane Google Doe', got '${profileRes.json?.data?.user?.fullName}'`)
+    }
+  })
+
   await runTest("POST /auth/linkedin creates candidate session with authProvider=linkedin", async () => {
     const res = await request("POST", "/api/v1/auth/linkedin", {
       code: "mock_linkedin_auth_code_test",

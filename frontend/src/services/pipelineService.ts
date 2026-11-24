@@ -28,11 +28,14 @@ export const pipelineService = {
           console.error("Failed to parse stored pipeline candidates", e)
         }
       }
-      // Initialize with mock data if not set
+      if (!env.useMock) {
+        return []
+      }
+      // Initialize with mock data if not set in mock mode
       this.saveCandidates(initialPipelineCandidates)
       return initialPipelineCandidates
     }
-    return initialPipelineCandidates
+    return env.useMock ? initialPipelineCandidates : []
   },
 
   saveCandidates(candidates: PipelineCandidate[]): void {

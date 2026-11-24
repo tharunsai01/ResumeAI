@@ -30,6 +30,33 @@ export async function hashPassword(password: string): Promise<string> {
   return "hs_hash_" + Math.abs(hash).toString(16)
 }
 
+function syncUserProfiles(user: User) {
+  if (typeof window === "undefined" || !user) return
+  try {
+    const candStored = localStorage.getItem("hiresmart_candidate_profile")
+    if (candStored) {
+      const parsed = JSON.parse(candStored)
+      parsed.fullName = user.name
+      parsed.email = user.email
+      if (user.avatarUrl) parsed.avatar = user.avatarUrl
+      localStorage.setItem("hiresmart_candidate_profile", JSON.stringify(parsed))
+      window.dispatchEvent(new Event('hiresmart_profile_updated'))
+    }
+    const recStored = localStorage.getItem("hiresmart_recruiter_profile")
+    if (recStored) {
+      const parsed = JSON.parse(recStored)
+      parsed.fullName = user.name
+      parsed.email = user.email
+      if (user.company) parsed.company = user.company
+      if (user.avatarUrl) parsed.avatar = user.avatarUrl
+      localStorage.setItem("hiresmart_recruiter_profile", JSON.stringify(parsed))
+      window.dispatchEvent(new Event('hiresmart_recruiter_profile_updated'))
+    }
+  } catch (e) {
+    console.error("Failed to sync profiles with user", e)
+  }
+}
+
 export const authService = {
   getUsers(): any[] {
     if (typeof window !== "undefined") {
@@ -45,6 +72,34 @@ export const authService = {
       return session ? JSON.parse(session) : null
     }
     return null
+  },
+
+  async getMe(): Promise<User | null> {
+    if (env.useMock) return this.getCurrentUser()
+    try {
+      const res = await httpClient.get<{ success: boolean; data: { user: any } }>("/auth/me")
+      if (res?.data?.user) {
+        const u = res.data.user
+        const sessionUser: User = {
+          id: u.id || u._id,
+          email: u.email,
+          name: u.fullName || u.name || "User",
+          fullName: u.fullName,
+          role: u.role as UserRole,
+          company: u.companyName || u.company,
+          avatarUrl: u.avatarUrl,
+        }
+        if (typeof window !== "undefined") {
+          localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+          syncUserProfiles(sessionUser)
+          window.dispatchEvent(new Event('hiresmart_auth_changed'))
+        }
+        return sessionUser
+      }
+    } catch {
+      // Session or token might be missing or expired
+    }
+    return this.getCurrentUser()
   },
 
   async login(email: string, password: string, requestedRole?: UserRole): Promise<User> {
@@ -108,11 +163,14 @@ export const authService = {
         id: u.id || u._id,
         email: u.email,
         name: u.fullName || u.name || "User",
+        fullName: u.fullName,
         role: u.role as UserRole,
         company: u.companyName || u.company,
+        avatarUrl: u.avatarUrl,
       }
       if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+        syncUserProfiles(sessionUser)
         window.dispatchEvent(new Event('hiresmart_auth_changed'))
       }
       return sessionUser
@@ -204,11 +262,14 @@ export const authService = {
         id: u.id || u._id,
         email: u.email,
         name: u.fullName || u.name || data.name,
+        fullName: u.fullName,
         role: u.role as UserRole,
         company: u.companyName || data.company,
+        avatarUrl: u.avatarUrl,
       }
       if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+        syncUserProfiles(sessionUser)
         window.dispatchEvent(new Event('hiresmart_auth_changed'))
       }
       return sessionUser
@@ -279,10 +340,13 @@ export const authService = {
             id: u.id || u._id,
             email: u.email,
             name: u.fullName || u.name || "Google User",
+            fullName: u.fullName,
             role: u.role as UserRole,
             company: u.companyName || u.company,
+            avatarUrl: u.avatarUrl,
           }
           localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+          syncUserProfiles(sessionUser)
           window.dispatchEvent(new Event('hiresmart_auth_changed'))
           return sessionUser
         }
@@ -398,10 +462,13 @@ export const authService = {
             id: u.id || u._id,
             email: u.email,
             name: u.fullName || u.name || "LinkedIn Professional",
+            fullName: u.fullName,
             role: u.role as UserRole,
             company: u.companyName || u.company,
+            avatarUrl: u.avatarUrl,
           }
           localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+          syncUserProfiles(sessionUser)
           window.dispatchEvent(new Event('hiresmart_auth_changed'))
           return sessionUser
         }
@@ -551,11 +618,31 @@ export const authService = {
     }
 
     if (typeof window !== "undefined") {
-      localStorage.removeItem(SESSION_KEY)
+      const keysToClear = [
+        SESSION_KEY,
+        "hiresmart_token",
+        "hiresmart_candidate_profile",
+        "hiresmart_recruiter_profile",
+        "hiresmart_active_resume",
+        "hiresmart_all_applications",
+        "hiresmart_saved_jobs",
+        "hiresmart_pipeline_candidates",
+        "hiresmart_recruiter_candidates",
+        "hiresmart_recruiter_interviews",
+        "hiresmart_interviews",
+      ]
+      keysToClear.forEach(key => localStorage.removeItem(key))
+
       if (typeof sessionStorage !== "undefined") {
         sessionStorage.clear()
       }
       window.dispatchEvent(new Event('hiresmart_auth_changed'))
+      window.dispatchEvent(new Event('hiresmart_profile_updated'))
+      window.dispatchEvent(new Event('hiresmart_recruiter_profile_updated'))
+      window.dispatchEvent(new Event('hiresmart_applications_updated'))
+      window.dispatchEvent(new Event('hiresmart_pipeline_updated'))
+      window.dispatchEvent(new Event('hiresmart_recruiter_candidates_updated'))
+      window.dispatchEvent(new Event('hiresmart_recruiter_interviews_updated'))
     }
   },
 

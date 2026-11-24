@@ -9,6 +9,7 @@ import { httpClient } from "./api/httpClient"
 import type { Job } from "../types/job"
 import { jobService } from "./jobService"
 import { applicationService } from "./applicationService"
+import { recruiterCandidateService } from "./recruiterCandidateService"
 import {
   screeningJobs,
   initialScreeningCandidates,
@@ -42,6 +43,31 @@ export const aiScreeningService = {
    * Retrieves candidate screening profiles.
    */
   getScreeningCandidates(_jobId?: string): DetailedScreeningCandidate[] {
+    if (!env.useMock) {
+      const candidates = recruiterCandidateService.getCandidates()
+      if (candidates.length > 0) {
+        return candidates.map(c => ({
+          id: c.id,
+          name: c.name,
+          role: c.appliedRole || c.title,
+          location: c.location,
+          experience: c.experience,
+          skills: c.skills.map(s => ({ name: s.name, proficiency: s.proficiency, matchType: "Matched" as const })),
+          overallMatch: c.matchScore,
+          skillMatch: Math.min(100, c.matchScore + 2),
+          experienceMatch: Math.max(60, c.matchScore - 5),
+          educationMatch: 90,
+          roleSimilarity: c.matchScore,
+          keywordMatch: c.matchScore,
+          status: c.status,
+          screeningStatus: c.screeningStatus,
+          appliedDate: c.appliedDate,
+          matchedStrengths: ["Strong technical foundation", "Matches core requirements"],
+          potentialGaps: [],
+        }))
+      }
+      return []
+    }
     return [...initialScreeningCandidates]
   },
 

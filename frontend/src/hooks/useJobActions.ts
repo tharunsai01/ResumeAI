@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react"
 import type { Job } from "../data/mockJobs"
+import { env } from "../config/env"
 import { jobService } from "../services/jobService"
+import { authService } from "../services/authService"
 import { notificationService } from "../services/notificationService"
 import { settingsService } from "../services/settingsService"
 import { applicationService, type ApplicationStatus, type TimelineEvent } from "../services/applicationService"
@@ -49,11 +51,41 @@ export function useJobActions() {
     const loadApps = async () => {
       setIsLoadingAppliedJobs(true)
       try {
-        const apps = applicationService.getApplicationsByCandidate("c_currentUser")
+        const apps = env.useMock
+          ? applicationService.getApplicationsByCandidate("c_currentUser")
+          : await applicationService.fetchLiveApplications()
+
         const allJobs = await jobService.getJobs()
         const mapped: AppliedJob[] = apps.map(app => {
           const job = allJobs.find(j => j.id === app.jobId)
-          if (!job) return null
+          if (!job) {
+            // Provide a graceful fallback representation if job detail isn't in top mock list
+            return {
+              id: app.jobId,
+              title: "Software Engineer",
+              company: "Tech Corp",
+              location: "Remote",
+              category: "Engineering",
+              salary: "Competitive",
+              type: "Full-time" as const,
+              workMode: "Remote" as const,
+              experience: "2–5 Years" as const,
+              description: "Job application submitted via HireSmart AI",
+              aboutCompany: "Technology firm partner",
+              additionalInfo: "",
+              responsibilities: [],
+              requirements: [],
+              skills: [],
+              postedDate: app.appliedDate,
+              deadline: "",
+              applicationId: app.id,
+              appliedDate: app.appliedDate,
+              status: app.status,
+              matchScore: app.matchScore,
+              timeline: app.timeline,
+              notes: app.notes,
+            }
+          }
           return {
             ...job,
             applicationId: app.id,
@@ -92,9 +124,10 @@ export function useJobActions() {
     if (appliedJobs.some(a => a.id === job.id)) return false
     
     const now = new Date().toISOString()
+    const currentUser = authService.getCurrentUser()
     const newApp = applicationService.createApplication({
       jobId: job.id,
-      candidateId: "c_currentUser",
+      candidateId: currentUser?.id || "c_currentUser",
       status: "Applied",
       matchScore,
       appliedDate: now,

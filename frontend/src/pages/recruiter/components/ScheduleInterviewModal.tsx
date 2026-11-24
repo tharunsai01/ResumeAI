@@ -2,6 +2,7 @@ import * as React from "react"
 import { Modal } from "../../../components/ui/Modal"
 import { Button } from "../../../components/ui/Button"
 import { Calendar as CalendarIcon, Clock, User, Briefcase, FileText } from "lucide-react"
+import { recruiterCandidateService } from "../../../services/recruiterCandidateService"
 
 interface ScheduleInterviewModalProps {
   isOpen: boolean
@@ -21,6 +22,14 @@ export function ScheduleInterviewModal({ isOpen, onClose, onSchedule, initialCan
   const [notes, setNotes] = React.useState("")
   
   const [errors, setErrors] = React.useState<Record<string, string>>({})
+
+  const availableCandidates = React.useMemo(() => {
+    const list = recruiterCandidateService.getCandidates()
+    if (initialCandidate && !list.some(c => c.id === initialCandidate.id)) {
+      return [{ id: initialCandidate.id, name: initialCandidate.name, appliedRole: initialCandidate.role, skills: [], education: [], projects: [], location: "", experience: "", matchScore: 90, status: "Applied" as const, appliedDate: "", screeningStatus: "Screened" as const, applicationHistory: [] }, ...list]
+    }
+    return list
+  }, [initialCandidate])
 
   const [prevCandidateId, setPrevCandidateId] = React.useState(initialCandidate?.id)
   if (initialCandidate?.id !== prevCandidateId) {
@@ -44,8 +53,11 @@ export function ScheduleInterviewModal({ isOpen, onClose, onSchedule, initialCan
       return
     }
 
+    const matchedCand = availableCandidates.find(c => c.id === candidate)
+
     onSchedule({
       candidateId: candidate,
+      candidateName: matchedCand?.name || initialCandidate?.name || "Candidate",
       jobTitle: job,
       date,
       time,
@@ -68,14 +80,23 @@ export function ScheduleInterviewModal({ isOpen, onClose, onSchedule, initialCan
               <User className="absolute left-3 w-4 h-4 text-brand-navy/40" />
               <select 
                 value={candidate} 
-                onChange={e => setCandidate(e.target.value)}
+                onChange={e => {
+                  setCandidate(e.target.value)
+                  const sel = availableCandidates.find(c => c.id === e.target.value)
+                  if (sel?.appliedRole && !job) {
+                    setJob(sel.appliedRole)
+                  }
+                }}
                 className="w-full bg-white border border-brand-gray/40 rounded-lg h-10 pl-9 pr-3 text-sm focus:border-brand-indigo/50 outline-none"
               >
                 <option value="">Select Candidate</option>
-                <option value="cand_1">Rahul Sharma</option>
-                <option value="cand_3">Ananya Patel</option>
-                <option value="cand_5">Priya Singh</option>
-                <option value="cand_7">Neha Gupta</option>
+                {availableCandidates.length > 0 ? (
+                  availableCandidates.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))
+                ) : (
+                  <option value="cand_manual">Candidate</option>
+                )}
               </select>
             </div>
             {errors.candidate && <p className="text-xs text-semantic-error mt-1">{errors.candidate}</p>}

@@ -9,6 +9,7 @@ import { Modal } from "../../components/ui/Modal"
 import { MatchScore } from "../../components/shared/MatchScore"
 import { SkillBadge } from "../../components/shared/SkillBadge"
 import { skillService } from "../../services/skillService"
+import { authService } from "../../services/authService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import SpotlightCard from "../../components/ui/SpotlightCard"
@@ -65,7 +66,7 @@ export default function CandidateSkills() {
 
   if (loading || !data) {
     return (
-      <DashboardShell type="candidate" userName="Rahul Kumar">
+      <DashboardShell type="candidate" userName={authService.getCurrentUser()?.name || "Candidate"}>
         <div className="flex items-center justify-center h-[60vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-indigo/30 border-t-brand-indigo" />
@@ -108,7 +109,7 @@ export default function CandidateSkills() {
   }
 
   return (
-    <DashboardShell type="candidate" userName="Rahul Kumar">
+    <DashboardShell type="candidate" userName={authService.getCurrentUser()?.name || "Candidate"}>
       <motion.div
         variants={staggerContainer}
         initial="initial"
@@ -214,22 +215,28 @@ export default function CandidateSkills() {
           <h2 className="text-xl font-display font-semibold text-brand-navy">Skills Detected From Your Resume</h2>
           <PremiumCard>
             <PremiumCardContent className="p-6 divide-y divide-brand-gray/30">
-              {Object.entries(groupedDetectedSkills).map(([category, skills]) => (
-                <div key={category} className={cn("py-4 first:pt-0 last:pb-0")}>
-                  <h3 className="text-sm font-semibold text-brand-navy/60 uppercase tracking-wider mb-3">{category}</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {skills.map(skill => (
-                      <SkillBadge 
-                        key={skill.id} 
-                        name={skill.name} 
-                        level={skill.level} 
-                        onClick={() => setSelectedSkill(skill)}
-                        className="cursor-pointer hover:shadow-sm"
-                      />
-                    ))}
-                  </div>
+              {Object.keys(groupedDetectedSkills).length === 0 ? (
+                <div className="py-6 text-center text-brand-navy/60">
+                  <p className="text-sm">No skills detected yet. Upload your resume or add skills in your profile to see skill analysis.</p>
                 </div>
-              ))}
+              ) : (
+                Object.entries(groupedDetectedSkills).map(([category, skills]) => (
+                  <div key={category} className={cn("py-4 first:pt-0 last:pb-0")}>
+                    <h3 className="text-sm font-semibold text-brand-navy/60 uppercase tracking-wider mb-3">{category}</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {skills.map(skill => (
+                        <SkillBadge 
+                          key={skill.id} 
+                          name={skill.name} 
+                          level={skill.level} 
+                          onClick={() => setSelectedSkill(skill)}
+                          className="cursor-pointer hover:shadow-sm"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </PremiumCardContent>
           </PremiumCard>
         </motion.div>

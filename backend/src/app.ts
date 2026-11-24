@@ -55,7 +55,8 @@ app.use(
   '/api',
   rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 300,
+    limit: isProd ? 300 : 50000,
+    skip: () => !isProd,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: { success: false, error: { message: 'Too many requests, please try again later' } },

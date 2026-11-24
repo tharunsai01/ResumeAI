@@ -43,12 +43,12 @@ export function calculateProfileCompletion(profile: any): number {
 
 export async function getProfileByUserId(userId: string) {
   let profile = await CandidateProfile.findOne({ user: userId })
-    .populate('user', 'fullName email role isVerified status createdAt')
+    .populate('user', 'fullName email role isVerified status createdAt avatarUrl')
     .populate('resume', 'fileName fileSize mimeType aiAnalysis parseStatus isActive createdAt');
 
   if (!profile) {
     profile = await CandidateProfile.create({ user: userId });
-    profile = await profile.populate('user', 'fullName email role isVerified status createdAt');
+    profile = await profile.populate('user', 'fullName email role isVerified status createdAt avatarUrl');
   }
 
   const completion = calculateProfileCompletion(profile);
@@ -90,7 +90,7 @@ export async function updateProfile(userId: string, data: UpdateCandidateProfile
   await profile.save();
 
   return profile.populate([
-    { path: 'user', select: 'fullName email role isVerified status createdAt' },
+    { path: 'user', select: 'fullName email role isVerified status createdAt avatarUrl' },
     { path: 'resume', select: 'fileName fileSize mimeType aiAnalysis parseStatus isActive createdAt' },
   ]);
 }
@@ -130,7 +130,7 @@ export async function patchProfile(userId: string, data: PatchCandidateProfileIn
   await profile.save();
 
   return profile.populate([
-    { path: 'user', select: 'fullName email role isVerified status createdAt' },
+    { path: 'user', select: 'fullName email role isVerified status createdAt avatarUrl' },
     { path: 'resume', select: 'fileName fileSize mimeType aiAnalysis parseStatus isActive createdAt' },
   ]);
 }

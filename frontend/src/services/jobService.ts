@@ -79,10 +79,14 @@ export const jobService = {
           console.error("Failed to parse recruiter jobs from localStorage", e)
         }
       }
-      // Initialize with initialRecruiterJobs if not stored
+      if (!env.useMock) {
+        return []
+      }
+      // Initialize with initialRecruiterJobs if not stored in mock mode
       localStorage.setItem(RECRUITER_STORAGE_KEY, JSON.stringify(initialRecruiterJobs))
+      return [...initialRecruiterJobs]
     }
-    return [...initialRecruiterJobs]
+    return env.useMock ? [...initialRecruiterJobs] : []
   },
 
   getRecruiterJobById: async (id: string): Promise<RecruiterJob | undefined> => {

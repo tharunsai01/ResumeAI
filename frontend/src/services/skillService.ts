@@ -44,6 +44,34 @@ export const skillService = {
    * Retrieves skills that have been extracted and detected from the candidate profile/resume.
    */
   getDetectedSkills(): SkillData[] {
+    if (!env.useMock) {
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("hiresmart_candidate_profile")
+        if (stored) {
+          try {
+            const profile = JSON.parse(stored)
+            if (Array.isArray(profile.skills) && profile.skills.length > 0) {
+              return profile.skills.map((s: any, idx: number) => ({
+                id: s.id || `s_${idx}`,
+                name: s.name || s,
+                category: s.category || "General",
+                level: s.level || "Intermediate",
+                currentScore: 80,
+                targetScore: 90,
+                priority: "High",
+                jobDemand: 85,
+                description: `${s.name || s} core competency`,
+                recommendation: `Continue applying ${s.name || s} on challenging projects`,
+                difficulty: "Intermediate",
+                estimatedEffort: "2-4 weeks",
+                isDetected: true,
+              }))
+            }
+          } catch {}
+        }
+      }
+      return []
+    }
     return mockSkills.filter(s => s.isDetected)
   },
 
@@ -61,7 +89,7 @@ export const skillService = {
           }))
 
           const rawDetected = Array.isArray(res.data.detectedSkills) ? res.data.detectedSkills : []
-          const normalizedDetected = rawDetected.map((s: any, idx: number) => ({
+          let normalizedDetected = rawDetected.map((s: any, idx: number) => ({
             id: s.id || s._id || `det_skill_${idx}`,
             name: s.name,
             category: s.category || "Backend",
@@ -77,15 +105,26 @@ export const skillService = {
             isDetected: true,
           }))
 
+          if (normalizedDetected.length === 0) {
+            normalizedDetected = this.getDetectedSkills()
+          }
+
           return {
-            overallScore: res.data.overallScore ?? 85,
+            overallScore: res.data.overallScore ?? (normalizedDetected.length > 0 ? 85 : 0),
             categories: normalizedCategories.length > 0 ? normalizedCategories : mockCategoryScores,
-            detectedSkills: normalizedDetected.length > 0 ? normalizedDetected : mockSkills.filter(s => s.isDetected),
+            detectedSkills: normalizedDetected,
             trend: mockSkillTrend,
           }
         }
       } catch (err) {
         console.warn("[SkillService] Live analyzeSkills fetch warning, fallback to cache:", err)
+      }
+      const liveDetected = this.getDetectedSkills()
+      return {
+        overallScore: liveDetected.length > 0 ? 80 : 0,
+        categories: mockCategoryScores,
+        detectedSkills: liveDetected,
+        trend: mockSkillTrend,
       }
     }
     return {

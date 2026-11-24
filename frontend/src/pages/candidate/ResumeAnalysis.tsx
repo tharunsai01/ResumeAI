@@ -6,6 +6,7 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
 import { MatchScore } from "../../components/shared/MatchScore"
 import { api } from "../../services/api"
+import { authService } from "../../services/authService"
 import type { ResumeAnalysisResult } from "../../data/mockResume"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
@@ -32,7 +33,7 @@ export default function CandidateResumeAnalysis() {
 
   if (loading || !data) {
     return (
-      <DashboardShell type="candidate" userName="Rahul Sharma">
+      <DashboardShell type="candidate" userName={authService.getCurrentUser()?.name || "Candidate"}>
         <div className="flex items-center justify-center h-[60vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-indigo/30 border-t-brand-indigo" />
@@ -44,7 +45,7 @@ export default function CandidateResumeAnalysis() {
   }
 
   return (
-    <DashboardShell type="candidate" userName={data.personalInfo.name}>
+    <DashboardShell type="candidate" userName={authService.getCurrentUser()?.name || data.personalInfo.name}>
       <motion.div
         variants={staggerContainer}
         initial="initial"

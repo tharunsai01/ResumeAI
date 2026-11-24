@@ -14,6 +14,7 @@ import { resumeService } from "../../services/resumeService"
 import { skillService } from "../../services/skillService"
 import { profileService } from "../../services/profileService"
 import { authService } from "../../services/authService"
+import { useAuth } from "../../context/AuthContext"
 import { Badge } from "../../components/ui/Badge"
 import { SkillBadge } from "../../components/shared/SkillBadge"
 import SpotlightCard from "../../components/ui/SpotlightCard";
@@ -37,6 +38,7 @@ export default function CandidateDashboard() {
       }
     }
     fetchRecommendations()
+    profileService.fetchLiveProfile().catch(() => {})
   }, [])
 
   // Calculate dynamic stats
@@ -44,9 +46,11 @@ export default function CandidateDashboard() {
   const totalInterviews = appliedJobs.filter(a => a.status === "Interview").length
   const totalOffers = appliedJobs.filter(a => a.status === "Offer").length
   
+  const { user } = useAuth()
+  const sessionUser = user || authService.getCurrentUser()
   const activeResume = resumeService.getActiveResumeAnalysis()
   const candidateProfile = profileService.getCandidateProfile()
-  const candidateName = candidateProfile?.fullName || authService.getCurrentUser()?.name || activeResume.personalInfo.name
+  const candidateName = sessionUser?.name || sessionUser?.fullName || (candidateProfile?.fullName !== "Rahul Kumar" ? candidateProfile?.fullName : null) || activeResume.personalInfo.name || "Candidate"
   const profileCompletion = candidateProfile?.profileCompletion ?? 85
 
   const stats = [

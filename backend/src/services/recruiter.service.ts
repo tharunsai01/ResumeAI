@@ -15,7 +15,7 @@ import { createNotification } from './notification.service';
 export async function getRecruiterProfile(userId: string) {
   let profile = await RecruiterProfile.findOne({ user: userId }).populate(
     'user',
-    'fullName email role isVerified status createdAt',
+    'fullName email role isVerified status createdAt avatarUrl',
   );
 
   if (!profile) {
@@ -23,7 +23,7 @@ export async function getRecruiterProfile(userId: string) {
       user: userId,
       companyName: 'My Company',
     });
-    profile = await profile.populate('user', 'fullName email role isVerified status createdAt');
+    profile = await profile.populate('user', 'fullName email role isVerified status createdAt avatarUrl');
   }
 
   return profile;

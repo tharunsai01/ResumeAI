@@ -6,6 +6,7 @@ import { DashboardShell } from "../../components/layout/DashboardShell"
 import { Badge } from "../../components/ui/Badge"
 import { Button } from "../../components/ui/Button"
 import { api } from "../../services/api"
+import { authService } from "../../services/authService"
 import { cn } from "../../lib/utils"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
@@ -81,12 +82,19 @@ export default function CandidateResume() {
     setAnalysisStep(0)
     
     try {
-      // Step 1: Upload (mock API)
-      await api.uploadResume(file)
+      // Step 1: Upload
+      const uploadRes = await api.uploadResume(file)
+      if (typeof window !== "undefined") {
+        localStorage.setItem("hiresmart_active_resume", JSON.stringify({
+          fileName: file.name,
+          fileSize: file.size,
+          fileId: uploadRes.fileId,
+          uploadedAt: new Date().toISOString()
+        }))
+      }
       setUploadState("analyzing")
       
-      // Step 2: Analyze (mock complex animation flow)
-      // We know analyzeResume takes ~4s. We'll sequence the steps over 4s.
+      // Step 2: Analyze sequence
       const stepDuration = 4000 / steps.length
       
       const interval = setInterval(() => {
@@ -99,7 +107,7 @@ export default function CandidateResume() {
         })
       }, stepDuration)
       
-      const res = await api.analyzeResume("doc_mock")
+      const res = await api.analyzeResume(uploadRes.fileId || "doc_live")
       if (res.success) {
         clearInterval(interval)
         setAnalysisStep(steps.length)
@@ -112,7 +120,7 @@ export default function CandidateResume() {
   }
 
   return (
-    <DashboardShell type="candidate" userName="Rahul Sharma">
+    <DashboardShell type="candidate" userName={authService.getCurrentUser()?.name || "Candidate"}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h1 className="text-xl sm:text-2xl font-display font-semibold text-brand-navy">My Resume</h1>
@@ -307,9 +315,13 @@ export default function CandidateResume() {
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
+                        className="space-y-2 pt-2"
                       >
-                        <Button size="lg" className="w-full group" onClick={() => navigate("/candidate/resume/analysis")}>
-                          View Analysis <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        <Button size="lg" className="w-full group" onClick={() => navigate("/candidate/profile")}>
+                          Review & Save Profile <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                        <Button size="lg" variant="outline" className="w-full group" onClick={() => navigate("/candidate/resume/analysis")}>
+                          View AI Analysis
                         </Button>
                       </motion.div>
                     )}

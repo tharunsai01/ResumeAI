@@ -43,8 +43,25 @@ export default function RecruiterInterviews() {
   const [statusFilter, setStatusFilter] = React.useState("All")
 
   React.useEffect(() => {
-    setLoading(false)
-    
+    let isMounted = true
+    interviewService.fetchLiveRecruiterInterviews().then(liveInterviews => {
+      if (isMounted && liveInterviews) {
+        setInterviews(liveInterviews)
+      }
+    }).catch(err => {
+      console.warn("Could not fetch live recruiter interviews:", err)
+    }).finally(() => {
+      if (isMounted) setLoading(false)
+    })
+
+    const handleUpdate = () => {
+      setInterviews(interviewService.getRecruiterInterviews())
+    }
+    window.addEventListener("hiresmart_recruiter_interviews_updated", handleUpdate)
+    return () => {
+      isMounted = false
+      window.removeEventListener("hiresmart_recruiter_interviews_updated", handleUpdate)
+    }
   }, [])
 
   const showToast = (msg: string) => {
@@ -56,8 +73,8 @@ export default function RecruiterInterviews() {
     const newInterview: MockInterview = {
       id: `int_${Date.now()}`,
       candidateId: data.candidateId,
-      candidateName: data.candidateId === "cand_1" ? "Rahul Sharma" : data.candidateId === "cand_3" ? "Ananya Patel" : data.candidateId === "cand_5" ? "Priya Singh" : data.candidateId === "cand_7" ? "Neha Gupta" : "Candidate",
-      jobId: "job_101",
+      candidateName: data.candidateName || "Candidate",
+      jobId: data.jobId || "job_live",
       jobTitle: data.jobTitle,
       date: data.date,
       time: data.time,
@@ -66,7 +83,9 @@ export default function RecruiterInterviews() {
       interviewer: data.interviewer,
       status: "Scheduled"
     }
-    setInterviews([...interviews, newInterview])
+    const updated = [newInterview, ...interviews]
+    setInterviews(updated)
+    interviewService.saveRecruiterInterviews(updated)
     showToast("Interview scheduled successfully.")
   }
 

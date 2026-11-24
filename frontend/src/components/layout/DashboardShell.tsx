@@ -29,7 +29,15 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
   const [isProfileOpen, setIsProfileOpen] = React.useState(false)
   const [headerSearchTerm, setHeaderSearchTerm] = React.useState("")
 
-  const effectiveUserName = (userName && userName !== "User" && userName !== "Recruiter") ? userName : (authService.getCurrentUser()?.name || (type === "recruiter" ? "Recruiter" : "User"))
+  const sessionUser = authService.getCurrentUser()
+  const isMockOrPlaceholder = !userName || 
+    userName === "User" || 
+    userName === "Recruiter" || 
+    userName === "Rahul Kumar" || 
+    userName === "Rahul Sharma" || 
+    userName === "Candidate"
+
+  const effectiveUserName = sessionUser?.name || (!isMockOrPlaceholder ? userName : (type === "recruiter" ? "Recruiter" : "User"))
   
   // Notification State
   const [isNotifOpen, setIsNotifOpen] = React.useState(false)
@@ -548,8 +556,12 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
                   <p className="text-sm font-medium text-brand-navy dark:text-white">{effectiveUserName}</p>
                   <p className="text-xs text-brand-navy/60 dark:text-white/60 capitalize">{type}</p>
                 </div>
-                <div className="h-9 w-9 rounded-full bg-brand-indigo/10 text-brand-indigo flex items-center justify-center font-semibold border border-brand-indigo/20">
-                  {effectiveUserName.charAt(0)}
+                <div className="h-9 w-9 rounded-full bg-brand-indigo/10 text-brand-indigo flex items-center justify-center font-semibold border border-brand-indigo/20 overflow-hidden">
+                  {sessionUser?.avatarUrl ? (
+                    <img src={sessionUser.avatarUrl} alt={effectiveUserName} className="h-full w-full object-cover" />
+                  ) : (
+                    effectiveUserName.charAt(0)
+                  )}
                 </div>
               </button>
 

@@ -90,6 +90,41 @@ export const interviewService = {
 
   // --- Recruiter-facing interview methods ---
 
+  async fetchLiveRecruiterInterviews(): Promise<MockInterview[]> {
+    if (env.useMock) return this.getRecruiterInterviews()
+    try {
+      const res = await httpClient.get<{ success: boolean; data: any[] }>("/interviews")
+      if (res?.data && Array.isArray(res.data)) {
+        const mapped: MockInterview[] = res.data.map((item) => ({
+          id: item._id,
+          candidateId: item.candidate?._id || item.candidate || "",
+          candidateName: item.candidate?.fullName || "Candidate",
+          jobId: item.job?._id || item.job || "",
+          jobTitle: item.job?.title || "Role",
+          date: item.scheduledAt ? new Date(item.scheduledAt).toISOString().split("T")[0] : "",
+          time: item.scheduledAt ? new Date(item.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "",
+          duration: `${item.durationMins || 45} mins`,
+          type: item.mode || "Technical",
+          interviewer: item.recruiter?.fullName || "Hiring Manager",
+          status: item.status === "completed" ? "Completed" : item.status === "cancelled" ? "Cancelled" : "Scheduled",
+          feedback: item.notes ? {
+            overall: 4,
+            technical: 4,
+            communication: 4,
+            problemSolving: 4,
+            comments: item.notes,
+            recommendation: "Hire"
+          } : undefined,
+        }))
+        this.saveRecruiterInterviews(mapped)
+        return mapped
+      }
+    } catch (err) {
+      console.warn("[InterviewService] Live recruiter interview fetch failed:", err)
+    }
+    return this.getRecruiterInterviews()
+  },
+
   getRecruiterInterviews(): MockInterview[] {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(RECRUITER_STORAGE_KEY)
@@ -100,9 +135,13 @@ export const interviewService = {
           console.error("Failed to parse recruiter interviews", e)
         }
       }
+      if (!env.useMock) {
+        return []
+      }
       this.saveRecruiterInterviews(initialInterviews)
+      return initialInterviews
     }
-    return [...initialInterviews]
+    return env.useMock ? [...initialInterviews] : []
   },
 
   saveRecruiterInterviews(interviews: MockInterview[]): void {

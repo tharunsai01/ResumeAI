@@ -2,7 +2,7 @@
 
 HireSmart AI is an end-to-end intelligent recruitment and talent matching platform that automates resume parsing, screens applicants using a calibrated 50/20/10/20 weighted AI scoring algorithm, defends against prompt-injection attacks, and provides dedicated portals for Candidates, Recruiters, and System Administrators.
 
-**Current Status:** **100% OPERATIONAL & VERIFIED** (109 / 109 automated tests passing: 103 backend integration & workflow tests + 6 Playwright browser suites).
+**Current Status:** **100% OPERATIONAL & VERIFIED** (113 / 113 automated tests passing: 104 backend integration & workflow tests + 9 Playwright browser suites).
 
 ---
 
@@ -142,23 +142,33 @@ ResumeAI/
 - **AI Fairness & Evaluation**: Monitor model bias, fairness calibration, and scoring stability.
 - **System Health**: Real-time gateway latency, memory usage, uptime, and database diagnostics.
 
-### H. Complete Verification & Testing (109 / 109 Tests Passed)
-- **40 / 40 Backend Integration Tests** ([backend/tests/integration.test.ts](file:///C:/ResumeAI/backend/tests/integration.test.ts)).
+### H. Complete Verification & Testing (113 / 113 Tests Passed)
+- **41 / 41 Backend Integration Tests** ([backend/tests/integration.test.ts](file:///C:/ResumeAI/backend/tests/integration.test.ts)).
 - **63 / 63 Backend E2E Workflow Tests** ([backend/tests/e2e-workflow.test.ts](file:///C:/ResumeAI/backend/tests/e2e-workflow.test.ts)).
-- **6 / 6 Real Browser Playwright Suites in Chromium** ([frontend/tests/browser-workflow.spec.ts](file:///C:/ResumeAI/frontend/tests/browser-workflow.spec.ts)):
+- **9 / 9 Real Browser Playwright Suites in Chromium** ([frontend/tests/browser-workflow.spec.ts](file:///C:/ResumeAI/frontend/tests/browser-workflow.spec.ts)):
   1. Landing Page & AuthModal triggers (with Google & LinkedIn buttons).
   2. Candidate Flow: Register, Login, Dashboard, Resume, Jobs, Skills, Profile, Complaint.
   3. Recruiter Flow: Login, Dashboard, Create Job, Candidates, AI Screening, Kanban Pipeline, Interviews.
   4. Admin Flow: Login, Statistics, User Moderation, Complaints, Skills, Audit Logs, System Health.
   5. Security Flow: Invalid Login error alert, Role Restrictions & Protected Route Redirects.
   6. OAuth Flow: OAuthCallback handles access denied and error reporting gracefully.
+  7. Google OAuth Flow: Authentic name mapping ("Jane Google Doe") to dashboard, header, and profile.
+  8. Data Isolation: Clean initial candidate profile with ZERO mock data leakage and full localStorage purge upon logout.
+  9. Cross-Portal Interaction: Recruiter reviews platform, candidate applies to jobs, applications sync cleanly across portals.
 - Detailed verification report documented in [docs/FULL_STACK_TEST_REPORT.md](file:///C:/ResumeAI/docs/FULL_STACK_TEST_REPORT.md).
 
-### I. OAuth 2.0 Social Authentication (Google & LinkedIn)
+### I. Data Isolation & Zero Mock Leakage in Live Mode
+- **Clean Profile Initialization**: In live mode (`VITE_USE_MOCK=false`), newly registered candidates receive an empty profile without fake personal data, fake education ("XYZ University"), or fake work experience ("ABC Technologies").
+- **Resume Extraction Review Flow**: Uploading a resume extracts available details with a direct "Review & Save Profile" step before committing changes to MongoDB.
+- **Complete Cache Purge on Logout**: Signing out systematically purges all user-specific local storage keys (`hiresmart_session`, `hiresmart_candidate_profile`, `hiresmart_recruiter_profile`, `hiresmart_all_applications`, `hiresmart_pipeline_candidates`, `hiresmart_recruiter_interviews`), ensuring switching accounts displays zero stale or leaked data.
+- **Dynamic Recruiter Pipeline & Interview Scheduling**: Real candidate applicant records populate Kanban pipeline columns and interview modals instead of hardcoded demo names.
+
+### J. OAuth 2.0 Social Authentication (Google & LinkedIn)
 - **Google OAuth 2.0 Integration**:
   - Implemented `GET /api/v1/auth/google/url` with CSRF state protection carrying selected role and nonce.
   - Implemented `POST /api/v1/auth/google` supporting both Authorization Code exchange (`https://oauth2.googleapis.com/token`) and Google Identity Services (GIS) ID tokens.
   - Automatic account provisioning for new users and account linking for existing accounts.
+  - Authentic user name extraction mapping Google profile name to MongoDB User, JWT claims, `/auth/me`, and Candidate/Recruiter profiles.
 - **LinkedIn OAuth 2.0 (OpenID Connect)**:
   - Implemented `GET /api/v1/auth/linkedin/url` requesting `openid profile email` scopes.
   - Implemented `POST /api/v1/auth/linkedin` exchanging code at `https://www.linkedin.com/oauth/v2/accessToken` and retrieving OpenID user details from `https://api.linkedin.com/v2/userinfo`.

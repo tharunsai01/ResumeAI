@@ -64,6 +64,21 @@ export default function CandidateProfilePage() {
   const [interestError, setInterestError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
+    let isMounted = true
+    profileService.fetchLiveProfile().then(liveProfile => {
+      if (isMounted && liveProfile) {
+        setProfile(liveProfile)
+        if (!isEditing) {
+          setEditedProfile(liveProfile)
+        }
+      }
+    }).catch(err => {
+      console.warn("Could not fetch live profile:", err)
+    })
+    return () => { isMounted = false }
+  }, [])
+
+  React.useEffect(() => {
     const handleProfileUpdate = () => {
       const updated = profileService.getCandidateProfile()
       setProfile(updated)

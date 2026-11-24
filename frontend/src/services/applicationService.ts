@@ -15,7 +15,12 @@ export const applicationService = {
         return JSON.parse(stored)
       }
       
-      // Seed data if empty
+      // In live mode, return empty array without seeding mock data
+      if (!env.useMock) {
+        return []
+      }
+
+      // Seed data if empty (mock mode only)
       const seeded = this.seedData()
       this.saveApplications(seeded)
       return seeded
@@ -163,15 +168,38 @@ export const applicationService = {
     this.saveApplications(apps)
 
     if (!env.useMock) {
-      httpClient.post("/applications", {
+      httpClient.post<{ success: boolean; data: any }>("/applications", {
         jobId: app.jobId,
         resumeId: (app as any).resumeId,
         coverLetter: (app as any).coverLetter || app.notes,
+      }).then(res => {
+        if (res?.data?._id) {
+          const currentApps = this.getApplications()
+          const idx = currentApps.findIndex(a => a.id === newApp.id)
+          if (idx !== -1) {
+            currentApps[idx].id = res.data._id
+            this.saveApplications(currentApps)
+          }
+        }
       }).catch((err) => {
         console.warn("[ApplicationService] Live submit application sync warning:", err)
       })
     }
     return newApp
+  },
+
+  async withdrawApplication(id: string): Promise<boolean> {
+    const apps = this.getApplications().filter(a => a.id !== id)
+    this.saveApplications(apps)
+    if (!env.useMock) {
+      try {
+        await httpClient.patch(`/applications/${id}/withdraw`)
+        return true
+      } catch (e) {
+        console.warn("[ApplicationService] Live withdraw error:", e)
+      }
+    }
+    return true
   },
 
   updateApplicationStatus(id: string, status: ApplicationStatus) {

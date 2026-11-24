@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import { isProd } from '../config/env';
 import * as ctrl from '../controllers/auth.controller';
 import { validate } from '../middleware/validate';
 import { authenticate } from '../middleware/auth';
@@ -18,7 +19,8 @@ const router = Router();
 // Stricter than the global limiter: slows down brute-force attempts
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 20,
+  limit: isProd ? 20 : 10000,
+  skip: () => !isProd,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { success: false, error: { message: 'Too many attempts, please try again later' } },
@@ -27,7 +29,8 @@ const authLimiter = rateLimit({
 // Anything that sends an email: stops email bombing
 const emailLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  limit: 5,
+  limit: isProd ? 5 : 1000,
+  skip: () => !isProd,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { success: false, error: { message: 'Too many requests, please try again later' } },

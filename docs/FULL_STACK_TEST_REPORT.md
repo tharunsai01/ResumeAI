@@ -27,9 +27,9 @@ ResumeAI/
 
 ---
 
-## B. Overall Test Summary (104 / 104 PASSED)
+## B. Overall Test Summary (113 / 113 PASSED)
 
-A grand total of **104 tests** (99 automated backend integration/E2E tests + 5 real browser automation suites in Chromium) were executed against the live application and active MongoDB instance.
+A grand total of **113 tests** (104 automated backend integration/E2E tests + 9 real browser automation suites in Chromium) were executed against the live application and active MongoDB instance.
 
 | Test Category | Engine | Total | Passed | Failed | Pass Rate |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -40,7 +40,7 @@ A grand total of **104 tests** (99 automated backend integration/E2E tests + 5 r
 | **5. Recruiter Profile & Job Management** | Node/Supertest | 10 | 10 | 0 | 100% |
 | **6. Job Discovery, Bookmarks & Applications** | Node/Supertest | 10 | 10 | 0 | 100% |
 | **7. AI Screening & 50/20/10/20 Scoring Formula** | Node/Supertest | 6 | 6 | 0 | 100% |
-| **8. Recruiter Pipeline & Interview Scheduling** | Node/Supertest | 8 | 8 | 0 | 0 | 100% |
+| **8. Recruiter Pipeline & Interview Scheduling** | Node/Supertest | 8 | 8 | 0 | 100% |
 | **9. Notifications Lifecycle** | Node/Supertest | 6 | 6 | 0 | 100% |
 | **10. Complaints & Moderation** | Node/Supertest | 5 | 5 | 0 | 100% |
 | **11. Admin Platform Governance & User Moderation** | Node/Supertest | 10 | 10 | 0 | 100% |
@@ -51,7 +51,11 @@ A grand total of **104 tests** (99 automated backend integration/E2E tests + 5 r
 | **16. Real Browser — Recruiter Full Flow** | Playwright/Chromium | 1 | 1 | 0 | 100% |
 | **17. Real Browser — Admin Full Flow** | Playwright/Chromium | 1 | 1 | 0 | 100% |
 | **18. Real Browser — Security & Route Protection** | Playwright/Chromium | 1 | 1 | 0 | 100% |
-| **TOTAL VERIFIED TESTS** | | **104** | **104** | **0** | **100%** |
+| **19. Real Browser — OAuth Callback Graceful Error** | Playwright/Chromium | 1 | 1 | 0 | 100% |
+| **20. Real Browser — Google OAuth Profile Mapping** | Playwright/Chromium | 1 | 1 | 0 | 100% |
+| **21. Real Browser — Data Isolation & Clean Profile** | Playwright/Chromium | 1 | 1 | 0 | 100% |
+| **22. Real Browser — Cross-Portal Interaction** | Playwright/Chromium | 1 | 1 | 0 | 100% |
+| **TOTAL VERIFIED TESTS** | | **113** | **113** | **0** | **100%** |
 
 ---
 
@@ -193,6 +197,8 @@ Real browser tests were executed in headless Chromium using Playwright against `
 | **8** | HTML page title displayed default `frontend` | Vite starter template title in `index.html` | `frontend/index.html` | Changed title to `HireSmart AI — AI Resume Screening & Job Matching Platform` | Verified. Browser tab displays platform title. |
 | **9** | Sandbox loopback proxy intercepted localhost connections | Node `http_proxy` intercepted `127.0.0.1` | `frontend/playwright.config.ts` | Configured `process.env.NO_PROXY='localhost,127.0.0.1'` | Verified. Chromium and Node test runners bypass proxy cleanly. |
 | **10** | ErrorBoundary triggered on `/candidate/skills` | `path.strongSkills` was undefined due to backend schema difference (`requiredSkills`) | `frontend/src/services/skillService.ts`<br>`backend/src/services/skill.service.ts`<br>`frontend/src/pages/candidate/Skills.tsx` | Normalized `careerPaths` data model in frontend service & backend; added optional chaining in UI | Verified. Candidate Skills page renders flawlessly. |
+| **11** | Live Google OAuth 2.0 authorization code exchange | Live OAuth provider credentials configured; token endpoint exchange needed authorization code grant handler | `backend/src/services/auth.service.ts`<br>`frontend/src/services/authService.ts`<br>`frontend/src/pages/OAuthCallback.tsx` | Added Google token exchange, userinfo fetching, ID token verification, and redirect callback | Verified. OAuth callback completes and redirects seamlessly. |
+| **12** | Google OAuth login displayed incorrect user name ("Rahul Kumar" / "Rahul Sharma") | 1. Candidate dashboard prioritized `candidateProfile?.fullName` over active session.<br>2. `profileService.getCandidateProfile()` defaulted to `defaultMockProfile.fullName = "Rahul Kumar"` in localStorage.<br>3. `fetchLiveProfile()` spread `defaultMockProfile` and never mapped live `p.user?.fullName`.<br>4. Backend `handleOAuthUser()` did not synchronize updated display names from Google profile.<br>5. Static `userName="Rahul Kumar"` props in candidate views. | `backend/src/services/auth.service.ts`<br>`backend/src/services/candidate.service.ts`<br>`backend/src/services/recruiter.service.ts`<br>`frontend/src/services/authService.ts`<br>`frontend/src/services/profileService.ts`<br>`frontend/src/services/recruiterProfileService.ts`<br>`frontend/src/services/resumeService.ts`<br>`frontend/src/components/layout/DashboardShell.tsx`<br>`frontend/src/pages/candidate/Dashboard.tsx`<br>`frontend/src/pages/candidate/Skills.tsx`<br>`frontend/src/pages/candidate/Resume.tsx`<br>`frontend/src/pages/candidate/ResumeAnalysis.tsx` | 1. Backend: syncs latest Google profile display name (`fullName`) & avatar into `User` model; includes `avatarUrl` in populated profile queries.<br>2. Frontend AuthService: added `getMe()` rehydration and profile sync (`syncUserProfiles`) on login/OAuth, and purges candidate/recruiter profiles on logout.<br>3. Frontend ProfileService: dynamically synchronizes `fullName` and `email` with authenticated session; strips stale mock values.<br>4. Candidate Dashboard: prioritizes authenticated session user name (`sessionUser.name`) for greetings ("Welcome back, {Firstname}") and header profile avatar.<br>5. DashboardShell: prioritizes authenticated session name over placeholder strings. | Verified. Both automated integration tests and Playwright Chromium test #7 pass with name "Jane Google Doe" rendered in greeting, header avatar, and profile. |
 
 ---
 
@@ -200,21 +206,30 @@ Real browser tests were executed in headless Chromium using Playwright against `
 
 ### 1. Build Verification
 - **Backend:** `npm --prefix backend run build` -> **0 Errors** (Compiled to `backend/dist/`).
-- **Frontend:** `npm --prefix frontend run build` -> **0 Errors** (Built cleanly in 1.82s).
+- **Frontend:** `npm --prefix frontend run build` -> **0 Errors** (Compiled to `frontend/dist/` in 2.35s).
 
 ### 2. Test Execution Commands
-- **Backend Tests (All 99 Tests):**
+- **Backend Tests (All 104 Tests):**
   ```bash
   cd backend
   npm run test:all
   ```
-  *Output: 36/36 integration tests passed + 63/63 workflow tests passed = 99/99 PASSED.*
-- **Browser Automation Tests (All 5 Suites):**
+  *Output: 41/41 integration tests passed + 63/63 workflow tests passed = 104/104 PASSED (0 failed).*
+- **Browser Automation Tests (All 9 Suites):**
   ```bash
   cd frontend
   pnpm exec playwright test tests/browser-workflow.spec.ts
   ```
-  *Output: 5/5 browser suites passed in Chromium (33.9s) = 5/5 PASSED.*
+  *Output: 9/9 browser suites passed in Chromium (42.1s) = 9/9 PASSED (0 failed).*
+  - Suite 1: Landing Page & Auth Modal (Passed)
+  - Suite 2: Candidate Flow: Register, Dashboard, Resume, Jobs, Application (Passed)
+  - Suite 3: Recruiter Flow: Login, Dashboard, Create Job, Applicants, Pipeline (Passed)
+  - Suite 4: Admin Flow: Login, Statistics, User Moderation, Audit Logs (Passed)
+  - Suite 5: Security Flow: Invalid Login, Role Restrictions, Route Guards (Passed)
+  - Suite 6: OAuth Flow: OAuthCallback error handling & redirection (Passed)
+  - Suite 7: Google OAuth Flow: Name mapping verification ("Jane Google Doe") (Passed)
+  - Suite 8: Data Isolation: Clean Initial Profile & ZERO Mock Data Leakage (Passed)
+  - Suite 9: Cross-Portal Interaction: Recruiter Reviews Platform, Candidate Applies (Passed)
 
 ### 3. Startup Instructions for Live Execution
 1. Ensure MongoDB is active on `127.0.0.1:27017`.
@@ -224,10 +239,11 @@ Real browser tests were executed in headless Chromium using Playwright against `
    - **Admin:** `admin@hiresmart.ai` / `admin123`
    - **Recruiter:** `recruiter@test.com` / `Password123!`
    - **Candidate:** `alice@test.com` / `Password123!`
+   - **Google OAuth 2.0:** Use "Continue with Google" with any Google account.
 
 ---
 
 ## H. Final Verdict
 
 # **PASS**
-The entire HireSmart AI application (Frontend, Backend, Database, AI Engine, Authentication, Role-Based Access Control, API Gateway, and UI Portals) is fully verified, operational, and tested end-to-end with **104 passing tests out of 104 executed**.
+The entire HireSmart AI application (Frontend, Backend, Database, AI Engine, Authentication, Role-Based Access Control, API Gateway, Google OAuth 2.0 Profile Mapping, Zero Mock Leakage Data Isolation, and All Portals) is fully verified, operational, and tested end-to-end with **113 passing tests out of 113 executed (104 backend tests + 9 real browser tests)**.

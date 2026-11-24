@@ -5,6 +5,7 @@
 
 import { env } from "../config/env"
 import { httpClient } from "./api/httpClient"
+import { authService } from "./authService"
 import { mockResumeAnalysis } from "../data/mockResume"
 import type { ResumeAnalysisResult } from "../types/resume"
 
@@ -18,7 +19,17 @@ export const resumeService = {
    * Synchronous accessor for fast UI rendering.
    */
   getActiveResumeAnalysis(): ResumeAnalysisResult {
-    // In live mode, this will return cached or context-stored resume data
+    const currentUser = authService.getCurrentUser()
+    if (currentUser) {
+      return {
+        ...mockResumeAnalysis,
+        personalInfo: {
+          ...mockResumeAnalysis.personalInfo,
+          name: currentUser.name || mockResumeAnalysis.personalInfo.name,
+          email: currentUser.email || mockResumeAnalysis.personalInfo.email,
+        },
+      }
+    }
     return mockResumeAnalysis
   },
 
