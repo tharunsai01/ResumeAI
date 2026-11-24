@@ -16,7 +16,8 @@ import { authService } from "../../services/authService"
 import { useAdminUsers } from "../../contexts/AdminUsersContext"
 
 export default function AdminUsers() {
-  const { users, setUsers } = useAdminUsers()
+  const { users, loading, error, updateUserStatus } = useAdminUsers()
+  const [actionError, setActionError] = useState("")
   const [searchParams] = useSearchParams()
 
   // Filters
@@ -126,39 +127,34 @@ export default function AdminUsers() {
     document.body.removeChild(link)
   }
 
-  const handleSuspendConfirm = () => {
-    if (targetUser) {
-      setUsers(prev => prev.map(u => u.id === targetUser.id ? { ...u, status: "Suspended" } : u))
-      showToast("User suspended successfully.")
+  const changeStatus = async (status: "Active" | "Suspended") => {
+    if (!targetUser) return
+    try {
+      await updateUserStatus(targetUser.id, status)
+      showToast(status === "Active" ? "User reactivated successfully." : "User suspended successfully.")
+    } catch {
+      setActionError("Unable to update the user.")
     }
     setSuspendModalOpen(false)
-    setTargetUser(null)
-  }
-
-  const handleReactivateConfirm = () => {
-    if (targetUser) {
-      setUsers(prev => prev.map(u => u.id === targetUser.id ? { ...u, status: "Active" } : u))
-      showToast("User reactivated successfully.")
-    }
     setReactivateModalOpen(false)
     setTargetUser(null)
   }
 
-  const handleBulkSuspendConfirm = () => {
+  const handleBulkSuspendConfirm = async () => {
     const currentUser = authService.getCurrentUser()
-    const idsToSuspend = selectedUserIds.filter(id => {
-      const user = users.find(u => u.id === id)
-      return user && user.email !== currentUser?.email
-    })
-
-    setUsers(prev => prev.map(u => idsToSuspend.includes(u.id) ? { ...u, status: "Suspended" } : u))
+    const ids = selectedUserIds.filter(id => users.some(user => user.id === id && user.email !== currentUser?.email))
     setBulkSuspendModalOpen(false)
     setSelectedUserIds([])
-    showToast(`${idsToSuspend.length} users suspended successfully.`)
+    const results = await Promise.allSettled(ids.map(id => updateUserStatus(id, "Suspended")))
+    const failed = results.filter(result => result.status === "rejected").length
+    if (failed) setActionError(`Could not suspend ${failed} of ${ids.length} selected users.`)
+    else showToast(`${ids.length} users suspended successfully.`)
   }
 
   return (
     <AdminShell>
+      {(error || actionError) && <p role="alert">{error || actionError}</p>}
+      {loading && <p role="status">Loading users…</p>}
       {/* TOAST */}
       <AnimatePresence>
         {toastMsg && (
@@ -282,7 +278,7 @@ export default function AdminUsers() {
           </div>
         }
         confirmLabel="Suspend User"
-        onConfirm={handleSuspendConfirm}
+        onConfirm={() => { setActionError(""); void changeStatus("Suspended") }}
         onCancel={() => { setSuspendModalOpen(false); setTargetUser(null); }}
         variant="danger"
       />
@@ -292,7 +288,7 @@ export default function AdminUsers() {
         title="Reactivate User?"
         message="This will restore platform access for this account."
         confirmLabel="Reactivate User"
-        onConfirm={handleReactivateConfirm}
+        onConfirm={() => { setActionError(""); void changeStatus("Active") }}
         onCancel={() => { setReactivateModalOpen(false); setTargetUser(null); }}
         variant="info"
       />

@@ -18,7 +18,7 @@ import { AdminEmptyState } from "../../components/admin/AdminEmptyState"
 export default function UserDetails() {
   const { userId } = useParams()
   const navigate = useNavigate()
-  const { getUserById, updateUserStatus } = useAdminUsers()
+  const { getUserById, updateUserStatus, loading, error } = useAdminUsers()
   
   const user = userId ? getUserById(userId) : undefined
   const currentUser = authService.getCurrentUser()
@@ -27,6 +27,8 @@ export default function UserDetails() {
   const [suspendModalOpen, setSuspendModalOpen] = useState(false)
   const [reactivateModalOpen, setReactivateModalOpen] = useState(false)
 
+  const [actionError, setActionError] = useState("")
+
   // Toast
   const [toastMsg, setToastMsg] = useState<string | null>(null)
   
@@ -34,6 +36,8 @@ export default function UserDetails() {
     setToastMsg(msg)
     setTimeout(() => setToastMsg(null), 3000)
   }
+
+  if (loading || error) return <AdminShell><p role={error ? "alert" : "status"}>{error || "Loading user…"}</p></AdminShell>
 
   if (!user) {
     return (
@@ -56,20 +60,21 @@ export default function UserDetails() {
     )
   }
 
-  const handleSuspendConfirm = () => {
-    updateUserStatus(user.id, "Suspended")
+  const changeStatus = async (status: "Active" | "Suspended") => {
+    setActionError("")
+    try {
+      await updateUserStatus(user.id, status)
+      showToast(status === "Active" ? "User reactivated successfully." : "User suspended successfully.")
+    } catch {
+      setActionError("Unable to update the user.")
+    }
     setSuspendModalOpen(false)
-    showToast("User suspended successfully.")
-  }
-
-  const handleReactivateConfirm = () => {
-    updateUserStatus(user.id, "Active")
     setReactivateModalOpen(false)
-    showToast("User reactivated successfully.")
   }
 
   return (
     <AdminShell>
+      {actionError && <p role="alert">{actionError}</p>}
       {/* TOAST */}
       <AnimatePresence>
         {toastMsg && (
@@ -148,7 +153,7 @@ export default function UserDetails() {
           </>
         }
         confirmLabel="Suspend User"
-        onConfirm={handleSuspendConfirm}
+        onConfirm={() => void changeStatus("Suspended")}
         onCancel={() => setSuspendModalOpen(false)}
         variant="danger"
       />
@@ -158,7 +163,7 @@ export default function UserDetails() {
         title="Reactivate User?"
         message="Reactivating this account will restore normal platform access."
         confirmLabel="Reactivate User"
-        onConfirm={handleReactivateConfirm}
+        onConfirm={() => void changeStatus("Active")}
         onCancel={() => setReactivateModalOpen(false)}
         variant="info"
       />
