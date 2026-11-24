@@ -4,6 +4,7 @@ import { env } from "../../config/env"
 import { httpClient } from "../../services/api/httpClient"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { AdminStatCard } from "../../components/admin/AdminStatCard"
 import { Users, AlertOctagon, Activity, Briefcase, FileText } from "lucide-react"
 
@@ -21,7 +22,24 @@ interface DashboardStats {
   jobs: { active: number }
   complaints: { pending: number }
   resumes: { total: number }
-  systemHealth: { database: string }
+  applications: { total: number; statusDistribution: Record<string, number> }
+  recentActivity: {
+    users: { _id: string; fullName: string; role: string }[]
+    jobs: { _id: string; title: string; companyName: string; status: string }[]
+    auditLogs: { _id: string; action: string; createdAt: string }[]
+  }
+  systemHealth: { database: string; uptimeSeconds: number }
+}
+
+function DashboardPanel({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <PremiumCard>
+      <PremiumCardHeader className="border-b border-brand-gray/20">
+        <PremiumCardTitle>{title}</PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent className="p-5">{children}</PremiumCardContent>
+    </PremiumCard>
+  )
 }
 
 function LiveAdminDashboard() {
@@ -40,17 +58,62 @@ function LiveAdminDashboard() {
       <AdminPageHeader title="Dashboard" description="Platform activity from the live demo database." />
       {error && <p role="alert">Unable to load platform statistics.</p>}
       {!stats && !error && <p role="status">Loading platform statistics…</p>}
-      {stats && <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <AdminStatCard title="Total Users" value={stats.users.total} icon={Users} />
-        <AdminStatCard title="Active Jobs" value={stats.jobs.active} icon={Briefcase} />
-        <AdminStatCard title="Open Complaints" value={stats.complaints.pending} icon={AlertOctagon} />
-        <AdminStatCard title="Resumes Processed" value={stats.resumes.total} icon={FileText} />
-        <p>Database {stats.systemHealth.database}</p>
-      </div>}
-      <div className="flex gap-4 text-brand-indigo font-medium">
-        <Link to="/admin/users">Manage users</Link>
-        <Link to="/admin/audit-logs">View audit logs</Link>
-      </div>
+      {stats && <>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+          <AdminStatCard title="Total Users" value={stats.users.total} icon={Users} />
+          <AdminStatCard title="Active Jobs" value={stats.jobs.active} icon={Briefcase} />
+          <AdminStatCard title="Applications" value={stats.applications.total} icon={Activity} />
+          <AdminStatCard title="Open Complaints" value={stats.complaints.pending} icon={AlertOctagon} />
+          <AdminStatCard title="Résumés Uploaded" value={stats.resumes.total} icon={FileText} />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+          <DashboardPanel title="Application Pipeline">
+            {Object.entries(stats.applications.statusDistribution).map(([status, count]) => (
+              <div key={status} className="mb-3 last:mb-0">
+                <div className="flex justify-between text-sm mb-1"><span className="capitalize">{status}</span><span>{count}</span></div>
+                <progress className="h-2 w-full accent-brand-indigo" value={count} max={Math.max(stats.applications.total, 1)} aria-label={status} />
+              </div>
+            ))}
+          </DashboardPanel>
+          <DashboardPanel title="Recent Users">
+            {!stats.recentActivity.users.length && <p>No users yet.</p>}
+            <ul className="divide-y divide-brand-gray/20">
+              {stats.recentActivity.users.map(user => <li key={user._id} className="py-2">
+                <Link className="font-medium hover:text-brand-indigo" to={`/admin/users/${user._id}`}>{user.fullName}</Link>
+                <p className="text-sm capitalize text-brand-navy/60 dark:text-white/60">{user.role === "admin" ? "Administrator" : user.role}</p>
+              </li>)}
+            </ul>
+            <Link className="text-brand-indigo text-sm font-medium" to="/admin/users">Manage users</Link>
+          </DashboardPanel>
+          <DashboardPanel title="Recent Jobs">
+            {!stats.recentActivity.jobs.length && <p>No jobs yet.</p>}
+            <ul className="divide-y divide-brand-gray/20">
+              {stats.recentActivity.jobs.map(job => <li key={job._id} className="flex justify-between gap-3 py-2">
+                <div className="min-w-0"><p className="font-medium break-words">{job.title}</p><p className="text-sm text-brand-navy/60 dark:text-white/60">{job.companyName}</p></div>
+                <span className="text-sm capitalize">{job.status}</span>
+              </li>)}
+            </ul>
+          </DashboardPanel>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <DashboardPanel title="Recent Audit Activity">
+              {!stats.recentActivity.auditLogs.length && <p>No audit events yet.</p>}
+              <ul className="divide-y divide-brand-gray/20">
+                {stats.recentActivity.auditLogs.map(log => <li key={log._id} className="flex flex-wrap justify-between gap-2 py-2 text-sm">
+                  <span className="capitalize">{log.action.toLowerCase().replaceAll("_", " ")}</span>
+                  <time dateTime={log.createdAt} className="text-brand-navy/60 dark:text-white/60">{new Date(log.createdAt).toLocaleString()}</time>
+                </li>)}
+              </ul>
+              <Link className="text-brand-indigo text-sm font-medium" to="/admin/audit-logs">View audit logs</Link>
+            </DashboardPanel>
+          </div>
+          <DashboardPanel title="Backend Status">
+            <p>Database {stats.systemHealth.database}</p>
+            <p className="mt-2 text-sm text-brand-navy/60 dark:text-white/60">Backend uptime {Math.floor(stats.systemHealth.uptimeSeconds / 60)} min</p>
+          </DashboardPanel>
+        </div>
+      </>}
     </AdminShell>
   )
 }
