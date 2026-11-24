@@ -72,7 +72,12 @@ app.use('/api/docs', (_req, res, next) => {
   next();
 });
 app.use('/api/docs', express.static(docs));
-app.use('/api/docs/assets', express.static(path.dirname(require.resolve('swagger-ui-dist/package.json'))));
+try {
+  const swaggerUiPath = path.dirname(require.resolve('swagger-ui-dist/package.json'));
+  app.use('/api/docs/assets', express.static(swaggerUiPath));
+} catch {
+  // Optional swagger-ui-dist static assets
+}
 
 app.use('/api/v1', routes);
 

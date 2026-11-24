@@ -26,9 +26,9 @@ test.describe('HireSmart AI - Complete Real Browser Testing Suite', () => {
     await expect(page.getByPlaceholder('Email Address')).toBeVisible();
     await expect(page.getByPlaceholder('Password')).toBeVisible();
 
-    // Verify OAuth social buttons are present in AuthModal
+    // Verify Google OAuth button is present in AuthModal and LinkedIn has been removed
     await expect(page.getByRole('button', { name: /continue with google/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /continue with linkedin/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /continue with linkedin/i })).not.toBeVisible();
 
     // Close modal
     const closeBtn = page.locator('button:has(svg.lucide-x)').first();

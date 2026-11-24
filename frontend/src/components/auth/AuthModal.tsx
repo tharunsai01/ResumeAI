@@ -144,22 +144,6 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
     }
   }
 
-  const handleLinkedInAuth = async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      if (mode === "register" && role === "admin") {
-        throw new Error("Administrator accounts cannot be registered via LinkedIn OAuth.")
-      }
-      await authService.linkedinAuth(mode === "register" ? role : undefined)
-      onClose()
-    } catch (err: any) {
-      setError(err.message || "LinkedIn authentication failed.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-2.5 sm:p-4 overflow-y-auto">
@@ -381,18 +365,6 @@ export function AuthModal({ isOpen, onClose, initialMode = "login", initialRole 
                       <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                     </svg>
                     Continue with Google
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleLinkedInAuth}
-                    disabled={isLoading}
-                    className="btn-interactive btn-secondary rounded-lg w-full flex items-center justify-center gap-2.5 sm:gap-3 border-2 hover:border-brand-gray/50 font-semibold py-2.5 sm:py-3 h-11 sm:h-12 text-xs sm:text-sm"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#0A66C2">
-                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
-                    </svg>
-                    Continue with LinkedIn
                   </button>
                 </div>
               </>

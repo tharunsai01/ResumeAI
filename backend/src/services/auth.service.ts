@@ -356,17 +356,35 @@ async function handleOAuthUser(params: OAuthUserProfile) {
     user.isVerified = true;
     user.lastLoginAt = new Date();
     await user.save();
+
+    // Ensure Candidate/Recruiter profile exists and stays synced with OAuth avatar
+    if (user.role === 'candidate') {
+      const candProfile = await CandidateProfile.findOne({ user: user._id });
+      if (!candProfile) {
+        await CandidateProfile.create({ user: user._id, avatarUrl: avatarUrl || undefined });
+      } else if (avatarUrl && !candProfile.avatarUrl) {
+        candProfile.avatarUrl = avatarUrl;
+        await candProfile.save();
+      }
+    } else if (user.role === 'recruiter') {
+      const recProfile = await RecruiterProfile.findOne({ user: user._id });
+      if (!recProfile) {
+        const defaultCompany = companyName?.trim() || `${name ? name.split(' ')[0] : 'Recruiter'}'s Organization`;
+        await RecruiterProfile.create({ user: user._id, companyName: defaultCompany, fullName: user.fullName });
+      }
+    }
   } else {
-    if (!role) {
-      throw new ApiError(422, 'Choose a role to finish signing up', { code: 'ROLE_REQUIRED' });
+    // New user registration via OAuth
+    const targetRole: 'candidate' | 'recruiter' = (role === 'recruiter' ? 'recruiter' : 'candidate');
+    if ((role as string) === 'admin') {
+      throw new ApiError(403, 'Administrator accounts cannot be created via OAuth.');
     }
-    if (role === 'recruiter' && !companyName) {
-      throw new ApiError(422, 'Company name is required for recruiters', { code: 'COMPANY_REQUIRED' });
-    }
+    const defaultCompany = companyName?.trim() || `${name ? name.split(' ')[0] : 'Recruiter'}'s Organization`;
+
     const createData: any = {
       fullName: name || email.split('@')[0],
       email,
-      role,
+      role: targetRole,
       authProvider: provider,
       isVerified: true,
       lastLoginAt: new Date(),
@@ -377,7 +395,7 @@ async function handleOAuthUser(params: OAuthUserProfile) {
 
     user = await User.create(createData);
     try {
-      await createProfileFor(user.id, role, companyName);
+      await createProfileFor(user.id, targetRole, defaultCompany);
     } catch (err) {
       await User.deleteOne({ _id: user._id });
       throw err;

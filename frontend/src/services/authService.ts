@@ -361,7 +361,9 @@ export const authService = {
               scope: "openid profile email",
               callback: async (tokenResponse: any) => {
                 if (tokenResponse.error) {
-                  reject(new Error(tokenResponse.error_description || tokenResponse.error || "Google sign-in was cancelled."))
+                  // Fall back seamlessly to server redirect flow if popup client fails or is blocked
+                  console.warn("Google popup reported error, falling back to server redirect:", tokenResponse.error)
+                  this.triggerGoogleRedirect(role).then(resolve).catch(reject)
                   return
                 }
                 if (tokenResponse.access_token) {
@@ -369,10 +371,10 @@ export const authService = {
                     const user = await this.googleAuth(role, tokenResponse.access_token)
                     resolve(user)
                   } catch (e) {
-                    reject(e)
+                    this.triggerGoogleRedirect(role).then(resolve).catch(reject)
                   }
                 } else {
-                  reject(new Error("No access token received from Google."))
+                  this.triggerGoogleRedirect(role).then(resolve).catch(reject)
                 }
               },
             })
@@ -434,6 +436,9 @@ export const authService = {
       }
       throw new Error("Failed to generate Google authentication link.")
     } catch (err: any) {
+      if (err?.isNetworkError) {
+        throw new Error("Cannot connect to HireSmart API gateway. Please ensure the backend server is running on http://localhost:5000.")
+      }
       const message = err.response?.data?.error?.message || err.message || ""
       if (message.includes("not configured") || err.status === 503) {
         throw new Error("Google Sign-In is not configured yet on the server. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to backend/.env, or sign in with your email and password.")

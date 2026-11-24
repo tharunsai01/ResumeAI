@@ -11,7 +11,6 @@ export default function OAuthCallback() {
   const navigate = useNavigate()
 
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
-  const [provider, setProvider] = useState<"google" | "linkedin">("google")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
@@ -40,17 +39,16 @@ export default function OAuthCallback() {
       }
 
       let detectedRole: UserRole = "candidate"
-      let detectedProvider: "google" | "linkedin" = "google"
 
       if (stateParam) {
         try {
-          const base64 = stateParam.replace(/-/g, "+").replace(/_/g, "/")
+          let base64 = stateParam.replace(/-/g, "+").replace(/_/g, "/")
+          while (base64.length % 4 !== 0) {
+            base64 += "="
+          }
           const jsonStr = atob(base64)
           const stateData = JSON.parse(jsonStr)
 
-          if (stateData.provider === "linkedin" || stateData.provider === "google") {
-            detectedProvider = stateData.provider
-          }
           if (stateData.role === "candidate" || stateData.role === "recruiter") {
             detectedRole = stateData.role
           }
@@ -59,19 +57,8 @@ export default function OAuthCallback() {
         }
       }
 
-      // Check current URL or parameters for provider hints
-      if (window.location.search.includes("linkedin") || stateParam?.includes("linkedin")) {
-        detectedProvider = "linkedin"
-      }
-      setProvider(detectedProvider)
-
       try {
-        let sessionUser
-        if (detectedProvider === "linkedin") {
-          sessionUser = await authService.linkedinAuth(detectedRole, code)
-        } else {
-          sessionUser = await authService.googleAuth(detectedRole, code)
-        }
+        const sessionUser = await authService.googleAuth(detectedRole, code)
 
         if (!isMounted) return
 
@@ -125,7 +112,7 @@ export default function OAuthCallback() {
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 border-3 border-brand-indigo/20 border-t-brand-indigo rounded-full animate-spin mb-6" />
               <h2 className="text-xl font-display font-semibold text-brand-navy mb-2">
-                Authenticating with {provider === "linkedin" ? "LinkedIn" : "Google"}
+                Authenticating with Google
               </h2>
               <p className="text-sm text-brand-navy/60">
                 Verifying your credentials and establishing a secure session...
