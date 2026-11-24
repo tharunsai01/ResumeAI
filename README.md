@@ -146,7 +146,7 @@ ResumeAI/
 - **41 / 41 Backend Integration Tests** ([backend/tests/integration.test.ts](file:///C:/ResumeAI/backend/tests/integration.test.ts)).
 - **63 / 63 Backend E2E Workflow Tests** ([backend/tests/e2e-workflow.test.ts](file:///C:/ResumeAI/backend/tests/e2e-workflow.test.ts)).
 - **9 / 9 Real Browser Playwright Suites in Chromium** ([frontend/tests/browser-workflow.spec.ts](file:///C:/ResumeAI/frontend/tests/browser-workflow.spec.ts)):
-  1. Landing Page & AuthModal triggers (with Google & LinkedIn buttons).
+  1. Landing Page & AuthModal triggers (with Google sign-in).
   2. Candidate Flow: Register, Login, Dashboard, Resume, Jobs, Skills, Profile, Complaint.
   3. Recruiter Flow: Login, Dashboard, Create Job, Candidates, AI Screening, Kanban Pipeline, Interviews.
   4. Admin Flow: Login, Statistics, User Moderation, Complaints, Skills, Audit Logs, System Health.
@@ -163,18 +163,15 @@ ResumeAI/
 - **Complete Cache Purge on Logout**: Signing out systematically purges all user-specific local storage keys (`hiresmart_session`, `hiresmart_candidate_profile`, `hiresmart_recruiter_profile`, `hiresmart_all_applications`, `hiresmart_pipeline_candidates`, `hiresmart_recruiter_interviews`), ensuring switching accounts displays zero stale or leaked data.
 - **Dynamic Recruiter Pipeline & Interview Scheduling**: Real candidate applicant records populate Kanban pipeline columns and interview modals instead of hardcoded demo names.
 
-### J. OAuth 2.0 Social Authentication (Google & LinkedIn)
+### J. OAuth 2.0 Social Authentication (Google)
 - **Google OAuth 2.0 Integration**:
   - Implemented `GET /api/v1/auth/google/url` with CSRF state protection carrying selected role and nonce.
   - Implemented `POST /api/v1/auth/google` supporting both Authorization Code exchange (`https://oauth2.googleapis.com/token`) and Google Identity Services (GIS) ID tokens.
   - Automatic account provisioning for new users and account linking for existing accounts.
   - Authentic user name extraction mapping Google profile name to MongoDB User, JWT claims, `/auth/me`, and Candidate/Recruiter profiles.
-- **LinkedIn OAuth 2.0 (OpenID Connect)**:
-  - Implemented `GET /api/v1/auth/linkedin/url` requesting `openid profile email` scopes.
-  - Implemented `POST /api/v1/auth/linkedin` exchanging code at `https://www.linkedin.com/oauth/v2/accessToken` and retrieving OpenID user details from `https://api.linkedin.com/v2/userinfo`.
 - **Client Route & Components**:
   - Built dedicated `OAuthCallback.tsx` (`/oauth/callback`) parsing code/state/error query parameters with user feedback and auto-redirect.
-  - Added "Continue with Google" and "Continue with LinkedIn" buttons inside `AuthModal.tsx`.
+  - Added a "Continue with Google" button inside `AuthModal.tsx`.
   - Added development mode OAuth test simulation so development and testing run with 100% test pass rate even before credentials are set.
 
 ---
@@ -227,10 +224,6 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 GOOGLE_REDIRECT_URI=http://localhost:5173/oauth/callback
 
-# LinkedIn OAuth 2.0 Credentials (Optional)
-LINKEDIN_CLIENT_ID=
-LINKEDIN_CLIENT_SECRET=
-LINKEDIN_REDIRECT_URI=http://localhost:5173/oauth/callback
 
 # Optional: External AI Provider Keys (Falls back to deterministic rule engine if omitted)
 GROQ_API_KEY=
@@ -244,9 +237,8 @@ Create `frontend/.env`:
 VITE_API_BASE_URL=http://localhost:5000/api/v1
 VITE_USE_MOCK=false
 
-# Optional Client IDs for frontend Google/LinkedIn components
+# Optional Client IDs for frontend Google components
 VITE_GOOGLE_CLIENT_ID=
-VITE_LINKEDIN_CLIENT_ID=
 ```
 
 ---
