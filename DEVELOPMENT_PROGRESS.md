@@ -22,7 +22,7 @@ Status key: **Done**, **Done (CI-verified only)** = written and wired into CI bu
 | 16. Kubernetes | Done | Kustomize set, NetworkPolicies, HPAs, hardened pods. 20/20 resources pass strict v1.30 validation. |
 | 17. Final QA and documentation | Done | 13 docs, README with screenshots, this log. |
 
-# Defects found and fixed during QA
+## Defects found and fixed during QA
 
 | Found by | Defect | Fix |
 |---|---|---|
@@ -37,7 +37,7 @@ Status key: **Done**, **Done (CI-verified only)** = written and wired into CI bu
 | Playwright | Demo data lost on full page reload | Demo layer persists per tab in sessionStorage |
 | Build review | 500 KB charts chunk preloaded on every page | Manual chunking removed; charts load with the pages that use them |
 
-# Next steps
+## Next steps
 
 1. Run CI once on GitHub to execute the MongoDB-backed suites and the live journey.
 2. Add an email provider for interview invitations and decisions.
