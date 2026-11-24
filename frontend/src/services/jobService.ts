@@ -10,6 +10,7 @@ import { initialRecruiterJobs } from "../data/recruiterMockData"
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export type { JobMatchResult }
+export type RecommendedJob = Pick<JobMatchResult, "job" | "overallMatch">
 
 const STORAGE_KEY = "hiresmart_created_jobs"
 const RECRUITER_STORAGE_KEY = "hiresmart_recruiter_jobs"
@@ -398,11 +399,21 @@ export const jobService = {
     }
   },
 
-  getRecommendedJobs: async (): Promise<JobMatchResult[]> => {
+  getRecommendedJobs: async (signal?: AbortSignal): Promise<RecommendedJob[]> => {
+    if (!env.useMock) {
+      const { data } = await httpClient.get<{ data: Array<{ job: Job; matchScore: number }> }>(
+        "/candidates/recommended-jobs", { signal },
+      )
+      return data.map(({ job, matchScore }) => ({
+        job: mapBackendJobToFrontend(job),
+        overallMatch: matchScore,
+      }))
+    }
+
     await delay(600)
     const candidate = mockResumeAnalysis
     const scored = mockJobs.map(job => jobService.calculateJobMatch(candidate, job))
     // Sort descending
-    return scored.sort((a, b) => b.overallMatch - a.overallMatch)
+    return scored.sort((a, b) => b.overallMatch - a.overallMatch).slice(0, 10)
   }
 }

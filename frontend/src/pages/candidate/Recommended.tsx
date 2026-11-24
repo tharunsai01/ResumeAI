@@ -5,33 +5,40 @@ import { Sparkles, ArrowRight } from "lucide-react"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { JobCard } from "../../components/shared/JobCard"
 import { jobService } from "../../services/jobService"
-import type { JobMatchResult } from "../../services/jobService"
+import type { RecommendedJob } from "../../services/jobService"
 import { useJobActions } from "../../hooks/useJobActions"
-import { resumeService } from "../../services/resumeService"
+import { authService } from "../../services/authService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 
 export default function CandidateRecommended() {
   const navigate = useNavigate()
   const { savedJobs, toggleSaveJob, hasApplied } = useJobActions()
-  const activeResume = resumeService.getActiveResumeAnalysis()
+  const userName = authService.getCurrentUser()?.name || "Candidate"
   
   const [loading, setLoading] = React.useState(true)
-  const [recommendedJobs, setRecommendedJobs] = React.useState<JobMatchResult[]>([])
+  const [recommendedJobs, setRecommendedJobs] = React.useState<RecommendedJob[]>([])
+  const [error, setError] = React.useState(false)
+  const [attempt, setAttempt] = React.useState(0)
 
   React.useEffect(() => {
-    const fetchRecommendations = async () => {
-      try {
-        const jobs = await jobService.getRecommendedJobs()
-        setRecommendedJobs(jobs)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchRecommendations()
-  }, [])
+    const controller = new AbortController()
+    setLoading(true)
+    setError(false)
+    void jobService.getRecommendedJobs(controller.signal)
+      .then(jobs => {
+        if (!controller.signal.aborted) setRecommendedJobs(jobs)
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setError(true)
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false)
+      })
+    return () => controller.abort()
+  }, [attempt])
 
   return (
-    <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
+    <DashboardShell type="candidate" userName={userName}>
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-6xl mx-auto space-y-8 pb-12">
         <motion.div variants={slideUp} className="flex items-center gap-3">
           <div className="p-2.5 sm:p-3 bg-brand-indigo/10 rounded-xl shrink-0">
@@ -49,6 +56,13 @@ export default function CandidateRecommended() {
               <div key={i} className="h-64 bg-white rounded-xl border border-brand-gray/30 animate-pulse" />
             ))}
           </div>
+        ) : error ? (
+          <div role="alert" className="bg-white rounded-xl border border-brand-gray/50 p-6">
+            <p>Could not load recommended jobs.</p>
+            <button className="text-brand-indigo underline mt-2" onClick={() => setAttempt(value => value + 1)}>
+              Try again
+            </button>
+          </div>
         ) : (
           <div className="space-y-8">
             <motion.div variants={slideUp}>
@@ -58,13 +72,7 @@ export default function CandidateRecommended() {
               {recommendedJobs.length > 0 ? (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                   {recommendedJobs.map(({ job, overallMatch }, index) => (
-                    <motion.div 
-                      key={job.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="relative"
-                    >
+                    <div key={job.id} className="relative">
                       {index === 0 && (
                         <div className="absolute -top-3 -right-3 z-10 bg-semantic-success text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-semantic-success/20">
                           #1 Match
@@ -79,16 +87,16 @@ export default function CandidateRecommended() {
                         onClick={() => navigate(`/candidate/jobs/${job.id}`)}
                         onApply={() => navigate(`/candidate/jobs/${job.id}?apply=true`)}
                       />
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               ) : (
                 <div className="bg-white rounded-xl border border-brand-gray/50 p-12 text-center flex flex-col items-center justify-center">
                   <Sparkles className="w-12 h-12 text-brand-navy/20 mb-4" />
-                  <h3 className="text-xl font-display font-semibold text-brand-navy mb-2">We need more profile information</h3>
-                  <p className="text-brand-navy/60 mb-6">Upload a resume to get AI-powered job recommendations.</p>
-                  <button onClick={() => navigate("/candidate/resume")} className="text-brand-indigo font-medium flex items-center hover:underline">
-                    Go to My Resume <ArrowRight className="w-4 h-4 ml-1" />
+                  <h3 className="text-xl font-display font-semibold text-brand-navy mb-2">No recommended jobs right now</h3>
+                  <p className="text-brand-navy/60 mb-6">Browse current listings or check back when more jobs are posted.</p>
+                  <button onClick={() => navigate("/candidate/jobs")} className="text-brand-indigo font-medium flex items-center hover:underline">
+                    Find Jobs <ArrowRight className="w-4 h-4 ml-1" />
                   </button>
                 </div>
               )}

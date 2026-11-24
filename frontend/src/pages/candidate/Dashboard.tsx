@@ -8,7 +8,7 @@ import { Briefcase, Calendar, CheckCircle2, Star, TrendingUp, Clock, ChevronRigh
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { ResumeUploader } from "../../components/shared/ResumeUploader"
 import { jobService } from "../../services/jobService"
-import type { JobMatchResult } from "../../services/jobService"
+import type { RecommendedJob } from "../../services/jobService"
 import { useJobActions } from "../../hooks/useJobActions"
 import { resumeService } from "../../services/resumeService"
 import { skillService } from "../../services/skillService"
@@ -25,7 +25,7 @@ export default function CandidateDashboard() {
   const navigate = useNavigate()
   const { savedJobs, toggleSaveJob, appliedJobs, hasApplied } = useJobActions()
   
-  const [recommendedJobs, setRecommendedJobs] = React.useState<JobMatchResult[]>([])
+  const [recommendedJobs, setRecommendedJobs] = React.useState<RecommendedJob[]>([])
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
@@ -33,6 +33,8 @@ export default function CandidateDashboard() {
       try {
         const jobs = await jobService.getRecommendedJobs()
         setRecommendedJobs(jobs)
+      } catch {
+        setRecommendedJobs([])
       } finally {
         setLoading(false)
       }
