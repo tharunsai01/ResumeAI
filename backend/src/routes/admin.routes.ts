@@ -3,6 +3,8 @@ import { authenticate, authorize } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import {
   adminUserQuerySchema,
+  adminAuditQuerySchema,
+  adminListQuerySchema,
   adminJobQuerySchema,
   adminUpdateUserStatusSchema,
   adminUpdateJobStatusSchema,
@@ -39,19 +41,19 @@ router.patch(
 );
 
 // Complaints
-router.get('/complaints', adminController.getComplaints);
+router.get('/complaints', validate(adminListQuerySchema, 'query'), adminController.getComplaints);
 router.get('/complaints/:id', adminController.getComplaintById);
 router.patch('/complaints/:id', adminController.updateComplaint);
 
 // Skills & Taxonomy
-router.get('/skills', adminController.getSkills);
+router.get('/skills', validate(adminListQuerySchema, 'query'), adminController.getSkills);
 router.post('/skills', adminController.addSkill);
 router.put('/skills/:id', adminController.updateSkill);
 router.patch('/skills/:id/review', adminController.reviewUnknownSkill);
 router.delete('/skills/:id', adminController.deleteSkill);
 
 // Audit logs
-router.get('/audit-logs', adminController.getAuditLogs);
+router.get('/audit-logs', validate(adminAuditQuerySchema, 'query'), adminController.getAuditLogs);
 
 // AI Evaluation
 router.get('/ai-evaluations', adminController.getAiEvaluations);

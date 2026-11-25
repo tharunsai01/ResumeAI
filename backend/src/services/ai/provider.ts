@@ -114,8 +114,8 @@ export class HttpAiMicroserviceProvider implements AIProviderInterface {
     const { report } = await this.analyze(rawText);
     return aiResumeAnalysisSchema.parse({
       summary: report.insights?.summary ?? '',
-      qualityScore: report.score ?? 0,
-      breakdown: report.breakdown ?? { skills: 0, experience: 0, education: 0, projects: 0 },
+      qualityScore: report.score,
+      breakdown: report.breakdown,
       skills: report.skills ?? [],
       strengths: report.insights?.strengths ?? [],
       weaknesses: report.insights?.improvements ?? [],

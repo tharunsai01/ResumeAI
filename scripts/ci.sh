@@ -21,6 +21,7 @@ export JWT_ACCESS_SECRET="$(openssl rand -hex 32)"
   npm run test:unit
   npm run seed
   npm run test:all
+  npm run test:login-rate-limit
 )
 (
   cd ai-service

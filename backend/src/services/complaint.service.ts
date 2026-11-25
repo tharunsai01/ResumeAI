@@ -1,3 +1,4 @@
+import { escapeRegex } from '../utils/escapeRegex';
 import { Complaint } from '../models';
 import { ApiError } from '../utils/ApiError';
 import { recordAuditLog } from './audit.service';
@@ -54,7 +55,7 @@ export async function listComplaintsForAdmin(query: { category?: string; status?
   if (query.category) filter.category = query.category;
   if (query.status) filter.status = query.status;
   if (query.search) {
-    const s = new RegExp(query.search.trim(), 'i');
+    const s = new RegExp(escapeRegex(query.search.trim()), 'i');
     filter.$or = [{ title: s }, { description: s }];
   }
 

@@ -2,14 +2,22 @@ import type { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import mongoose from 'mongoose';
 import { ApiError } from '../utils/ApiError';
+import { recordAuditLog } from '../services/audit.service';
 import { isProd } from '../config/env';
 
-export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
+export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction) {
   let status = 500;
   let message = 'Internal server error';
   let details: unknown;
 
-  if (err instanceof ApiError) {
+  const parserError = err as { type?: string; status?: number } | null;
+  if (parserError?.type === 'entity.parse.failed' && parserError.status === 400) {
+    status = 400;
+    message = 'Malformed request body';
+  } else if (parserError?.type === 'entity.too.large' && parserError.status === 413) {
+    status = 413;
+    message = 'Request body exceeds the maximum size';
+  } else if (err instanceof ApiError) {
     status = err.statusCode;
     message = err.message;
     details = err.details;
@@ -30,6 +38,16 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
     status = 409;
     message = 'Duplicate value';
     details = (err as { keyValue?: unknown }).keyValue;
+  }
+
+  if ((status === 401 || status === 403) && req.route?.path !== '/login') {
+    void recordAuditLog({
+      action: 'SECURITY_ACCESS_DENIED',
+      actorId: req.user?.id,
+      actorRole: req.user?.role,
+      status: 'failure',
+      details: { method: req.method, statusCode: status },
+    });
   }
 
   if (status >= 500) console.error(err);

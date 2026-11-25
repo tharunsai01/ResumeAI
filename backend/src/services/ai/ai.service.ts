@@ -3,12 +3,27 @@ import { ApiError } from '../../utils/ApiError';
 import { getAIProvider } from './provider';
 import { createNotification } from '../notification.service';
 import { recordAuditLog } from '../audit.service';
+import { scanResumeContent } from '../resume.service';
+import { aiResumeAnalysisSchema, aiJobMatchSchema, aiScreeningSchema } from './types';
 import { calculateProfileCompletion } from '../candidate.service';
 import type {
   AIResumeAnalysisOutput,
   AIJobMatchOutput,
   AICandidateScreeningOutput,
 } from './types';
+
+async function checkResumeSafety(text: string, flagged: boolean, actorId: string, role: 'candidate' | 'recruiter', resumeId: string) {
+  if (!flagged && scanResumeContent(text).isSafe) return;
+  await recordAuditLog({
+    action: 'AI_RESUME_BLOCKED',
+    actorId,
+    actorRole: role,
+    targetType: 'Resume',
+    targetId: resumeId,
+    status: 'failure',
+  });
+  throw ApiError.badRequest('This résumé was flagged for suspicious instructions and cannot be sent to the AI service.');
+}
 
 export async function analyzeResume(
   candidateId: string,
@@ -30,7 +45,8 @@ export async function analyzeResume(
     );
   }
 
-  const analysis = await provider.analyzeResume(resume.rawText);
+  await checkResumeSafety(resume.rawText, resume.securityResult?.isSafe === false, candidateId, 'candidate', resumeId);
+  const analysis = aiResumeAnalysisSchema.parse(await provider.analyzeResume(resume.rawText));
 
   // Persist analysis onto resume document
   resume.aiAnalysis = {
@@ -93,13 +109,14 @@ export async function matchResumeToJob(
     throw ApiError.badRequest('This job is not currently open for matching');
   }
 
-  return provider.matchJob(resume.rawText, {
+  await checkResumeSafety(resume.rawText, resume.securityResult?.isSafe === false, candidateId, 'candidate', resumeId);
+  return aiJobMatchSchema.parse(await provider.matchJob(resume.rawText, {
     title: job.title,
     description: job.description,
     requiredSkills: job.requiredSkills || [],
     niceToHaveSkills: job.niceToHaveSkills || [],
     minExperienceYears: job.minExperienceYears || 0,
-  });
+  }));
 }
 
 export async function screenCandidateApplication(
@@ -132,8 +149,12 @@ export async function screenCandidateApplication(
     throw ApiError.badRequest('Applicant resume text is unavailable or insufficient for screening');
   }
 
+  await checkResumeSafety(
+    [resumeText, application.coverLetter].filter(Boolean).join('\n'),
+    resume.securityResult?.isSafe === false, recruiterId, 'recruiter', resume._id.toString(),
+  );
   const job = application.job as any;
-  const screening: AICandidateScreeningOutput = await provider.screenCandidate(
+  const screening: AICandidateScreeningOutput = aiScreeningSchema.parse(await provider.screenCandidate(
     resumeText,
     {
       title: job.title,
@@ -142,7 +163,7 @@ export async function screenCandidateApplication(
       minExperienceYears: job.minExperienceYears || 0,
     },
     { coverLetter: application.coverLetter || undefined },
-  );
+  ));
 
   const threshold = job.screening?.threshold ?? 80;
   const meetsThreshold = screening.overallScore >= threshold;

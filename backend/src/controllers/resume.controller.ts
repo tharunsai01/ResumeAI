@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import * as resumeService from '../services/resume.service';
 import { sendSuccess } from '../utils/apiResponse';
 import { ApiError } from '../utils/ApiError';
-import { Resume, Application } from '../models';
+import { Resume } from '../models';
 
 export async function uploadResume(req: Request, res: Response) {
   if (!req.user?.id) throw ApiError.unauthorized('Authentication required');
@@ -33,12 +33,9 @@ export async function getResume(req: Request, res: Response) {
     return sendSuccess(res, resume);
   }
 
-  if (req.user.role === 'recruiter') {
-    const app = await Application.findOne({ resume: resumeId }).populate('job');
-    const jobRecruiter = (app?.job as any)?.recruiter?.toString();
-    if (jobRecruiter !== req.user.id) {
-      throw ApiError.forbidden('You do not have permission to view this resume');
-    }
+  if (req.user.role !== 'admin' &&
+      !(req.user.role === 'recruiter' && await resumeService.recruiterCanAccessResume(req.user.id, resumeId))) {
+    throw ApiError.forbidden('You do not have permission to view this resume');
   }
 
   const resume = await Resume.findById(resumeId);

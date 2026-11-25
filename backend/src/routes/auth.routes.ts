@@ -26,6 +26,16 @@ const authLimiter = rateLimit({
   message: { success: false, error: { message: 'Too many attempts, please try again later' } },
 });
 
+// Keep login attempts from consuming the budget for other auth operations.
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  skip: () => !isProd,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { success: false, error: { message: 'Too many login attempts, please try again later' } },
+});
+
 // Anything that sends an email: stops email bombing
 const emailLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -39,7 +49,7 @@ const emailLimiter = rateLimit({
 
 
 router.post('/register', authLimiter, validate(registerSchema), ctrl.register);
-router.post('/login', authLimiter, validate(loginSchema), ctrl.login);
+router.post('/login', loginLimiter, validate(loginSchema), ctrl.login);
 router.post('/refresh', ctrl.refresh);
 router.post('/logout', ctrl.logout);
 router.get('/me', authenticate, ctrl.me);

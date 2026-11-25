@@ -1,3 +1,4 @@
+import { escapeRegex } from '../utils/escapeRegex';
 import { Skill } from '../models';
 import { ApiError } from '../utils/ApiError';
 import { recordAuditLog } from './audit.service';
@@ -69,7 +70,7 @@ export async function listSkillsForAdmin(query: {
     filter.isUnknown = String(query.isUnknown) === 'true';
   }
   if (query.search) {
-    const s = new RegExp(query.search.trim(), 'i');
+    const s = new RegExp(escapeRegex(query.search.trim()), 'i');
     filter.$or = [{ name: s }, { category: s }, { synonyms: { $in: [s] } }];
   }
 
@@ -89,7 +90,7 @@ export async function addSkill(
   },
 ) {
   const existing = await Skill.findOne({
-    name: { $regex: `^${data.name.trim()}$`, $options: 'i' },
+    name: { $regex: `^${escapeRegex(data.name.trim())}$`, $options: 'i' },
   });
   if (existing) {
     throw ApiError.conflict(`Skill "${data.name}" already exists in taxonomy`);
