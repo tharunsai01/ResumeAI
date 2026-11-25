@@ -1,0 +1,85 @@
+{
+  "info": {
+    "name": "HireSmart Security Demo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:35173"
+    },
+    {
+      "key": "candidateToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2FuZGlkYXRlIiwiaWF0IjoxNzk1NTgyODE2LCJleHAiOjE3OTU1ODM3MTYsInN1YiI6IjZiMDU5ZDMwZmQxN2JmNmNhMDFhMzQ5ZCJ9.fWcCioexvVXM3Axu0YjlEVp7-0Z-xiVGqyPz-tXg_GM"
+    }
+  ],
+  "item": [
+    {
+      "name": "Anonymous admin request",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/admin/stats"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Helmet sends nosniff\", () => pm.expect(pm.response.headers.get(\"X-Content-Type-Options\")).to.equal(\"nosniff\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Candidate blocked from admin API",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/admin/stats",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{candidateToken}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Malformed r\u00e9sum\u00e9 ID rejected",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/resumes/not-an-id/status",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{candidateToken}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
