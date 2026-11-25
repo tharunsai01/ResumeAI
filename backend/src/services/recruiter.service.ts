@@ -1,3 +1,4 @@
+import { escapeRegex } from '../utils/escapeRegex';
 import {
   RecruiterProfile,
   Job,
@@ -130,20 +131,28 @@ export async function searchCandidates(
   recruiterId: string,
   query: { skills?: string; minExperience?: number; location?: string; search?: string },
 ) {
-  // Find candidates with profiles
-  const filter: any = {};
+  const jobs = await Job.find({ recruiter: recruiterId }).select('_id').lean();
+  const applications = await Application.find({ job: { $in: jobs.map(job => job._id) } })
+    .select('candidate resume').sort({ createdAt: -1 })
+    .populate('resume', 'aiAnalysis');
+  const resumesByCandidate = new Map();
+  for (const application of applications) {
+    const candidateId = application.candidate.toString();
+    if (!resumesByCandidate.has(candidateId)) resumesByCandidate.set(candidateId, application.resume);
+  }
+  const filter: any = { user: { $in: [...resumesByCandidate.keys()] } };
 
   if (query.skills) {
-    const skillsArr = query.skills.split(',').map((s) => new RegExp(s.trim(), 'i'));
+    const skillsArr = query.skills.split(',').map((s) => new RegExp(escapeRegex(s.trim()), 'i'));
     filter.skills = { $in: skillsArr };
   }
 
   if (query.location) {
-    filter.location = { $regex: query.location.trim(), $options: 'i' };
+    filter.location = { $regex: escapeRegex(query.location.trim()), $options: 'i' };
   }
 
   if (query.search) {
-    const sRegex = new RegExp(query.search.trim(), 'i');
+    const sRegex = new RegExp(escapeRegex(query.search.trim()), 'i');
     filter.$or = [
       { headline: sRegex },
       { summary: sRegex },
@@ -154,12 +163,11 @@ export async function searchCandidates(
 
   const profiles = await CandidateProfile.find(filter)
     .populate('user', 'fullName email isVerified status createdAt')
-    .populate('resume', 'fileName fileUrl aiAnalysis parsedData')
     .limit(50);
 
   return profiles.map((p) => {
     const u = p.user as any;
-    const r = p.resume as any;
+    const r = u?._id ? resumesByCandidate.get(u._id.toString()) : undefined;
     return {
       id: p.user?._id || p._id,
       name: u?.fullName || 'Candidate',
@@ -183,24 +191,22 @@ export async function searchCandidates(
 }
 
 export async function getCandidateDetailsForRecruiter(recruiterId: string, candidateId: string) {
-  const profile = await CandidateProfile.findOne({ user: candidateId })
-    .populate('user', 'fullName email isVerified status createdAt')
-    .populate('resume', 'fileName fileUrl aiAnalysis parsedData');
-
-  if (!profile) {
-    throw ApiError.notFound('Candidate profile not found');
-  }
-
-  // Also look up any applications submitted to this recruiter's jobs
-  const recruiterJobs = await Job.find({ recruiter: recruiterId }).select('_id');
-  const jobIds = recruiterJobs.map((j) => j._id);
+  const jobs = await Job.find({ recruiter: recruiterId }).select('_id').lean();
   const applications = await Application.find({
     candidate: candidateId,
-    job: { $in: jobIds },
-  }).populate('job', 'title status').populate('matchResult');
+    job: { $in: jobs.map(job => job._id) },
+  }).sort({ createdAt: -1 }).populate('job', 'title status').populate('matchResult')
+    .populate('resume', 'fileName fileUrl aiAnalysis parsedData');
+
+  if (!applications.length) throw ApiError.notFound('Candidate profile not found');
+
+  const profile = await CandidateProfile.findOne({ user: candidateId })
+    .populate('user', 'fullName email isVerified status createdAt')
+    .lean();
+  if (!profile) throw ApiError.notFound('Candidate profile not found');
 
   return {
-    profile,
+    profile: { ...profile, resume: applications[0].resume },
     applications,
   };
 }

@@ -1,0 +1,15 @@
+# Use this overlay with a new project/database volume.
+services:
+  mongodb:
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: hiresmart_root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD}
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:?Set MONGO_APP_PASSWORD}
+    volumes:
+      - mongodb_secure_data:/data/db
+      - ./deploy/mongodb/init-app-user.js:/docker-entrypoint-initdb.d/10-app-user.js:ro
+  backend:
+    environment:
+      MONGODB_URI: mongodb://hiresmart_app:${MONGO_APP_PASSWORD:?Set MONGO_APP_PASSWORD}@mongodb:27017/hiresmart?authSource=hiresmart
+volumes:
+  mongodb_secure_data:

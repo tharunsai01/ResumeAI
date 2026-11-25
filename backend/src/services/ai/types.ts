@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const aiResumeAnalysisSchema = z.object({
+export const aiResumeAnalysisSchema = z.strictObject({
   summary: z.string().min(10),
   provider: z.string().optional(),
   qualityScore: z.number().min(0).max(100),
@@ -60,7 +60,7 @@ export const aiResumeAnalysisSchema = z.object({
     .default([]),
 });
 
-export const aiJobMatchSchema = z.object({
+export const aiJobMatchSchema = z.strictObject({
   overallScore: z.number().min(0).max(100),
   skillMatchPercentage: z.number().min(0).max(100),
   experienceMatch: z.number().min(0).max(100).nullish(),
@@ -75,7 +75,7 @@ export const aiJobMatchSchema = z.object({
   explanation: z.string(),
 });
 
-export const aiScreeningSchema = z.object({
+export const aiScreeningSchema = z.strictObject({
   overallScore: z.number().min(0).max(100),
   skillsScore: z.number().min(0).max(100),
   experienceScore: z.number().min(0).max(100),

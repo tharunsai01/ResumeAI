@@ -1,3 +1,4 @@
+import { escapeRegex } from '../utils/escapeRegex';
 import mongoose from 'mongoose';
 import {
   User,
@@ -135,7 +136,7 @@ export async function getAdminUsers(options: {
   if (options.role) query.role = options.role;
   if (options.status) query.status = options.status;
   if (options.search) {
-    const regex = new RegExp(options.search.trim(), 'i');
+    const regex = new RegExp(escapeRegex(options.search.trim()), 'i');
     query.$or = [{ fullName: regex }, { email: regex }];
   }
 
@@ -222,7 +223,7 @@ export async function getAdminJobs(options: {
   const query: Record<string, any> = {};
   if (options.status) query.status = options.status;
   if (options.search) {
-    const regex = new RegExp(options.search.trim(), 'i');
+    const regex = new RegExp(escapeRegex(options.search.trim()), 'i');
     query.$or = [{ title: regex }, { companyName: regex }];
   }
 
@@ -286,7 +287,7 @@ export async function getAuditLogs(options: {
 
   const query: any = {};
   if (options.action) query.action = options.action;
-  if (options.actorEmail) query.actorEmail = { $regex: options.actorEmail.trim(), $options: 'i' };
+  if (options.actorEmail) query.actorEmail = { $regex: escapeRegex(options.actorEmail.trim()), $options: 'i' };
   if (options.status) query.status = options.status;
 
   const [logs, total] = await Promise.all([

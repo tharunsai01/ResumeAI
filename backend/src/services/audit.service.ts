@@ -47,12 +47,18 @@ function sanitizePayload(obj: Record<string, any>): Record<string, any> {
   for (const [key, value] of Object.entries(obj)) {
     if (sensitiveKeys.some((k) => key.toLowerCase().includes(k.toLowerCase()))) {
       sanitized[key] = '[REDACTED]';
-    } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      sanitized[key] = sanitizePayload(value);
+    } else if (typeof value === 'object' && value !== null) {
+      sanitized[key] = sanitizeValue(value);
     } else {
       sanitized[key] = value;
     }
   }
 
   return sanitized;
+}
+
+function sanitizeValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sanitizeValue);
+  if (value && typeof value === 'object') return sanitizePayload(value as Record<string, unknown>);
+  return value;
 }

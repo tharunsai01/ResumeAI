@@ -1,3 +1,4 @@
+import { escapeRegex } from '../utils/escapeRegex';
 import { Job, Application, MatchResult } from '../models';
 import { ApiError } from '../utils/ApiError';
 import { recordAuditLog } from './audit.service';
@@ -209,11 +210,11 @@ export async function searchJobs(query: JobQueryInput) {
     filter.minExperienceYears = { $lte: query.minExperience };
   }
   if (query.location) {
-    filter.location = { $regex: query.location, $options: 'i' };
+    filter.location = { $regex: escapeRegex(query.location), $options: 'i' };
   }
 
   if (query.search) {
-    const sRegex = new RegExp(query.search.trim(), 'i');
+    const sRegex = new RegExp(escapeRegex(query.search.trim()), 'i');
     filter.$or = [
       { title: sRegex },
       { description: sRegex },

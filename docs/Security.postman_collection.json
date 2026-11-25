@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "HireSmart Security Demo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "13b01e4a-a8f8-423f-92bc-ad7c445677da"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:35173"
+    },
+    {
+      "key": "candidateToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Anonymous admin request",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "stats"
+          ]
+        },
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Helmet sends nosniff\", () => pm.expect(pm.response.headers.get(\"X-Content-Type-Options\")).to.equal(\"nosniff\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Candidate blocked from admin API",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "stats"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{candidateToken}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Malformed r\u00e9sum\u00e9 ID rejected",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/resumes/not-an-id/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "resumes",
+            "not-an-id",
+            "status"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{candidateToken}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

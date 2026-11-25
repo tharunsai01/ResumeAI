@@ -59,7 +59,7 @@ export async function addNote(req: Request, res: Response) {
   const application = await applicationService.addRecruiterNote(
     req.user.id,
     req.params.id as string,
-    req.body.note || req.body.notes || '',
+    req.body.note,
   );
   sendSuccess(res, application);
 }

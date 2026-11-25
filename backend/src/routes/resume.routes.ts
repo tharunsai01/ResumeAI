@@ -2,6 +2,8 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import multer from 'multer';
 import * as ctrl from '../controllers/resume.controller';
 import { authenticate, authorize } from '../middleware/auth';
+import { validate } from '../middleware/validate';
+import { recordIdParamSchema } from '../validators/recordId.validators';
 import { ApiError } from '../utils/ApiError';
 
 const router = Router();
@@ -38,13 +40,13 @@ router.post('/', authorize('candidate'), handleUploadMiddleware, ctrl.uploadResu
 router.post('/upload', authorize('candidate'), handleUploadMiddleware, ctrl.uploadResume);
 router.get('/', authorize('candidate'), ctrl.listResumes);
 router.get('/active', authorize('candidate'), ctrl.getActiveResume);
-router.patch('/:id/active', authorize('candidate'), ctrl.setActiveResume);
-router.post('/:id/activate', authorize('candidate'), ctrl.setActiveResume);
-router.delete('/:id', authorize('candidate'), ctrl.deleteResume);
+router.patch('/:id/active', authorize('candidate'), validate(recordIdParamSchema, 'params'), ctrl.setActiveResume);
+router.post('/:id/activate', authorize('candidate'), validate(recordIdParamSchema, 'params'), ctrl.setActiveResume);
+router.delete('/:id', authorize('candidate'), validate(recordIdParamSchema, 'params'), ctrl.deleteResume);
 
 // Accessible by candidate owner or authorized recruiter or admin
-router.get('/:id', ctrl.getResume);
-router.get('/:id/status', ctrl.getResumeStatus);
-router.get('/:id/download', ctrl.downloadResume);
+router.get('/:id', validate(recordIdParamSchema, 'params'), ctrl.getResume);
+router.get('/:id/status', validate(recordIdParamSchema, 'params'), ctrl.getResumeStatus);
+router.get('/:id/download', validate(recordIdParamSchema, 'params'), ctrl.downloadResume);
 
 export default router;

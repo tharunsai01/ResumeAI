@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import JSZip from 'jszip';
 import { Resume, CandidateProfile, Application, Job } from '../models';
 import { ApiError } from '../utils/ApiError';
 import { detectMimeFromBuffer } from '../utils/fileValidation';
@@ -16,7 +17,7 @@ function ensureUploadDirExists() {
   }
 }
 
-function scanResumeContent(text: string): { isSafe: boolean; flags: string[] } {
+export function scanResumeContent(text: string): { isSafe: boolean; flags: string[] } {
   const flags: string[] = [];
   const suspiciousPatterns = [
     /ignore\s+(?:all\s+)?(?:previous|prior)\s+instructions/i,
@@ -36,6 +37,13 @@ function scanResumeContent(text: string): { isSafe: boolean; flags: string[] } {
   return { isSafe: flags.length === 0, flags };
 }
 
+function storedResumePath(fileName: string): string {
+  if (!/^[a-zA-Z0-9_-]+\.(pdf|docx)$/.test(fileName)) {
+    throw ApiError.notFound('Resume file unavailable');
+  }
+  return path.join(UPLOAD_DIR, fileName);
+}
+
 export async function uploadResumeFile(
   candidateId: string,
   file: Express.Multer.File | undefined,
@@ -52,10 +60,18 @@ export async function uploadResumeFile(
 
   // 2. Validate real file signature (magic bytes)
   const detectedMime = detectMimeFromBuffer(file.buffer);
-  if (!detectedMime) {
+  const expectedExtension = detectedMime === 'application/pdf' ? '.pdf' : '.docx';
+  if (!detectedMime || path.extname(file.originalname).toLowerCase() !== expectedExtension) {
     throw ApiError.badRequest(
       'Invalid file format. Only authentic PDF and DOCX files are accepted.',
     );
+  }
+
+  if (expectedExtension === '.docx') {
+    const archive = await JSZip.loadAsync(file.buffer).catch(() => null);
+    if (!archive?.file('[Content_Types].xml') || !archive.file('word/document.xml')) {
+      throw ApiError.badRequest('The upload is not a valid DOCX document');
+    }
   }
 
   // 3. Compute SHA-256 hash for duplicate detection and caching
@@ -66,11 +82,13 @@ export async function uploadResumeFile(
   // 4. Generate safe unguessable storage filename
   const ext = detectedMime === 'application/pdf' ? '.pdf' : '.docx';
   const storedFileName = `${crypto.randomUUID()}-${Date.now()}${ext}`;
-  const diskPath = path.join(UPLOAD_DIR, storedFileName);
+  const diskPath = storedResumePath(storedFileName);
 
+  let fileWritten = false;
   try {
     // 5. Save file to disk
-    await fs.promises.writeFile(diskPath, file.buffer);
+    await fs.promises.writeFile(diskPath, file.buffer, { mode: 0o600, flag: 'wx' });
+    fileWritten = true;
 
     // 6. Extract text
     let rawText = '';
@@ -124,7 +142,7 @@ export async function uploadResumeFile(
         version: '1.0.0',
       },
       parseStatus,
-      analysisStatus: parseStatus === 'done' ? 'pending' : 'failed',
+      analysisStatus: parseStatus === 'done' && securityResult.isSafe ? 'pending' : 'failed',
       parseError,
       isActive: true,
     });
@@ -160,7 +178,7 @@ export async function uploadResumeFile(
 
     return resume;
   } catch (err) {
-    if (fs.existsSync(diskPath)) {
+    if (fileWritten) {
       try {
         await fs.promises.unlink(diskPath);
       } catch {}
@@ -205,7 +223,7 @@ export async function deleteCandidateResume(candidateId: string, resumeId: strin
   }
 
   if (resume.storedFileName) {
-    const diskPath = path.join(UPLOAD_DIR, resume.storedFileName);
+    const diskPath = storedResumePath(resume.storedFileName);
     if (fs.existsSync(diskPath)) {
       try {
         await fs.promises.unlink(diskPath);
@@ -242,6 +260,12 @@ export async function deleteCandidateResume(candidateId: string, resumeId: strin
   return { message: 'Resume deleted successfully' };
 }
 
+// A résumé may be attached to applications owned by more than one recruiter.
+export async function recruiterCanAccessResume(recruiterId: string, resumeId: string) {
+  const jobs = await Job.find({ recruiter: recruiterId }).select('_id').lean();
+  return Boolean(await Application.exists({ resume: resumeId, job: { $in: jobs.map(job => job._id) } }));
+}
+
 export async function getResumeFilePath(
   userId: string,
   userRole: string,
@@ -258,9 +282,7 @@ export async function getResumeFilePath(
       throw ApiError.forbidden('You do not have access to view this resume');
     }
   } else if (userRole === 'recruiter') {
-    const authorizedApp = await Application.findOne({ resume: resumeId }).populate('job');
-    const jobRecruiter = (authorizedApp?.job as any)?.recruiter?.toString();
-    if (jobRecruiter !== userId) {
+    if (!(await recruiterCanAccessResume(userId, resumeId))) {
       throw ApiError.forbidden('You do not have permission to view resumes outside your job applicants');
     }
   } else if (userRole !== 'admin') {
@@ -271,8 +293,9 @@ export async function getResumeFilePath(
     throw ApiError.notFound('Physical file not available');
   }
 
-  const diskPath = path.join(UPLOAD_DIR, resume.storedFileName);
-  if (!fs.existsSync(diskPath)) {
+  const diskPath = storedResumePath(resume.storedFileName);
+  const storedFile = await fs.promises.lstat(diskPath).catch(() => null);
+  if (!storedFile?.isFile()) {
     throw ApiError.notFound('Resume file missing on storage server');
   }
 
