@@ -10,7 +10,7 @@ import { ComplaintFilters } from "../../components/admin/complaints/ComplaintFil
 import { ComplaintTable } from "../../components/admin/complaints/ComplaintTable"
 
 export default function AdminComplaints() {
-  const { complaints } = useAdminComplaints()
+  const { complaints, loading, loadError } = useAdminComplaints()
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("")
@@ -69,9 +69,13 @@ export default function AdminComplaints() {
 
   const handleExport = () => {
     const headers = ["Complaint ID,Subject,Submitted By,Role,Category,Priority,Status,Created,Updated"]
-    const rows = filteredComplaints.map(c => 
-      `"${c.id}","${c.subject.replace(/"/g, '""')}","${c.submittedBy.name}","${c.role}","${c.category}","${c.priority}","${c.status}","${c.createdAt}","${c.updatedAt}"`
-    )
+    const quote = (value: string) => {
+      const safe = /^\s*[=+@-]|^[\t\r\n]/.test(value) ? "'" + value : value
+      return '"' + safe.replaceAll('"', '""') + '"'
+    }
+    const rows = filteredComplaints.map(c => [
+      c.id, c.subject, c.submittedBy.name, c.role, c.category, c.priority, c.status, c.createdAt, c.updatedAt,
+    ].map(quote).join(","))
     const csvContent = headers.concat(rows).join("\n")
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement("a")
@@ -116,7 +120,7 @@ export default function AdminComplaints() {
         onReset={handleResetFilters}
       />
 
-      {filteredComplaints.length === 0 ? (
+      {loading ? <p role="status">Loading complaints…</p> : loadError ? <p role="alert">{loadError}</p> : filteredComplaints.length === 0 ? (
         <AdminEmptyState 
           icon={SearchX}
           title="No complaints found"

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { env } from "../../config/env"
 import { useParams, useNavigate } from "react-router-dom"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
@@ -13,12 +14,15 @@ import SpotlightCard from "../../components/ui/SpotlightCard";
 export default function AdminComplaintDetails() {
   const { complaintId } = useParams()
   const navigate = useNavigate()
-  const { getComplaintById, updateComplaintStatus, updateComplaintPriority, addInternalNote } = useAdminComplaints()
+  const { loading, loadError, getComplaintById, updateComplaintStatus, updateComplaintPriority, addInternalNote } = useAdminComplaints()
 
   const complaint = complaintId ? getComplaintById(complaintId) : undefined
 
   const [notes, setNotes] = useState("")
   const [resolutionNoteError, setResolutionNoteError] = useState(false)
+
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState("")
 
   // Toast
   const [toastMsg, setToastMsg] = useState<string | null>(null)
@@ -34,8 +38,8 @@ export default function AdminComplaintDetails() {
         <AdminPageHeader title="Complaint Details" />
         <AdminEmptyState 
           icon={MessageSquareX}
-          title="Complaint Not Found"
-          description="The requested complaint could not be found. The ID might be incorrect."
+          title={loading ? "Loading complaint…" : loadError ? "Could not load complaint" : "Complaint Not Found"}
+          description={loadError || (loading ? "" : "The requested complaint could not be found.")}
           action={
             <button 
               onClick={() => navigate('/admin/complaints')}
@@ -49,7 +53,7 @@ export default function AdminComplaintDetails() {
     )
   }
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value as ComplaintStatus
     
     if (newStatus === "Resolved") {
@@ -60,7 +64,16 @@ export default function AdminComplaintDetails() {
     }
     
     setResolutionNoteError(false)
-    updateComplaintStatus(complaint.id, newStatus, newStatus === "Resolved" ? notes : undefined)
+    setSaveError("")
+    setSaving(true)
+    try {
+      await updateComplaintStatus(complaint.id, newStatus, newStatus === "Resolved" ? notes.trim() : undefined)
+    } catch {
+      setSaveError("Unable to save the complaint status. Please try again.")
+      return
+    } finally {
+      setSaving(false)
+    }
     
     if (newStatus === "Resolved") {
       setNotes("") // Clear after successful resolution
@@ -143,6 +156,7 @@ export default function AdminComplaintDetails() {
             <select 
               value={complaint.priority} 
               onChange={handlePriorityChange}
+              disabled={!env.useMock}
               className="text-sm font-medium bg-brand-light border border-brand-gray/30 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-indigo w-full"
             >
               <option value="Low">Low</option>
@@ -156,6 +170,8 @@ export default function AdminComplaintDetails() {
             <select 
               value={complaint.status} 
               onChange={handleStatusChange}
+              disabled={saving}
+              aria-label="Complaint status"
               className="text-sm font-medium bg-brand-light border border-brand-gray/30 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-indigo w-full"
             >
               <option value="Open">Open</option>
@@ -166,6 +182,8 @@ export default function AdminComplaintDetails() {
           </div>
         </div>
       </SpotlightCard>
+
+      {saveError && <p role="alert" className="mb-4 text-semantic-error">{saveError}</p>}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2 space-y-6">
@@ -190,25 +208,25 @@ export default function AdminComplaintDetails() {
                   </div>
                   <p className="text-brand-navy/80 mb-3">{complaint.resolutionNotes}</p>
                   <div className="text-xs text-brand-navy/60">
-                    Resolved by {complaint.resolvedBy} on {complaint.resolvedAt}
+                    {complaint.resolvedBy && <>Resolved by {complaint.resolvedBy} </>}{complaint.resolvedAt}
                   </div>
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium text-brand-navy mb-2">Internal Admin Notes</label>
+                  <label className="block text-sm font-medium text-brand-navy mb-2">{env.useMock ? "Internal Admin Notes" : "Resolution notes"}</label>
                   <textarea
                     value={notes}
                     onChange={(e) => {
                       setNotes(e.target.value)
                       if (e.target.value.trim()) setResolutionNoteError(false)
                     }}
-                    placeholder="Add resolution notes or internal updates..."
+                    placeholder={env.useMock ? "Add resolution notes or internal updates..." : "Add a response before marking this complaint as resolved"}
                     className={`w-full h-32 px-4 py-3 bg-white border ${resolutionNoteError ? 'border-semantic-error ring-1 ring-semantic-error' : 'border-brand-gray/30'} rounded-lg text-sm text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-indigo/50 resize-none mb-2`}
                   />
                   {resolutionNoteError && (
                     <p className="text-sm text-semantic-error mb-3">Please add a resolution note before marking this complaint as resolved.</p>
                   )}
-                  <div className="flex sm:justify-end">
+                  {env.useMock && <div className="flex sm:justify-end">
                     <button 
                       onClick={handleAddNote}
                       disabled={!notes.trim()}
@@ -216,7 +234,7 @@ export default function AdminComplaintDetails() {
                     >
                       Save Notes
                     </button>
-                  </div>
+                  </div>}
                 </div>
               )}
             </PremiumCardContent>

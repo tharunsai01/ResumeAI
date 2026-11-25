@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 import { env } from "../../config/env";
-import { httpClient } from "../../services/api/httpClient";
+import { complaintService } from "../../services/complaintService"
 
 let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
@@ -33,7 +33,7 @@ type ComplaintType =
 
 interface Report {
   id: string
-  type: ComplaintType
+  type: string
   subject: string
   date: string
   status: "Submitted" | "Under Review" | "Resolved"
@@ -51,6 +51,30 @@ const COMPLAINT_TYPES: ComplaintType[] = [
   "Harassment or Inappropriate Communication",
   "Other"
 ]
+
+const REPORT_CATEGORIES: Record<ComplaintType, string> = {
+  "Suspicious Job Posting": "safety",
+  "Suspicious Recruiter": "safety",
+  "Job Matching Issue": "ai_screening",
+  "Resume Analysis Issue": "resume",
+  "Application Issue": "job_posting",
+  "Incorrect Job Information": "job_posting",
+  "Privacy Concern": "safety",
+  "Technical Problem": "technical",
+  "Harassment or Inappropriate Communication": "safety",
+  Other: "other",
+}
+
+function toReport(record: Awaited<ReturnType<typeof complaintService.submit>>): Report {
+  return {
+    id: record._id,
+    subject: record.title || "Complaint",
+    date: new Date(record.createdAt).toLocaleDateString(),
+    type: record.category.replaceAll("_", " "),
+    status: ["resolved", "closed", "dismissed"].includes(record.status)
+      ? "Resolved" : record.status === "open" ? "Submitted" : "Under Review",
+  }
+}
 
 export default function ComplaintPage() {
   const navigate = useNavigate()
@@ -72,6 +96,7 @@ export default function ComplaintPage() {
 
   // History State
   const [reports, setReports] = React.useState<Report[]>(() => {
+    if (!env.useMock) return []
     const saved = localStorage.getItem("hiresmart_reports")
     if (saved) {
       try {
@@ -82,6 +107,22 @@ export default function ComplaintPage() {
     }
     return []
   })
+
+  const [historyError, setHistoryError] = React.useState("")
+  React.useEffect(() => {
+    if (env.useMock) return
+    let active = true
+    complaintService.listMine().then(items => {
+      if (!active) return
+      setReports(current => {
+        const ids = new Set(current.map(item => item.id))
+        return [...current, ...items.filter(item => !ids.has(item._id)).map(toReport)]
+      })
+    }).catch(() => {
+      if (active) setHistoryError("Unable to load your complaint history. Refresh to retry.")
+    })
+    return () => { active = false }
+  }, [])
 
   const handleDynamicChange = (field: string, value: string) => {
     setDynamicFields(prev => ({ ...prev, [field]: value }))
@@ -99,7 +140,7 @@ export default function ComplaintPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!selectedType) {
@@ -114,32 +155,31 @@ export default function ComplaintPage() {
     setError("")
     setIsSubmitting(true)
 
-    const newId = `HS-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`
-    const newReport: Report = {
-      id: newId,
-      type: selectedType,
-      subject,
-      date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-      status: "Submitted"
+    try {
+      if (env.useMock) {
+        const report: Report = {
+          id: `HS-${crypto.randomUUID()}`, type: selectedType, subject,
+          date: new Date().toLocaleDateString(), status: "Submitted",
+        }
+        const updated = [report, ...reports]
+        setReports(updated)
+        localStorage.setItem("hiresmart_reports", JSON.stringify(updated))
+        setGeneratedId(report.id)
+      } else {
+        const details = Object.entries(dynamicFields)
+          .filter(([, value]) => value.trim())
+          .map(([field, value]) => `${field}: ${value.trim()}`)
+        const body = [`${selectedType}\n\n${description.trim()}`, ...details].join("\n")
+        const record = await complaintService.submit(subject.trim(), body, REPORT_CATEGORIES[selectedType])
+        setReports(previous => [toReport(record), ...previous.filter(report => report.id !== record._id)])
+        setGeneratedId(record._id)
+      }
+      setIsSuccess(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to submit the complaint. Please try again.")
+    } finally {
+      setIsSubmitting(false)
     }
-    
-    const updatedReports = [newReport, ...reports]
-    setReports(updatedReports)
-    localStorage.setItem("hiresmart_reports", JSON.stringify(updatedReports))
-    
-    if (!env.useMock) {
-      httpClient.post("/complaints", {
-        title: subject,
-        description,
-        category: "technical",
-      }).catch((err) => {
-        console.warn("[CandidateComplaint] Live submit warning:", err)
-      })
-    }
-
-    setGeneratedId(newId)
-    setIsSubmitting(false)
-    setIsSuccess(true)
   }
   const showSafetyPanel = selectedType === "Suspicious Job Posting" || selectedType === "Suspicious Recruiter"
 
@@ -362,7 +402,7 @@ export default function ComplaintPage() {
                         required
                       />
                     </div>
-                    <div>
+                    {env.useMock && <div>
                       <label className="block text-xs font-semibold text-brand-navy/60 mb-1.5 uppercase">Attachment (Optional)</label>
                       <div className="border-2 border-dashed border-brand-gray/80 hover:border-brand-indigo/50 transition-colors rounded-xl p-6 flex flex-col items-center justify-center bg-brand-light/50 group cursor-pointer relative">
                         <input 
@@ -377,7 +417,7 @@ export default function ComplaintPage() {
                         </p>
                         <p className="text-xs text-brand-navy/50 mt-1">PDF, PNG, JPG up to 5MB</p>
                       </div>
-                    </div>
+                    </div>}
 
                     {error && (
                       <div className="p-3 bg-semantic-error/10 border border-semantic-error/20 text-semantic-error rounded-lg flex items-center gap-2 text-sm font-medium">
@@ -411,7 +451,7 @@ export default function ComplaintPage() {
                 <PremiumCardDescription>Your recent support requests</PremiumCardDescription>
               </PremiumCardHeader>
               <PremiumCardContent className="p-0">
-                {reports.length === 0 ? (
+                {historyError ? <p role="alert">{historyError}</p> : reports.length === 0 ? (
                   <div className="p-8 text-center text-brand-navy/50">
                     <FileText className="w-8 h-8 mx-auto mb-2 text-brand-navy/20" />
                     <p className="font-medium text-sm">No reports filed</p>

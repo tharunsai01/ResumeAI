@@ -61,7 +61,7 @@ export interface AdminComplaint {
     email: string
     id: string
   }
-  role: "Candidate" | "Recruiter"
+  role: "Candidate" | "Recruiter" | "Admin"
   category: ComplaintCategory
   priority: ComplaintPriority
   status: ComplaintStatus
