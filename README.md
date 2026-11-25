@@ -215,7 +215,8 @@ PORT=5000
 NODE_ENV=development
 MONGODB_URI=mongodb://127.0.0.1:27017/hiresmart
 CLIENT_URL=http://localhost:5173
-JWT_ACCESS_SECRET=hiresmart_super_secure_jwt_access_secret_key_2026_at_least_32_chars
+# Use a unique value from openssl rand -hex 32
+JWT_ACCESS_SECRET=
 JWT_ACCESS_MINUTES=15
 JWT_REFRESH_DAYS=7
 
