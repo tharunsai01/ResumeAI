@@ -1,7 +1,8 @@
 {
   "info": {
     "name": "HireSmart Security Demo",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "13b01e4a-a8f8-423f-92bc-ad7c445677da"
   },
   "variable": [
     {
@@ -10,7 +11,7 @@
     },
     {
       "key": "candidateToken",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2FuZGlkYXRlIiwiaWF0IjoxNzk1NTgyODE2LCJleHAiOjE3OTU1ODM3MTYsInN1YiI6IjZiMDU5ZDMwZmQxN2JmNmNhMDFhMzQ5ZCJ9.fWcCioexvVXM3Axu0YjlEVp7-0Z-xiVGqyPz-tXg_GM"
+      "value": ""
     }
   ],
   "item": [
@@ -18,7 +19,19 @@
       "name": "Anonymous admin request",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/v1/admin/stats"
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "stats"
+          ]
+        },
+        "header": []
       },
       "event": [
         {
@@ -37,7 +50,18 @@
       "name": "Candidate blocked from admin API",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/v1/admin/stats",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "stats"
+          ]
+        },
         "header": [
           {
             "key": "Authorization",
@@ -61,7 +85,19 @@
       "name": "Malformed r\u00e9sum\u00e9 ID rejected",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/v1/resumes/not-an-id/status",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/resumes/not-an-id/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "resumes",
+            "not-an-id",
+            "status"
+          ]
+        },
         "header": [
           {
             "key": "Authorization",
