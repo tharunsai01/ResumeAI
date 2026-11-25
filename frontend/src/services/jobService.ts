@@ -15,6 +15,21 @@ export type RecommendedJob = Pick<JobMatchResult, "job" | "overallMatch">
 const STORAGE_KEY = "hiresmart_created_jobs"
 const RECRUITER_STORAGE_KEY = "hiresmart_recruiter_jobs"
 
+function formatJobSalary(salary?: { min?: number; max?: number; currency?: string }): string {
+  if (!salary || (salary.min == null && salary.max == null)) return "Salary not listed"
+
+  const currency = salary.currency?.toUpperCase() || "INR"
+  const formatter = new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
+    style: "currency",
+    currency: /^[A-Z]{3}$/.test(currency) ? currency : "INR",
+    maximumFractionDigits: 0,
+  })
+  const { min, max } = salary
+  if (min == null) return `Up to ${formatter.format(max!)}`
+  if (max == null) return `From ${formatter.format(min)}`
+  return `${formatter.format(min)} – ${formatter.format(max)}`
+}
+
 function mapBackendJobToFrontend(b: any): Job {
   const expLevel: JobExperienceLevel = b.minExperienceYears
     ? (b.minExperienceYears >= 5 ? "5+ Years" : b.minExperienceYears <= 2 ? "0–2 Years" : "2–5 Years")
@@ -26,7 +41,7 @@ function mapBackendJobToFrontend(b: any): Job {
     company: b.companyName || b.company || "HireSmart Partner",
     location: b.location || "Remote",
     category: b.department || "Engineering",
-    salary: b.salaryRange ? `$${b.salaryRange.min ?? 80000} - $${b.salaryRange.max ?? 140000}` : "$90,000 - $130,000",
+    salary: formatJobSalary(b.salary ?? b.salaryRange),
     type: (b.jobType ? (b.jobType.charAt(0).toUpperCase() + b.jobType.slice(1)) : "Full-time") as any,
     experience: expLevel,
     description: b.description || "",
@@ -48,7 +63,7 @@ function mapBackendJobToRecruiterJob(b: any): RecruiterJob {
     workMode: (b.workMode ? (b.workMode.charAt(0).toUpperCase() + b.workMode.slice(1)) : "Remote") as any,
     jobType: (b.jobType ? (b.jobType.charAt(0).toUpperCase() + b.jobType.slice(1)) : "Full-time") as any,
     experience: b.minExperienceYears ? `${b.minExperienceYears}+ Years` : "2–5 Years",
-    salary: b.salaryRange ? `$${b.salaryRange.min} - $${b.salaryRange.max}` : "$100k - $140k",
+    salary: formatJobSalary(b.salary ?? b.salaryRange),
     skills: b.requiredSkills || b.skills || [],
     description: b.description || "",
     status: (b.status === "open" ? "Active" : b.status === "closed" ? "Closed" : "Draft") as any,
