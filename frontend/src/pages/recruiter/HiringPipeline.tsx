@@ -1,3 +1,5 @@
+import { interviewService, type InterviewSchedule } from "../../services/interviewService"
+import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, CheckCircle2, Users, Check, X, ChevronRight, FileText, ArrowRight, RotateCcw } from "lucide-react"
@@ -89,50 +91,52 @@ export default function RecruiterHiringPipeline() {
     setTimeout(() => setToastMsg(null), 3000)
   }
 
-  const handleHire = () => {
-    if (activeCandidate) {
-      const updated = pipelineService.updateCandidateStage(activeCandidate.id, "Hired")
-      if (updated) {
-        setCandidates(pipelineService.getCandidates())
-        showToast(`${activeCandidate.name} marked as hired.`)
-      }
+  const [interviewCandidate, setInterviewCandidate] = React.useState<PipelineCandidate | null>(null)
+
+  const saveStage = async (candidate: PipelineCandidate, stage: PipelineStage) => {
+    try {
+      const result = await pipelineService.updateCandidateStage(candidate.applicationId || candidate.id, stage)
+      if (!result) throw new Error("Application stage could not be refreshed.")
+      setCandidates(list => list.map(item => (item.applicationId || item.id) === (candidate.applicationId || candidate.id) ? result : item))
+      showToast(`${candidate.name} moved to ${stage}.`)
+      return true
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Couldn’t update the stage.")
+      return false
+    }
+  }
+
+  const handleHire = async () => {
+    if (activeCandidate && await saveStage(activeCandidate, "Hired")) {
       setHireModalOpen(false)
       setActiveCandidate(null)
     }
   }
 
-  const handleReject = () => {
-    if (activeCandidate) {
-      const updated = pipelineService.updateCandidateStage(activeCandidate.id, "Rejected")
-      if (updated) {
-        setCandidates(pipelineService.getCandidates())
-        showToast(`${activeCandidate.name} marked as rejected.`)
-      }
+  const handleReject = async () => {
+    if (activeCandidate && await saveStage(activeCandidate, "Rejected")) {
       setRejectModalOpen(false)
       setActiveCandidate(null)
     }
   }
 
-  const handleStageSelect = (cand: PipelineCandidate, newStage: PipelineStage) => {
-    if (cand.stage === newStage) return
-
-    if (newStage === "Hired") {
-      setActiveCandidate(cand)
-      setHireModalOpen(true)
-      return
+  const handleStageSelect = (candidate: PipelineCandidate, stage: PipelineStage) => {
+    if (candidate.stage === stage) return
+    if (stage === "Interview Scheduled") {
+      setInterviewCandidate(candidate)
+    } else if (stage === "Hired" || stage === "Rejected") {
+      setActiveCandidate(candidate)
+      if (stage === "Hired") setHireModalOpen(true)
+      else setRejectModalOpen(true)
+    } else {
+      void saveStage(candidate, stage)
     }
+  }
 
-    if (newStage === "Rejected") {
-      setActiveCandidate(cand)
-      setRejectModalOpen(true)
-      return
-    }
-
-    const updated = pipelineService.updateCandidateStage(cand.id, newStage)
-    if (updated) {
-      setCandidates(pipelineService.getCandidates())
-      showToast(`${cand.name} moved to ${newStage}.`)
-    }
+  const schedule = async (data: InterviewSchedule) => {
+    await interviewService.createRecruiterInterview(data)
+    setCandidates(await pipelineService.fetchLivePipeline())
+    showToast("Interview scheduled.")
   }
 
   const handleFurtherReview = (e: React.MouseEvent) => {
@@ -208,7 +212,7 @@ export default function RecruiterHiringPipeline() {
                   <div className="p-3 flex-1 overflow-y-auto overflow-x-hidden space-y-3 no-scrollbar">
                     {columnCandidates.map(cand => (
                       <SpotlightCard 
-                        key={cand.id} 
+                        key={cand.applicationId || cand.id}
                         className="glass-card p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col"
                         onClick={() => navigate(`/recruiter/candidates/${cand.id}`)}
                       >
@@ -222,7 +226,7 @@ export default function RecruiterHiringPipeline() {
                               <div className="text-[11px] text-brand-navy/60 line-clamp-1">{cand.role}</div>
                             </div>
                           </div>
-                          <CandidateMatchScore score={cand.overallMatch} size="sm" showLabel={false} />
+                          {cand.overallMatch != null && <CandidateMatchScore score={cand.overallMatch} size="sm" showLabel={false} />}
                         </div>
                         
                         <div className="mt-2 flex items-center justify-between">
@@ -237,7 +241,7 @@ export default function RecruiterHiringPipeline() {
                             </Button>
                           ) : (
                             <div className="text-[10px] font-semibold text-brand-navy/40 uppercase tracking-wider">
-                              {cand.experience}
+                              {cand.stage === "Interview Scheduled" && cand.scheduledAt ? new Date(cand.scheduledAt).toLocaleString() : cand.experience}
                             </div>
                           )}
                           <ChevronRight className="w-4 h-4 text-brand-navy/20 group-hover:text-brand-indigo/60 transition-colors" />
@@ -411,7 +415,7 @@ export default function RecruiterHiringPipeline() {
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-brand-navy/60 uppercase tracking-wider mb-0.5">AI Match</div>
-                  <div className="font-bold text-brand-indigo text-xl">{activeCandidate.overallMatch}%</div>
+                  <div className="font-bold text-brand-indigo text-xl">{activeCandidate.overallMatch == null ? "—" : `${activeCandidate.overallMatch}%`}</div>
                 </div>
               </div>
               <p className="text-sm text-brand-navy/80">
@@ -437,7 +441,7 @@ export default function RecruiterHiringPipeline() {
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-brand-navy/60 uppercase tracking-wider mb-0.5">AI Match</div>
-                  <div className="font-bold text-brand-indigo text-xl">{activeCandidate.overallMatch}%</div>
+                  <div className="font-bold text-brand-indigo text-xl">{activeCandidate.overallMatch == null ? "—" : `${activeCandidate.overallMatch}%`}</div>
                 </div>
               </div>
               <p className="text-sm text-brand-navy/80">
@@ -451,6 +455,12 @@ export default function RecruiterHiringPipeline() {
           </div>
       </Modal>
 
+      <ScheduleInterviewModal
+        isOpen={!!interviewCandidate}
+        onClose={() => setInterviewCandidate(null)}
+        onSchedule={schedule}
+        initialCandidate={interviewCandidate ? { ...interviewCandidate, applicationId: interviewCandidate.applicationId } : undefined}
+      />
     </DashboardShell>
   )
 }

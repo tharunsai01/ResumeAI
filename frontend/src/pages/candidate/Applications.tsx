@@ -94,6 +94,7 @@ export default function CandidateApplications() {
       case "Under Review": return <Badge variant="secondary" className="bg-brand-violet/10 text-brand-violet">Under Review</Badge>
       case "Shortlisted": return <Badge variant="success" className="bg-semantic-success/20 text-semantic-success">Shortlisted</Badge>
       case "Interview": return <Badge variant="secondary" className="bg-brand-indigo/10 text-brand-indigo">Interview</Badge>
+      case "Hired": return <Badge variant="success">Hired</Badge>
       case "Offer": return <Badge variant="success" className="bg-semantic-success/20 text-semantic-success">Offer</Badge>
       case "Rejected": return <Badge variant="secondary" className="bg-semantic-error/10 text-semantic-error">Rejected</Badge>
       case "Withdrawn": return <Badge variant="secondary" className="bg-brand-gray/50 text-brand-navy/60">Withdrawn</Badge>
@@ -190,6 +191,7 @@ export default function CandidateApplications() {
                       <option value="Shortlisted">Shortlisted</option>
                       <option value="Interview">Interview</option>
                       <option value="Offer">Offer</option>
+                      <option value="Hired">Hired</option>
                       <option value="Rejected">Rejected</option>
                       <option value="Withdrawn">Withdrawn</option>
                     </select>

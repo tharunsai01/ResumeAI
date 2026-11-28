@@ -13,6 +13,7 @@ done
 db_address="$(docker port "$db_container" 27017/tcp)"
 export MONGODB_URI="mongodb://${db_address}/resumeai_ci"
 export NODE_ENV=test
+export GROQ_API_KEY="" GEMINI_API_KEY="" AI_SERVICE_URL="" AI_SERVICE_KEY=""
 export JWT_ACCESS_SECRET="$(openssl rand -hex 32)"
 (
   cd backend

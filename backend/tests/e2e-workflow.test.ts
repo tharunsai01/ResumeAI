@@ -466,7 +466,7 @@ Education: Bachelor of Technology in Computer Science, NIT 2020
 
   await step('Pipeline', 'PATCH /recruiter/pipeline/:appId/stage updates pipeline stage', async () => {
     const res = await apiRequest('PATCH', `/api/v1/recruiter/pipeline/${createdAppId}/stage`, {
-      stage: 'Interview Scheduled',
+      stage: 'Shortlisted',
     }, recruiterToken);
     if (res.status !== 200) throw new Error(`Status ${res.status}: ${JSON.stringify(res.json)}`);
   });
@@ -485,6 +485,14 @@ Education: Bachelor of Technology in Computer Science, NIT 2020
     if (res.status !== 201) throw new Error(`Status ${res.status}: ${JSON.stringify(res.json)}`);
     scheduledInterviewId = res.json?.data?._id || res.json?.data?.id;
     if (!scheduledInterviewId) throw new Error('Missing scheduled interview ID');
+  });
+
+  await step('Pipeline', 'Scheduled interview appears on the matching application card', async () => {
+    const res = await apiRequest('GET', `/api/v1/recruiter/pipeline?jobId=${createdJobId}`, null, recruiterToken);
+    const card = res.json?.data?.find((item: any) => item.applicationId === createdAppId);
+    if (res.status !== 200 || card?.stage !== 'Interview Scheduled' || card.interviewId !== scheduledInterviewId) {
+      throw new Error('Scheduled interview was not linked to its pipeline card');
+    }
   });
 
   await step('Interview', 'GET /interviews allows candidate to view scheduled interview', async () => {

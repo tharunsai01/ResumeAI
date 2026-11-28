@@ -1,3 +1,5 @@
+import { env } from "../../config/env"
+import { LiveAiEvaluation } from "./LiveAiEvaluation"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { AdminShell } from "../../components/layout/AdminShell"
@@ -17,6 +19,10 @@ import { cn } from "../../lib/utils"
 import type { EvaluationRecord } from "../../data/mockAdminAiEvaluation"
 
 export default function AdminAiEvaluation() {
+  return env.useMock ? <SampleAiEvaluation /> : <LiveAiEvaluation />
+}
+
+function SampleAiEvaluation() {
   const { evaluationData, runEvaluation } = useAdminAiEvaluation()
 
   // State
@@ -28,7 +34,7 @@ export default function AdminAiEvaluation() {
   const handleRunEvaluation = () => {
     setIsConfirmModalOpen(false)
     runEvaluation()
-    showToast("AI evaluation completed.")
+    showToast("Sample report loaded.")
   }
 
   const showToast = (msg: string) => {
@@ -63,11 +69,10 @@ export default function AdminAiEvaluation() {
         {/* HEADER */}
         <AdminPageHeader 
           title="AI Evaluation & Fairness" 
-          description="Monitor AI quality, stability, security, and fairness across HireSmart AI."
-          statusIndicator={{ label: "Evaluation Monitoring Active", isHealthy: true }}
+          description="Review sample checks for résumé skill extraction, score consistency, and AI safety."
           action={
             <Button onClick={() => setIsConfirmModalOpen(true)} className="bg-brand-indigo hover:bg-brand-blue text-white shadow-sm w-full sm:w-auto justify-center">
-              <Play className="w-4 h-4 mr-2" /> Run Evaluation
+              <Play className="w-4 h-4 mr-2" /> Load Sample Run
             </Button>
           }
         />
@@ -76,16 +81,16 @@ export default function AdminAiEvaluation() {
         <motion.div variants={slideUp} className="bg-brand-indigo/5 border border-brand-indigo/20 rounded-xl p-4 flex items-start gap-3">
           <Info className="w-5 h-5 text-brand-indigo shrink-0 mt-0.5" />
           <p className="text-sm text-brand-navy/80">
-            <strong>Important:</strong> Evaluation results shown here are based on configured evaluation datasets and demo measurements. They are intended for monitoring and review, not as proof that the AI system is bias-free.
+            <strong>Sample data.</strong> Compare equivalent résumés in the table to see which score differences would be flagged for review. Use the extraction and stability panels to see how an evaluation report is read.
           </p>
         </motion.div>
 
         {/* STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-          <AdminStatCard title="Skill Extraction Accuracy" value={evaluationData.summary.skillExtractionAccuracy} icon={Target} color={{ bg: "bg-emerald-500/10", text: "text-emerald-500" }} />
+          <AdminStatCard title="Skill Accuracy" value={evaluationData.summary.skillExtractionAccuracy} icon={Target} color={{ bg: "bg-emerald-500/10", text: "text-emerald-500" }} />
           <AdminStatCard title="Score Stability" value={evaluationData.summary.scoreStability} icon={Activity} color={{ bg: "bg-brand-blue/10", text: "text-brand-blue" }} />
-          <AdminStatCard title="Fairness Test" value={evaluationData.summary.fairnessTest} icon={Scale} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
-          <AdminStatCard title="Prompt Injection Checks" value={evaluationData.summary.promptInjectionChecks} icon={ShieldAlert} color={{ bg: "bg-semantic-error/10", text: "text-semantic-error" }} />
+          <AdminStatCard title="Fairness Test" value="Review" icon={Scale} color={{ bg: "bg-semantic-warning/10", text: "text-semantic-warning" }} />
+          <AdminStatCard title="Security Checks" value={evaluationData.summary.promptInjectionChecks} icon={ShieldAlert} color={{ bg: "bg-semantic-error/10", text: "text-semantic-error" }} />
           <AdminStatCard title="Last Evaluation" value={evaluationData.summary.lastEvaluation} icon={History} color={{ bg: "bg-brand-gray/20", text: "text-brand-navy/60" }} />
         </div>
 
@@ -491,18 +496,18 @@ export default function AdminAiEvaluation() {
       <Modal
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
-        title="Run AI Evaluation?"
+        title="Load Sample Evaluation?"
       >
         <div className="py-4 space-y-4">
           <p className="text-sm text-brand-navy/70">
-            This will start a demo evaluation workflow using the configured evaluation dataset.
+            This adds a preset report to this session’s history. It uses sample scores and does not run a model or process candidates’ résumés.
           </p>
           <div className="flex justify-end gap-3 mt-6">
             <Button variant="outline" onClick={() => setIsConfirmModalOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handleRunEvaluation} className="bg-brand-indigo hover:bg-brand-blue text-white">
-              Run Evaluation
+              Load Sample Run
             </Button>
           </div>
         </div>

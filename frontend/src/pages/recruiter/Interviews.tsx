@@ -1,13 +1,13 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Calendar as CalendarIcon, Clock, User, Video, Users, CheckCircle2, Search } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent } from "../../components/ui/PremiumCard"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { interviewService } from "../../services/interviewService"
-import type { MockInterview } from "../../services/interviewService"
+import type { InterviewSchedule, MockInterview } from "../../services/interviewService"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
@@ -31,11 +31,13 @@ const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
 
 export default function RecruiterInterviews() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const [applicationId, setApplicationId] = React.useState<string | undefined>(location.state?.applicationId)
   const [loading, setLoading] = React.useState(true)
   const [interviews, setInterviews] = React.useState<MockInterview[]>(() => interviewService.getRecruiterInterviews())
   
   // Modals
-  const [scheduleModalOpen, setScheduleModalOpen] = React.useState(false)
+  const [scheduleModalOpen, setScheduleModalOpen] = React.useState(!!applicationId)
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
   
   // Filters
@@ -69,24 +71,9 @@ export default function RecruiterInterviews() {
     setTimeout(() => setToastMsg(null), 3000)
   }
 
-  const handleSchedule = (data: any) => {
-    const newInterview: MockInterview = {
-      id: `int_${Date.now()}`,
-      candidateId: data.candidateId,
-      candidateName: data.candidateName || "Candidate",
-      jobId: data.jobId || "job_live",
-      jobTitle: data.jobTitle,
-      date: data.date,
-      time: data.time,
-      duration: data.duration,
-      type: data.type,
-      interviewer: data.interviewer,
-      status: "Scheduled"
-    }
-    const updated = [newInterview, ...interviews]
-    setInterviews(updated)
-    interviewService.saveRecruiterInterviews(updated)
-    showToast("Interview scheduled successfully.")
+  const handleSchedule = async (data: InterviewSchedule) => {
+    setInterviews(await interviewService.createRecruiterInterview(data))
+    showToast("Interview scheduled. The candidate can see it in Interviews.")
   }
 
   const filteredInterviews = React.useMemo(() => {
@@ -232,7 +219,7 @@ export default function RecruiterInterviews() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 text-brand-navy/80">
                             <User className="w-4 h-4 text-brand-navy/40" />
-                            {int.interviewer.split(" ")[0]}
+                            {int.interviewer}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
@@ -271,7 +258,8 @@ export default function RecruiterInterviews() {
 
       <ScheduleInterviewModal
         isOpen={scheduleModalOpen}
-        onClose={() => setScheduleModalOpen(false)}
+        onClose={() => { setScheduleModalOpen(false); setApplicationId(undefined) }}
+        applicationId={applicationId}
         onSchedule={handleSchedule}
       />
     </DashboardShell>

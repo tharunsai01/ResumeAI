@@ -1,4 +1,5 @@
-import { Interview, Application, Job, User } from '../models';
+import { Interview, Application } from '../models';
+import { isValidObjectId } from 'mongoose';
 import { ApiError } from '../utils/ApiError';
 import { createNotification } from './notification.service';
 import { recordAuditLog } from './audit.service';
@@ -12,6 +13,7 @@ export async function listUserInterviews(userId: string, role: string) {
   }
 
   return Interview.find(filter)
+    .select(role === 'candidate' ? '-feedback -notes' : '')
     .populate('candidate', 'fullName email')
     .populate('recruiter', 'fullName email companyName')
     .populate('job', 'title companyName location workMode')
@@ -21,6 +23,7 @@ export async function listUserInterviews(userId: string, role: string) {
 
 export async function getInterviewById(userId: string, role: string, interviewId: string) {
   const interview = await Interview.findById(interviewId)
+    .select(role === 'candidate' ? '-feedback -notes' : '')
     .populate('candidate', 'fullName email')
     .populate('recruiter', 'fullName email companyName')
     .populate('job', 'title companyName location workMode')
@@ -53,9 +56,15 @@ export async function scheduleInterview(
     meetingLink?: string;
     location?: string;
     title?: string;
+    interviewer?: string;
     notes?: string;
   },
 ) {
+  const scheduledAt = new Date(data.scheduledAt);
+  if (!isValidObjectId(data.applicationId)) throw ApiError.badRequest('Select a valid application');
+  if (Number.isNaN(scheduledAt.getTime()) || scheduledAt.getTime() <= Date.now()) {
+    throw ApiError.badRequest('Select a future interview date and time');
+  }
   const application = await Application.findById(data.applicationId).populate('job');
   if (!application) {
     throw ApiError.notFound('Application not found');
@@ -66,16 +75,21 @@ export async function scheduleInterview(
     throw ApiError.forbidden('You can only schedule interviews for your own job openings');
   }
 
+  if (['hired', 'rejected', 'withdrawn'].includes(application.status)) {
+    throw ApiError.badRequest('This application cannot be scheduled for an interview');
+  }
+
   const interview = await Interview.create({
     application: application._id,
     job: (application.job as any)._id,
     candidate: application.candidate,
     recruiter: recruiterId,
     title: data.title || 'Technical Interview',
-    scheduledAt: new Date(data.scheduledAt),
+    scheduledAt,
+    interviewer: data.interviewer,
     durationMins: data.durationMins || 45,
     mode: data.mode || 'video',
-    meetingLink: data.meetingLink || 'https://meet.google.com/hiresmart-room',
+    meetingLink: data.meetingLink,
     location: data.location,
     notes: data.notes,
     status: 'scheduled',
@@ -89,7 +103,12 @@ export async function scheduleInterview(
     note: `Interview scheduled for ${new Date(data.scheduledAt).toLocaleDateString()}`,
     changedAt: new Date(),
   });
-  await application.save();
+  try {
+    await application.save();
+  } catch (error) {
+    await Interview.deleteOne({ _id: interview._id });
+    throw error;
+  }
 
   void recordAuditLog({
     action: 'INTERVIEW_SCHEDULE',
@@ -101,10 +120,10 @@ export async function scheduleInterview(
   });
 
   // Notify candidate
-  createNotification(application.candidate.toString(), {
+  await createNotification(application.candidate.toString(), {
     type: 'interview_scheduled',
     title: 'Interview Scheduled',
-    message: `An interview has been scheduled for "${(application.job as any).title}" on ${new Date(data.scheduledAt).toLocaleString()}`,
+    message: `An interview has been scheduled for "${(application.job as any).title}"`,
     link: '/candidate/interviews',
     entityId: interview._id.toString(),
     entityType: 'Interview',
@@ -132,7 +151,16 @@ export async function updateInterview(
     throw ApiError.forbidden('Unauthorized to update this interview');
   }
 
-  if (updates.scheduledAt) interview.scheduledAt = new Date(updates.scheduledAt);
+  if (updates.scheduledAt) {
+    const date = new Date(updates.scheduledAt);
+    if (Number.isNaN(date.getTime()) || date.getTime() <= Date.now()) {
+      throw ApiError.badRequest('Select a future interview date and time');
+    }
+    interview.scheduledAt = date;
+    interview.status = 'rescheduled';
+  }
+  if (updates.title) interview.title = updates.title;
+  if (updates.interviewer !== undefined) interview.interviewer = updates.interviewer;
   if (updates.durationMins !== undefined) interview.durationMins = updates.durationMins;
   if (updates.mode) interview.mode = updates.mode;
   if (updates.meetingLink !== undefined) interview.meetingLink = updates.meetingLink;
@@ -159,6 +187,27 @@ export async function updateInterview(
     targetId: interviewId,
     status: 'success',
   });
+
+  if (updates.scheduledAt || updates.status === 'cancelled') {
+    const cancelled = updates.status === 'cancelled';
+    if (cancelled && !await Interview.exists({
+      application: interview.application,
+      status: { $in: ['scheduled', 'rescheduled', 'completed'] },
+    })) {
+      await Application.updateOne({ _id: interview.application, status: 'interview' }, {
+        $set: { status: 'shortlisted' },
+        $push: { statusHistory: { status: 'shortlisted', changedBy: userId, changedAt: new Date(), note: 'Interview cancelled' } },
+      });
+    }
+    await createNotification(interview.candidate.toString(), {
+      type: 'interview_scheduled',
+      title: cancelled ? 'Interview Cancelled' : 'Interview Rescheduled',
+      message: `Your interview for "${(interview.job as any)?.title || 'the position'}" was ${cancelled ? 'cancelled' : 'rescheduled'}.`,
+      link: '/candidate/interviews',
+      entityId: interview._id.toString(),
+      entityType: 'Interview',
+    }).catch(() => {});
+  }
 
   return interview;
 }

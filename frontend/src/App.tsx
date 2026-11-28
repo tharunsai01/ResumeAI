@@ -7,6 +7,7 @@ import CandidateResumeAnalysis from "./pages/candidate/ResumeAnalysis"
 import CandidateJobs from "./pages/candidate/Jobs"
 import CandidateJobDetails from "./pages/candidate/JobDetails"
 import CandidateRecommended from "./pages/candidate/Recommended"
+import CandidateInterviews from "./pages/candidate/Interviews"
 import CandidateApplications from "./pages/candidate/Applications"
 import CandidateApplicationDetails from "./pages/candidate/ApplicationDetails"
 import CandidateSkills from "./pages/candidate/Skills"
@@ -104,6 +105,7 @@ function App() {
               <Route path="/candidate/jobs" element={<CandidateJobs />} />
               <Route path="/candidate/jobs/:jobId" element={<CandidateJobDetails />} />
               <Route path="/candidate/recommended" element={<CandidateRecommended />} />
+              <Route path="/candidate/interviews" element={<CandidateInterviews />} />
               <Route path="/candidate/applications" element={<CandidateApplications />} />
               <Route path="/candidate/applications/:applicationId" element={<CandidateApplicationDetails />} />
               <Route path="/candidate/skills" element={<CandidateSkills />} />

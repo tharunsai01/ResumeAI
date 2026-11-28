@@ -53,6 +53,7 @@ export async function getPipeline(req: Request, res: Response) {
   const pipeline = await recruiterService.getHiringPipeline(
     req.user.id,
     req.query.jobId as string | undefined,
+    req.query.includeApplied === "true",
   );
   sendSuccess(res, pipeline);
 }

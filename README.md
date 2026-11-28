@@ -314,6 +314,22 @@ RESUMEAI_BASE_URL=http://localhost:5173 .venv/bin/python frontend/tests/selenium
 
 The test uses the seeded candidate to upload a synthetic DOCX and open the stored analysis.
 
+To run the full Selenium suite, use Docker Compose 2.24.4 or later, Chrome, and a Python environment with Selenium installed. The runner builds a disposable stack, seeds synthetic accounts, and removes the stack and its data on exit.
+
+```bash
+SELENIUM_PYTHON=.venv/bin/python bash scripts/selenium-ci.sh
+```
+
+The suite checks résumé analysis, candidate-to-recruiter application visibility, candidate access restrictions, and candidate-to-admin complaint resolution. Jenkins runs it in the **Selenium browser workflows** stage and archives `selenium-results.log`. Set `SELENIUM_PYTHON` in the Jenkins agent environment if Selenium is installed in a virtual environment.
+
+For a visible Jenkins walkthrough, select **Build with Parameters**, check **WATCH_SELENIUM**, and start the build. Chrome opens on the Mac agent, so keep its desktop session unlocked. The stage runs after the backend unit tests. Both stages archive their test logs. Leave the option unchecked for the full headless suite.
+
+To run the same visible walkthrough from a terminal, add `--visible`. Chrome opens and moves through sign-in, résumé upload and analysis, job application, and confirmation in My Applications. The visible walkthrough stays in the candidate portal and holds the final screen briefly before closing Chrome.
+
+```bash
+SELENIUM_PYTHON=.venv/bin/python bash scripts/selenium-ci.sh --visible
+```
+
 ### C. Build Verification
 ```bash
 # Verify backend TypeScript compilation
@@ -358,3 +374,32 @@ Open http://localhost:5173 for the demo. The backend forwards resume analysis an
 | **Recruiter** | `recruiter@test.com` | `Password123!` | Job postings, applicant screening, Kanban pipeline, interview scheduling |
 | **Candidate 1 (Senior)** | `alice@test.com` | `Password123!` | Full Stack Engineer profile, parsed resume, job discovery, skill analysis |
 | **Candidate 2 (Junior)** | `bob@test.com` | `Password123!` | Junior Frontend profile, applications, issue reporting |
+
+### Release staging and recovery
+
+Use a dedicated staging project and a fresh database. Generate separate values for
+`JWT_ACCESS_SECRET` and `AI_SERVICE_KEY` with `openssl rand -hex 32`, and provide
+the Groq key through the environment or an ignored environment file with
+restricted permissions. Set `CLIENT_URL` to the exact HTTPS origin and configure
+the OAuth callback for that origin if OAuth is enabled. Seed accounts are for
+disposable testing. Provision release accounts on the fresh database.
+
+Start the HTTPS overlay with
+`docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build --wait`.
+Set `TLS_DIRECTORY` to the folder containing the server certificate chain and
+private key, named `localhost.crt` and `localhost.key` for the mounted paths.
+The certificate must cover the browser hostname. The default bind is local
+loopback. For a public host, configure `HTTPS_BIND_ADDRESS`, `HTTPS_PORT`,
+DNS, the firewall, and certificate renewal with your hosting provider.
+
+Stop the backend before taking a backup so database records and uploaded files
+are copied together. With MongoDB running, execute
+`bash scripts/data-recovery.sh backup PROJECT /absolute/new-backup-directory`.
+Store the resulting directory securely because it contains private data.
+To rehearse recovery, start MongoDB in a fresh Compose project and execute
+`bash scripts/data-recovery.sh restore FRESH_PROJECT /absolute/backup-directory`.
+The restore refuses projects with existing records or uploaded files. Once
+restored, start the app and verify that an authorized user can download an
+original uploaded résumé. If a restore fails partway, retry in a fresh empty
+project. The AI service keeps its latest completed benchmark report on its
+separate `evaluation_data` volume.

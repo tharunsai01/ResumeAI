@@ -48,7 +48,12 @@ export async function getAdminStats() {
     Complaint.countDocuments({ status: { $in: ['open', 'in_review', 'in_progress'] } }),
     Complaint.countDocuments(),
     Application.find().select('status'),
-    User.find().sort({ createdAt: -1 }).limit(5).select('fullName email role createdAt isVerified status'),
+    User.find({
+      $nor: [
+        { role: 'candidate', fullName: 'Selenium Demo Candidate', email: /^selenium-demo-[a-f0-9]+@example\.test$/i },
+        { role: 'candidate', fullName: /^Rehearsal Candidate \d+$/, email: /@example\.test$/i },
+      ],
+    }).sort({ createdAt: -1 }).limit(5).select('fullName email role createdAt isVerified status'),
     Job.find().sort({ createdAt: -1 }).limit(5).select('title companyName status createdAt workMode jobType'),
     Application.find().sort({ createdAt: -1 }).limit(5).populate('job', 'title').populate('candidate', 'fullName email').select('status createdAt job candidate'),
     AuditLog.find().sort({ createdAt: -1 }).limit(5),

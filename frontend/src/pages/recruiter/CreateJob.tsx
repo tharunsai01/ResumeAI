@@ -57,7 +57,7 @@ export default function CreateJob() {
       })
     } catch (err) {
       console.error("Failed to create job:", err)
-      setErrorMsg("An error occurred while creating the job. Please try again.")
+      setErrorMsg(err instanceof Error ? err.message : "Unable to create the job. Please try again.")
       setIsSubmitting(false)
     }
   }

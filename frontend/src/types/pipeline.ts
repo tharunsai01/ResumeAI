@@ -11,17 +11,20 @@ export type PipelineStage =
   | "Rejected"
 
 export interface PipelineCandidate {
+  applicationId?: string
+  scheduledAt?: string
   id: string
   name: string
   role: string
   experience: string
   skills: string[]
-  overallMatch: number
+  overallMatch?: number
   stage: PipelineStage
   interviewId?: string
 }
 
 export interface MockInterview {
+  applicationId?: string
   id: string
   candidateId: string
   candidateName: string

@@ -14,6 +14,7 @@ export type ApplicationStatus =
   | "Hired"
 
 export interface TimelineEvent {
+  label?: string
   status: ApplicationStatus
   date: string
 }

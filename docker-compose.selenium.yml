@@ -1,0 +1,6 @@
+services:
+  backend:
+    ports: !reset []
+  frontend:
+    ports: !override
+      - "127.0.0.1::80"

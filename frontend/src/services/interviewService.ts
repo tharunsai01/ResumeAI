@@ -4,6 +4,7 @@
  */
 
 import { env } from "../config/env"
+import { authService } from "./authService"
 import { httpClient } from "./api/httpClient"
 import type { Interview, InterviewType, InterviewStatus } from "../types/interview"
 import type { MockInterview } from "../types/pipeline"
@@ -14,7 +15,68 @@ export type { Interview, InterviewType, InterviewStatus, MockInterview }
 const CANDIDATE_STORAGE_KEY = "hiresmart_interviews"
 const RECRUITER_STORAGE_KEY = "hiresmart_recruiter_interviews"
 
+function recruiterStorageKey() {
+  if (env.useMock) return RECRUITER_STORAGE_KEY
+  return `${RECRUITER_STORAGE_KEY}_${authService.getCurrentUser()?.id ?? "anonymous"}`
+}
+
+export interface InterviewSchedule {
+  applicationId: string
+  candidateId: string
+  candidateName: string
+  jobTitle: string
+  date: string
+  time: string
+  duration: string
+  type: string
+  interviewer: string
+  notes: string
+  mode?: "video" | "phone" | "onsite"
+  meetingLink?: string
+  location?: string
+}
+
+function localInterviewDate(value: string) {
+  const date = new Date(value)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+}
+
+function interviewPayload(data: InterviewSchedule) {
+  return {
+    applicationId: data.applicationId,
+    scheduledAt: new Date(`${data.date}T${data.time}`).toISOString(),
+    title: data.type,
+    durationMins: Number.parseInt(data.duration, 10),
+    mode: data.mode || "video",
+    interviewer: data.interviewer,
+    meetingLink: data.meetingLink,
+    location: data.location,
+    notes: data.notes,
+  }
+}
+
 export const interviewService = {
+  async createRecruiterInterview(data: InterviewSchedule) {
+    if (env.useMock) {
+      const interview: MockInterview = { ...data, id: `int_${Date.now()}`, jobId: "", status: "Scheduled" }
+      this.saveRecruiterInterviews([interview, ...this.getRecruiterInterviews()])
+      return this.getRecruiterInterviews()
+    }
+    await httpClient.post("/interviews", interviewPayload(data))
+    return this.fetchLiveRecruiterInterviews()
+  },
+
+  async rescheduleRecruiterInterview(id: string, data: InterviewSchedule) {
+    if (env.useMock) return this.updateRecruiterInterview(id, data)
+    await httpClient.patch(`/interviews/${id}`, interviewPayload(data))
+    return (await this.fetchLiveRecruiterInterviews()).find(interview => interview.id === id)
+  },
+
+  async cancelRecruiterInterview(id: string) {
+    if (env.useMock) return this.updateRecruiterInterview(id, { status: "Cancelled" })
+    await httpClient.patch(`/interviews/${id}/cancel`)
+  },
+
   // --- Candidate-facing interview methods ---
 
   getInterviews(): Interview[] {
@@ -38,26 +100,29 @@ export const interviewService = {
       if (res?.data && Array.isArray(res.data)) {
         const mapped: Interview[] = res.data.map((item) => ({
           id: item._id,
+          scheduledAt: item.scheduledAt,
+          jobTitle: item.job?.title,
+          company: item.job?.companyName,
+          durationMins: item.durationMins,
+          location: item.location,
+          mode: item.mode,
+          interviewer: item.interviewer || item.recruiter?.fullName,
           applicationId: item.application?._id || item.application || "",
           candidateId: item.candidate?._id || item.candidate || "",
           jobId: item.job?._id || item.job || "",
-          type: (["Technical", "HR", "Managerial", "Final"].includes(item.mode) ? item.mode : "Technical") as InterviewType,
+          type: (item.title || "Technical") as InterviewType,
           date: item.scheduledAt ? new Date(item.scheduledAt).toISOString().split("T")[0] : "",
           time: item.scheduledAt ? new Date(item.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "",
-          status: (["Scheduled", "Completed", "Cancelled"].includes(item.status) ? item.status : "Scheduled") as InterviewStatus,
+          status: (item.status === "completed" ? "Completed" : item.status === "cancelled" ? "Cancelled" : "Scheduled") as InterviewStatus,
           meetingLink: item.meetingLink || "",
           notes: item.notes || "",
         }))
-        if (typeof window !== "undefined") {
-          localStorage.setItem(CANDIDATE_STORAGE_KEY, JSON.stringify(mapped))
-          window.dispatchEvent(new Event("hiresmart_interviews_updated"))
-        }
         return mapped
       }
     } catch (err) {
       console.warn("[InterviewService] Live fetch failed, using cached:", err)
     }
-    return this.getInterviews()
+    throw new Error("Couldn’t load interviews. Please try again.")
   },
 
   scheduleInterview(interview: Omit<Interview, "id" | "status">): Interview {
@@ -92,20 +157,23 @@ export const interviewService = {
 
   async fetchLiveRecruiterInterviews(): Promise<MockInterview[]> {
     if (env.useMock) return this.getRecruiterInterviews()
+    const recruiterId = authService.getCurrentUser()?.id
     try {
       const res = await httpClient.get<{ success: boolean; data: any[] }>("/interviews")
+      if (authService.getCurrentUser()?.id !== recruiterId) return []
       if (res?.data && Array.isArray(res.data)) {
         const mapped: MockInterview[] = res.data.map((item) => ({
           id: item._id,
+          applicationId: item.application?._id || item.application,
           candidateId: item.candidate?._id || item.candidate || "",
           candidateName: item.candidate?.fullName || "Candidate",
           jobId: item.job?._id || item.job || "",
           jobTitle: item.job?.title || "Role",
-          date: item.scheduledAt ? new Date(item.scheduledAt).toISOString().split("T")[0] : "",
+          date: item.scheduledAt ? localInterviewDate(item.scheduledAt) : "",
           time: item.scheduledAt ? new Date(item.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "",
           duration: `${item.durationMins || 45} mins`,
-          type: item.mode || "Technical",
-          interviewer: item.recruiter?.fullName || "Hiring Manager",
+          type: item.title || "Technical",
+          interviewer: item.interviewer || item.recruiter?.fullName || "Hiring Manager",
           status: item.status === "completed" ? "Completed" : item.status === "cancelled" ? "Cancelled" : "Scheduled",
           feedback: item.notes ? {
             overall: 4,
@@ -127,7 +195,7 @@ export const interviewService = {
 
   getRecruiterInterviews(): MockInterview[] {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(RECRUITER_STORAGE_KEY)
+      const stored = localStorage.getItem(recruiterStorageKey())
       if (stored) {
         try {
           return JSON.parse(stored)
@@ -146,7 +214,7 @@ export const interviewService = {
 
   saveRecruiterInterviews(interviews: MockInterview[]): void {
     if (typeof window !== "undefined") {
-      localStorage.setItem(RECRUITER_STORAGE_KEY, JSON.stringify(interviews))
+      localStorage.setItem(recruiterStorageKey(), JSON.stringify(interviews))
       window.dispatchEvent(new Event("hiresmart_recruiter_interviews_updated"))
     }
   },

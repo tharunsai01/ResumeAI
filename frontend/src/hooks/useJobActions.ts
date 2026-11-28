@@ -111,10 +111,12 @@ export function useJobActions() {
     }
 
     loadApps()
+    window.addEventListener("focus", loadApps)
 
     const handleUpdate = () => loadApps()
     window.addEventListener("hiresmart_applications_updated", handleUpdate)
     return () => {
+      window.removeEventListener("focus", loadApps)
       isMounted = false
       window.removeEventListener("hiresmart_applications_updated", handleUpdate)
     }

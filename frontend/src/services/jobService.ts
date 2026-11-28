@@ -30,10 +30,56 @@ function formatJobSalary(salary?: { min?: number; max?: number; currency?: strin
   return `${formatter.format(min)} – ${formatter.format(max)}`
 }
 
+function jobSalaryPayload(value: string | undefined, hidden: boolean | undefined) {
+  if (hidden || !value?.trim() || value === "Salary not listed" || value === "Salary not disclosed") return {}
+
+  const currency = /\$|USD/i.test(value) ? "USD" : "INR"
+  const range = value.replace(/^(Up to|From)\s+/i, "").split(/\s*[-–—]\s*/)
+  const sharedUnit = range.length === 2 && /LPA\s*$/i.test(value)
+  const amounts = range.map(part => {
+    const match = part.trim().match(/^(?:₹|\$|INR\s*|USD\s*)?([0-9][0-9,]*(?:\.[0-9]+)?)\s*(LPA|k)?$/i)
+    if (!match) throw new Error("Enter a salary such as ₹6 LPA – ₹9 LPA or ₹6,00,000.")
+    const unit = match[2]?.toLowerCase() || (sharedUnit ? "lpa" : "")
+    return Number(match[1].replaceAll(",", "")) * (unit === "lpa" ? 100000 : unit === "k" ? 1000 : 1)
+  })
+  const [min, max] = amounts
+  if (amounts.length > 2 || amounts.some(amount => !Number.isFinite(amount)) || (max != null && max < min)) {
+    throw new Error("Enter a salary range with the lower amount first.")
+  }
+  return /^up to/i.test(value) ? { max: min, currency } : { min, max, currency }
+}
+
+function jobExperiencePayload(experience: string) {
+  const [min = 0, max] = (experience.match(/\d+(?:\.\d+)?/g) ?? []).map(Number)
+  return { minExperienceYears: min, maxExperienceYears: max ?? null }
+}
+
+function liveJobFields(data: any) {
+  const jobType = (data.jobType || data.type)?.toLowerCase()
+  return {
+    title: data.title,
+    companyName: data.company,
+    department: data.category,
+    description: data.description,
+    location: data.location,
+    workMode: data.workMode?.toLowerCase().replace("on-site", "onsite"),
+    jobType: jobType === "freelance" ? "contract" : jobType,
+    requiredSkills: data.requiredSkills ?? data.skills,
+    niceToHaveSkills: data.preferredSkills,
+    status: data.status === "Active" ? "open" : data.status?.toLowerCase(),
+    ...(data.experience !== undefined ? jobExperiencePayload(data.experience) : {}),
+    ...(data.salary !== undefined || data.salaryNotDisclosed !== undefined
+      ? { salary: jobSalaryPayload(data.salary, data.salaryNotDisclosed) }
+      : {}),
+  }
+}
+
 function mapBackendJobToFrontend(b: any): Job {
-  const expLevel: JobExperienceLevel = b.minExperienceYears
-    ? (b.minExperienceYears >= 5 ? "5+ Years" : b.minExperienceYears <= 2 ? "0–2 Years" : "2–5 Years")
-    : "2–5 Years"
+  const years = b.minExperienceYears
+  const expLevel: JobExperienceLevel = years === 0 && !(b.maxExperienceYears > 0) ? "Fresher"
+    : years == null ? "2–5 Years"
+    : years >= 5 ? "5+ Years"
+    : years <= 2 ? "0–2 Years" : "2–5 Years"
 
   return {
     id: b._id || b.id,
@@ -60,9 +106,12 @@ function mapBackendJobToRecruiterJob(b: any): RecruiterJob {
     title: b.title,
     company: b.companyName || "My Company",
     location: b.location || "Remote",
-    workMode: (b.workMode ? (b.workMode.charAt(0).toUpperCase() + b.workMode.slice(1)) : "Remote") as any,
+    workMode: (b.workMode === "onsite" ? "On-site" : b.workMode === "hybrid" ? "Hybrid" : "Remote"),
     jobType: (b.jobType ? (b.jobType.charAt(0).toUpperCase() + b.jobType.slice(1)) : "Full-time") as any,
-    experience: b.minExperienceYears ? `${b.minExperienceYears}+ Years` : "2–5 Years",
+    experience: b.maxExperienceYears != null ? `${b.minExperienceYears ?? 0}–${b.maxExperienceYears} Years`
+      : b.minExperienceYears ? `${b.minExperienceYears}+ Years` : "Fresher",
+    category: b.department,
+    preferredSkills: b.niceToHaveSkills ?? [],
     salary: formatJobSalary(b.salary ?? b.salaryRange),
     skills: b.requiredSkills || b.skills || [],
     description: b.description || "",
@@ -121,16 +170,21 @@ export const jobService = {
     return jobs.find(j => j.id === id)
   },
 
-  getJobs: async (): Promise<Job[]> => {
+  getJobs: async (signal?: AbortSignal): Promise<Job[]> => {
     if (!env.useMock) {
-      try {
-        const res = await httpClient.get<{ success: boolean; data: { jobs: any[] } }>("/jobs")
-        if (res?.data?.jobs && Array.isArray(res.data.jobs)) {
-          return res.data.jobs.map(mapBackendJobToFrontend)
+      type JobPage = { data: { jobs: any[]; pagination: { totalPages: number } } }
+      const jobs = new Map<string, Job>()
+      const limit = 100
+      let totalPages = 1
+      for (let page = 1; page <= totalPages; page++) {
+        const response = await httpClient.get<JobPage>(`/jobs?page=${page}&limit=${limit}`, { signal })
+        if (page === 1) totalPages = response.data.pagination.totalPages
+        for (const record of response.data.jobs) {
+          const job = mapBackendJobToFrontend(record)
+          jobs.set(job.id, job)
         }
-      } catch (err) {
-        console.warn("[JobService] Live getJobs failed, using local cache:", err)
       }
+      return [...jobs.values()]
     }
 
     await delay(0)
@@ -173,25 +227,15 @@ export const jobService = {
       ]))
 
     if (!env.useMock) {
-      try {
-        const payload = {
-          title: jobData.title,
-          companyName: jobData.company || "HireSmart Technologies",
-          description: jobData.description || "Exciting career opportunity.",
-          location: jobData.location || "Remote",
-          workMode: (jobData.workMode?.toLowerCase() === "on-site" ? "onsite" : jobData.workMode?.toLowerCase()) || "remote",
-          jobType: jobData.jobType?.toLowerCase() || "full-time",
-          requiredSkills: skillsList.length > 0 ? skillsList : ["Communication"],
-          minExperienceYears: 2,
-          status: "open",
-        }
-        const res = await httpClient.post<{ success: boolean; data: any }>("/jobs", payload)
-        if (res?.data) {
-          return mapBackendJobToRecruiterJob(res.data)
-        }
-      } catch (err) {
-        console.warn("[JobService] Live createJob failed, fallback to local:", err)
-      }
+      const payload = liveJobFields(jobData)
+      const res = await httpClient.post<{ data: any }>("/jobs", {
+        ...payload,
+        companyName: payload.companyName || "HireSmart Technologies",
+        description: payload.description || "Job posting draft",
+        requiredSkills: payload.requiredSkills?.length ? payload.requiredSkills : ["Communication"],
+        status: payload.status || "open",
+      })
+      return mapBackendJobToRecruiterJob(res.data)
     }
 
     await delay(0)
@@ -242,16 +286,8 @@ export const jobService = {
 
   updateJob: async (id: string, updates: any): Promise<RecruiterJob | undefined> => {
     if (!env.useMock) {
-      try {
-        const payload: Record<string, any> = {}
-        if (updates.title) payload.title = updates.title
-        if (updates.description) payload.description = updates.description
-        if (updates.status) payload.status = updates.status.toLowerCase() === "active" ? "open" : updates.status.toLowerCase()
-        if (updates.skills) payload.requiredSkills = updates.skills
-        await httpClient.patch(`/jobs/${id}`, payload)
-      } catch (err) {
-        console.warn("[JobService] Live updateJob failed:", err)
-      }
+      const res = await httpClient.patch<{ data: any }>(`/jobs/${id}`, liveJobFields(updates))
+      return mapBackendJobToRecruiterJob(res.data)
     }
 
     await delay(0)

@@ -4,7 +4,6 @@ import { env } from "../../config/env"
 import { httpClient } from "../../services/api/httpClient"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
-import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { AdminStatCard } from "../../components/admin/AdminStatCard"
 import { Users, AlertOctagon, Activity, Briefcase, FileText } from "lucide-react"
 
@@ -33,12 +32,10 @@ interface DashboardStats {
 
 function DashboardPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <PremiumCard>
-      <PremiumCardHeader className="border-b border-brand-gray/20">
-        <PremiumCardTitle>{title}</PremiumCardTitle>
-      </PremiumCardHeader>
-      <PremiumCardContent className="p-5">{children}</PremiumCardContent>
-    </PremiumCard>
+    <section className="min-w-0 rounded-2xl border border-brand-gray/30 bg-white px-5 py-4 shadow-sm dark:bg-slate-900">
+      <h2 className="mb-3 border-b border-brand-gray/30 pb-3 text-base font-semibold">{title}</h2>
+      {children}
+    </section>
   )
 }
 
@@ -55,7 +52,7 @@ function LiveAdminDashboard() {
 
   return (
     <AdminShell>
-      <AdminPageHeader title="Dashboard" description="Platform activity from the live demo database." />
+      <AdminPageHeader title="Dashboard" description="Monitor hiring activity, account changes, and platform health." />
       {error && <p role="alert">Unable to load platform statistics.</p>}
       {!stats && !error && <p role="status">Loading platform statistics…</p>}
       {stats && <>
@@ -66,14 +63,19 @@ function LiveAdminDashboard() {
           <AdminStatCard title="Open Complaints" value={stats.complaints.pending} icon={AlertOctagon} />
           <AdminStatCard title="Résumés Uploaded" value={stats.resumes.total} icon={FileText} />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 items-start gap-4 mb-4">
           <DashboardPanel title="Application Pipeline">
-            {Object.entries(stats.applications.statusDistribution).map(([status, count]) => (
+            {Object.entries(stats.applications.statusDistribution).filter(([, count]) => count > 0).map(([status, count]) => (
               <div key={status} className="mb-3 last:mb-0">
-                <div className="flex justify-between text-sm mb-1"><span className="capitalize">{status}</span><span>{count}</span></div>
-                <progress className="h-2 w-full accent-brand-indigo" value={count} max={Math.max(stats.applications.total, 1)} aria-label={status} />
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className="capitalize">{status}</span><span className="tabular-nums">{count}</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                  <div className="h-full rounded-full bg-indigo-500" style={{width: `${100 * count / Math.max(stats.applications.total, 1)}%`}} />
+                </div>
               </div>
             ))}
+            {stats.applications.total === 0 && <p className="text-sm text-slate-500">No applications yet.</p>}
           </DashboardPanel>
           <DashboardPanel title="Recent Users">
             {!stats.recentActivity.users.length && <p>No users yet.</p>}
@@ -90,7 +92,7 @@ function LiveAdminDashboard() {
             <ul className="divide-y divide-brand-gray/20">
               {stats.recentActivity.jobs.map(job => <li key={job._id} className="flex justify-between gap-3 py-2">
                 <div className="min-w-0"><p className="font-medium break-words">{job.title}</p><p className="text-sm text-brand-navy/60 dark:text-white/60">{job.companyName}</p></div>
-                <span className="text-sm capitalize">{job.status}</span>
+                <span className="h-fit rounded-full bg-indigo-50 px-2 py-0.5 text-xs capitalize text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200">{job.status}</span>
               </li>)}
             </ul>
           </DashboardPanel>

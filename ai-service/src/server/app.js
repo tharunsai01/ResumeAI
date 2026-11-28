@@ -79,7 +79,7 @@ export function createApp(deps = {}) {
   }
   const logger = deps.logger ?? { info: (m) => console.log(m), error: (m) => console.error(m) };
   const limiter = deps.limiter ?? createLimiter({ maxConcurrent: serverConfig.maxConcurrentLlm, maxQueue: serverConfig.maxQueue });
-  const runs = deps.runs ?? createRunStore();
+  const runs = deps.runs ?? createRunStore({ reportFile: process.env.EVALUATION_REPORT_FILE });
   const embeddingState = deps.embeddingState ?? { value: "not-started" };
   const allowTxt = deps.allowTxt ?? serverConfig.allowTxtUploads;
   const evalPaceMs = deps.evalPaceMs ?? serverConfig.evalPaceMs;
@@ -263,6 +263,8 @@ export function createApp(deps = {}) {
       res.status(202).json({ id: run.id, status: run.status, startedAt: run.startedAt });
     })
   );
+
+  v1.get("/evaluation/latest", (_req, res) => res.json({ run: runs.latest() }));
 
   v1.get(
     "/evaluation/:id",

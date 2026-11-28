@@ -20,6 +20,8 @@ router.use(authenticate, authorize('admin'));
 // Stats & Health
 router.get('/stats', adminController.getAdminStats);
 router.get('/health', adminController.getSystemHealth);
+router.get('/ai-evaluation', adminController.getLatestAiEvaluation);
+router.post('/ai-evaluation', adminController.startAiEvaluation);
 
 // Users
 router.get('/users', validate(adminUserQuerySchema, 'query'), adminController.getAdminUsers);

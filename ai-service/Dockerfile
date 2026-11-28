@@ -18,5 +18,6 @@ ENV NODE_ENV=production \
     PORT=8000
 EXPOSE 8000
 
+RUN mkdir -p /app/evaluation && chown node:node /app/evaluation
 USER node
 CMD ["node", "src/server/start.js"]

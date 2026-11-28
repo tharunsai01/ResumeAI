@@ -1,3 +1,4 @@
+import * as evaluationService from '../services/adminEvaluation.service';
 import type { Request, Response } from 'express';
 import * as adminService from '../services/admin.service';
 import * as complaintService from '../services/complaint.service';
@@ -127,4 +128,12 @@ export async function runAiEvaluation(req: Request, res: Response) {
 export async function getSystemHealth(_req: Request, res: Response) {
   const health = await adminService.getDetailedSystemHealth();
   sendSuccess(res, health);
+}
+
+export async function getLatestAiEvaluation(_req: Request, res: Response) {
+  sendSuccess(res, await evaluationService.getLatestAiEvaluation());
+}
+
+export async function startAiEvaluation(_req: Request, res: Response) {
+  sendSuccess(res, await evaluationService.startAiEvaluation(), 202);
 }

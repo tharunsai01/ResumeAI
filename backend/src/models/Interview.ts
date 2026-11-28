@@ -7,6 +7,7 @@ const interviewSchema = new Schema(
     job: { type: Schema.Types.ObjectId, ref: 'Job', required: true, index: true },
     candidate: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     recruiter: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    interviewer: { type: String, trim: true, maxlength: 120 },
     title: { type: String, trim: true, default: 'Technical Interview' },
     scheduledAt: { type: Date, required: true },
     durationMins: { type: Number, default: 45 },

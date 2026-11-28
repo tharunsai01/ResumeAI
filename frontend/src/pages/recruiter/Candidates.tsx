@@ -119,18 +119,29 @@ export default function RecruiterCandidates() {
     shortlisted: candidates.filter(c => c.status === "Shortlisted").length,
   }
 
-  const handleShortlist = (e: React.MouseEvent, id: string, name: string) => {
-    e.stopPropagation()
-    setCandidates(candidates.map(c => c.id === id ? { ...c, status: "Shortlisted" } : c))
-    setShortlistMsg(`${name} shortlisted successfully.`)
-    setTimeout(() => setShortlistMsg(null), 3000)
+  const [savingCandidateId, setSavingCandidateId] = React.useState<string | null>(null)
+  const [statusError, setStatusError] = React.useState("")
+
+  const saveStatus = async (id: string, status: "Shortlisted" | "Rejected") => {
+    const candidate = candidates.find(item => item.id === id)
+    if (!candidate || savingCandidateId) return
+    setSavingCandidateId(id)
+    setStatusError("")
+    try {
+      const updated = await recruiterCandidateService.setApplicationStatus(candidate, status)
+      setCandidates(list => list.map(item => item.id === id ? updated : item))
+      setShortlistMsg(`${candidate.name} ${status.toLowerCase()} for ${candidate.appliedRole}.`)
+      setCandidateToReject(null)
+      setTimeout(() => setShortlistMsg(null), 3000)
+    } catch (error) {
+      setStatusError(error instanceof Error ? error.message : "Couldn’t update the application. Please try again.")
+    } finally {
+      setSavingCandidateId(null)
+    }
   }
 
   const handleReject = () => {
-    if (candidateToReject) {
-      setCandidates(candidates.map(c => c.id === candidateToReject.id ? { ...c, status: "Rejected" } : c))
-      setCandidateToReject(null)
-    }
+    if (candidateToReject) void saveStatus(candidateToReject.id, "Rejected")
   }
 
   const clearFilters = () => {
@@ -306,9 +317,9 @@ export default function RecruiterCandidates() {
                               <Button variant="outline" disabled size="sm" className="bg-brand-light text-brand-navy/40 border-brand-gray/30 text-xs">
                                 Shortlisted
                               </Button>
-                            ) : cand.status === "Rejected" ? (
+                            ) : !["Applied", "Screening"].includes(cand.status) ? (
                               <Button variant="outline" disabled size="sm" className="bg-brand-light text-brand-navy/40 border-brand-gray/30 text-xs">
-                                Rejected
+                                {cand.status}
                               </Button>
                             ) : (
                               <>
@@ -326,7 +337,8 @@ export default function RecruiterCandidates() {
                                 <Button 
                                   size="sm" 
                                   className="text-xs bg-brand-navy hover:bg-brand-navy/90"
-                                  onClick={(e) => handleShortlist(e, cand.id, cand.name)}
+                                  disabled={savingCandidateId !== null}
+                                  onClick={(e) => { e.stopPropagation(); void saveStatus(cand.id, "Shortlisted") }}
                                 >
                                   Shortlist
                                 </Button>
@@ -357,6 +369,7 @@ export default function RecruiterCandidates() {
         </motion.div>
       </motion.div>
 
+      {statusError && <p role="alert" className="fixed bottom-5 right-5 z-[110] rounded-lg bg-white p-4 text-semantic-error shadow-lg">{statusError}</p>}
       <RejectCandidateModal
         isOpen={!!candidateToReject}
         candidateName={candidateToReject?.name}

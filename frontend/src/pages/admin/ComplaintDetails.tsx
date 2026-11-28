@@ -3,7 +3,7 @@ import { env } from "../../config/env"
 import { useParams, useNavigate } from "react-router-dom"
 import { AdminShell } from "../../components/layout/AdminShell"
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader"
-import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
+import { PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
 import { AdminEmptyState } from "../../components/admin/AdminEmptyState"
 import { useAdminComplaints } from "../../contexts/AdminComplaintsContext"
 import { ArrowLeft, MessageSquareX, ExternalLink, Activity, ArrowRight, ShieldAlert, CheckCircle2 } from "lucide-react"
@@ -53,12 +53,13 @@ export default function AdminComplaintDetails() {
     )
   }
 
-  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newStatus = e.target.value as ComplaintStatus
+  const saveStatus = async (newStatus: ComplaintStatus) => {
+    if (saving) return
     
     if (newStatus === "Resolved") {
       if (!notes.trim()) {
         setResolutionNoteError(true)
+        document.getElementById("resolution-notes")?.focus()
         return
       }
     }
@@ -169,7 +170,7 @@ export default function AdminComplaintDetails() {
             <span className="text-xs text-brand-navy/50 font-semibold uppercase mb-1">Status</span>
             <select 
               value={complaint.status} 
-              onChange={handleStatusChange}
+              onChange={event => void saveStatus(event.target.value as ComplaintStatus)}
               disabled={saving}
               aria-label="Complaint status"
               className="text-sm font-medium bg-brand-light border border-brand-gray/30 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-indigo w-full"
@@ -185,22 +186,22 @@ export default function AdminComplaintDetails() {
 
       {saveError && <p role="alert" className="mb-4 text-semantic-error">{saveError}</p>}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 space-y-6">
-          <PremiumCard>
-            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 items-start gap-4 mb-6">
+        <div className="min-w-0 lg:col-span-2 space-y-4">
+          <section className="rounded-xl border border-brand-gray/30 bg-white shadow-sm dark:bg-slate-900">
+            <PremiumCardHeader className="p-4 border-b border-brand-gray/20">
               <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Complaint Description</PremiumCardTitle>
             </PremiumCardHeader>
-            <PremiumCardContent>
-              <p className="text-brand-navy/80 whitespace-pre-wrap">{complaint.description}</p>
+            <PremiumCardContent className="p-4">
+              <p className="text-brand-navy/80 whitespace-pre-wrap break-words">{complaint.description}</p>
             </PremiumCardContent>
-          </PremiumCard>
+          </section>
 
-          <PremiumCard>
-            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+          <section className="rounded-xl border border-brand-gray/30 bg-white shadow-sm dark:bg-slate-900">
+            <PremiumCardHeader className="p-4 border-b border-brand-gray/20">
               <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Resolution</PremiumCardTitle>
             </PremiumCardHeader>
-            <PremiumCardContent>
+            <PremiumCardContent className="p-4">
               {complaint.status === "Resolved" || complaint.status === "Closed" ? (
                 <div className="bg-semantic-success/5 border border-semantic-success/20 rounded-lg p-4">
                   <div className="flex items-center gap-2 text-semantic-success font-semibold mb-2">
@@ -213,40 +214,45 @@ export default function AdminComplaintDetails() {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium text-brand-navy mb-2">{env.useMock ? "Internal Admin Notes" : "Resolution notes"}</label>
+                  <label htmlFor="resolution-notes" className="block text-sm font-medium text-brand-navy mb-2">{env.useMock ? "Internal Admin Notes" : "Resolution notes"}</label>
                   <textarea
+                    id="resolution-notes"
+                    maxLength={2000}
+                    aria-invalid={resolutionNoteError}
                     value={notes}
                     onChange={(e) => {
                       setNotes(e.target.value)
                       if (e.target.value.trim()) setResolutionNoteError(false)
                     }}
                     placeholder={env.useMock ? "Add resolution notes or internal updates..." : "Add a response before marking this complaint as resolved"}
-                    className={`w-full h-32 px-4 py-3 bg-white border ${resolutionNoteError ? 'border-semantic-error ring-1 ring-semantic-error' : 'border-brand-gray/30'} rounded-lg text-sm text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-indigo/50 resize-none mb-2`}
+                    className={`w-full h-24 px-4 py-3 bg-white border ${resolutionNoteError ? 'border-semantic-error ring-1 ring-semantic-error' : 'border-brand-gray/30'} rounded-lg text-sm text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-indigo/50 resize-none mb-2`}
                   />
                   {resolutionNoteError && (
                     <p className="text-sm text-semantic-error mb-3">Please add a resolution note before marking this complaint as resolved.</p>
                   )}
-                  {env.useMock && <div className="flex sm:justify-end">
-                    <button 
-                      onClick={handleAddNote}
-                      disabled={!notes.trim()}
-                      className="w-full sm:w-auto px-4 py-2 bg-brand-indigo text-white rounded-lg hover:bg-brand-indigo/90 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed justify-center"
+                  <div className="flex flex-wrap justify-end gap-2">
+                    {env.useMock && <button type="button" onClick={handleAddNote} disabled={!notes.trim()} className="rounded-lg px-3 py-2 text-sm">Save Notes</button>}
+                    <button
+                      type="button"
+                      onClick={() => void saveStatus("Resolved")}
+                      disabled={saving}
+                      className="rounded-lg bg-brand-indigo px-4 py-2 text-sm font-medium text-white hover:bg-brand-indigo/90 disabled:opacity-50"
                     >
-                      Save Notes
+                      {saving ? "Saving…" : "Resolve Complaint"}
                     </button>
-                  </div>}
+                  </div>
                 </div>
               )}
             </PremiumCardContent>
-          </PremiumCard>
+          </section>
         </div>
 
-        <div className="space-y-6">
-          <PremiumCard>
-            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+        <div className="min-w-0 space-y-4">
+          <section className="rounded-xl border border-brand-gray/30 bg-white shadow-sm dark:bg-slate-900">
+            <PremiumCardHeader className="p-4 border-b border-brand-gray/20">
               <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Information</PremiumCardTitle>
             </PremiumCardHeader>
-            <PremiumCardContent className="space-y-4">
+            <PremiumCardContent className="space-y-3 p-4">
               <div>
                 <span className="text-xs text-brand-navy/50 font-semibold uppercase block mb-1">Category</span>
                 <span className="text-sm font-medium text-brand-navy">{complaint.category}</span>
@@ -260,13 +266,13 @@ export default function AdminComplaintDetails() {
                 <span className="text-sm font-medium text-brand-navy">{complaint.updatedAt}</span>
               </div>
             </PremiumCardContent>
-          </PremiumCard>
+          </section>
 
-          <PremiumCard>
-            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4">
+          <section className="rounded-xl border border-brand-gray/30 bg-white shadow-sm dark:bg-slate-900">
+            <PremiumCardHeader className="p-4 border-b border-brand-gray/20">
               <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Submitted By</PremiumCardTitle>
             </PremiumCardHeader>
-            <PremiumCardContent className="space-y-4">
+            <PremiumCardContent className="space-y-3 p-4">
               <div>
                 <span className="text-xs text-brand-navy/50 font-semibold uppercase block mb-1">Name</span>
                 <span className="text-sm font-medium text-brand-navy">{complaint.submittedBy.name}</span>
@@ -290,14 +296,14 @@ export default function AdminComplaintDetails() {
                 View User <ExternalLink className="w-4 h-4" />
               </button>
             </PremiumCardContent>
-          </PremiumCard>
+          </section>
 
-          <PremiumCard>
-            <PremiumCardHeader className="pb-2 border-b border-brand-gray/20 mb-4 flex flex-row items-center justify-between">
+          <section className="rounded-xl border border-brand-gray/30 bg-white shadow-sm dark:bg-slate-900">
+            <PremiumCardHeader className="p-4 border-b border-brand-gray/20 flex flex-row items-center justify-between">
               <PremiumCardTitle className="text-lg font-display font-semibold text-brand-navy">Complaint Activity</PremiumCardTitle>
               <Activity className="w-4 h-4 text-brand-navy/40" />
             </PremiumCardHeader>
-            <PremiumCardContent>
+            <PremiumCardContent className="p-4">
               <div className="space-y-4">
                 {complaint.activity.map((act, i) => (
                   <div key={i} className="flex gap-4 relative">
@@ -315,7 +321,7 @@ export default function AdminComplaintDetails() {
                 ))}
               </div>
             </PremiumCardContent>
-          </PremiumCard>
+          </section>
 
           <div className="bg-brand-light/50 border border-brand-gray/20 rounded-xl p-4">
             <h3 className="font-semibold text-brand-navy mb-2 flex items-center gap-2">

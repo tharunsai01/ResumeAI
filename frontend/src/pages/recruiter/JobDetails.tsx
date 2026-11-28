@@ -67,9 +67,14 @@ export default function RecruiterJobDetails() {
   const handleCloseJob = async () => {
     if (!jobId) return
     if (window.confirm("Are you sure you want to close this job? It will no longer accept applications.")) {
-      const updated = await jobService.updateJob(jobId, { status: "Closed" })
-      if (updated) setJob(updated)
-      setToastMsg("Job closed successfully ✓")
+      try {
+        const updated = await jobService.updateJob(jobId, { status: "Closed" })
+        if (!updated) throw new Error("Job is unavailable")
+        setJob(updated)
+        setToastMsg("Job closed successfully ✓")
+      } catch {
+        setToastMsg("Couldn’t close the job. Please try again.")
+      }
       setTimeout(() => setToastMsg(null), 3000)
     }
   }

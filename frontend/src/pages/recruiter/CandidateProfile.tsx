@@ -1,17 +1,19 @@
 import * as React from "react"
 import { motion } from "framer-motion"
-import { ChevronLeft, MapPin, Mail, Briefcase, Download, Eye, Calendar, Sparkles, AlertCircle, CheckCircle2, FileText } from "lucide-react"
+import { ChevronLeft, MapPin, Mail, Briefcase, Download, Eye, Calendar, Sparkles, CheckCircle2, FileText } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DashboardShell } from "../../components/layout/DashboardShell"
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "../../components/ui/PremiumCard"
+import { httpClient } from "../../services/api/httpClient"
+import { Modal } from "../../components/ui/Modal"
 import { Button } from "../../components/ui/Button"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { recruiterCandidateService } from "../../services/recruiterCandidateService"
 import type { RecruiterCandidate } from "../../services/recruiterCandidateService"
 import { CandidateStatusBadge } from "./components/CandidateStatusBadge"
 import { CandidateMatchScore } from "./components/CandidateMatchScore"
-import { RejectCandidateModal } from "./components/RejectCandidateModal"
 import { cn } from "../../lib/utils"
+import { RejectCandidateModal } from "./components/RejectCandidateModal"
 
 export default function RecruiterCandidateProfile() {
   const navigate = useNavigate()
@@ -22,28 +24,70 @@ export default function RecruiterCandidateProfile() {
   const [candidateToReject, setCandidateToReject] = React.useState<boolean>(false)
   const [shortlistMsg, setShortlistMsg] = React.useState<string | null>(null)
 
-  React.useEffect(() => {
-    let active = true
-    void recruiterCandidateService.fetchLiveCandidates().then(() => {
-      if (!active) return
-      setCandidate(recruiterCandidateService.getCandidateById(candidateId || "") ?? null)
-      setLoading(false)
-    })
-    return () => { active = false }
-  }, [candidateId])
+  const [resumeError, setResumeError] = React.useState("")
+  const [previewUrl, setPreviewUrl] = React.useState<string>()
+  const [fileLoading, setFileLoading] = React.useState(false)
+  React.useEffect(() => () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+  }, [previewUrl])
 
-  const handleShortlist = () => {
-    if (candidate) {
-      setCandidate({ ...candidate, status: "Shortlisted" })
-      setShortlistMsg("Candidate shortlisted successfully.")
-      setTimeout(() => setShortlistMsg(null), 3000)
+  async function openResume(preview: boolean) {
+    if (!candidate?.resume || fileLoading) return
+    const { id, fileName } = candidate.resume
+    setFileLoading(true)
+    setResumeError("")
+    try {
+      const file = await httpClient.get<Blob>(`/resumes/${encodeURIComponent(id)}/download`, { responseType: "blob" })
+      const url = URL.createObjectURL(file)
+      if (preview) {
+        setPreviewUrl(url)
+      } else {
+        const link = document.createElement("a")
+        link.href = url
+        link.download = fileName
+        link.click()
+        window.setTimeout(() => URL.revokeObjectURL(url), 30_000)
+      }
+    } catch {
+      setResumeError("The submitted résumé could not be opened.")
+    } finally {
+      setFileLoading(false)
     }
   }
 
-  const handleReject = () => {
-    if (candidate) {
-      setCandidate({ ...candidate, status: "Rejected" })
+  React.useEffect(() => {
+    let active = true
+    const refresh = () => {
+      void recruiterCandidateService.fetchLiveCandidates({ candidateId }).then(items => {
+        if (!active) return
+        setCandidate(items.find(item => item.id === candidateId) ?? null)
+        setLoading(false)
+      }).catch(() => {
+        if (active) {
+          setCandidate(null)
+          setLoading(false)
+        }
+      })
+    }
+    refresh()
+    window.addEventListener("focus", refresh)
+    return () => { active = false; window.removeEventListener("focus", refresh) }
+  }, [candidateId])
+
+  const [saving, setSaving] = React.useState(false)
+  const changeStatus = async (status: "Shortlisted" | "Rejected") => {
+    if (!candidate || saving) return
+    setSaving(true)
+    try {
+      const updated = await recruiterCandidateService.setApplicationStatus(candidate, status)
+      setCandidate(updated)
       setCandidateToReject(false)
+      setShortlistMsg(`Application ${status.toLowerCase()} successfully.`)
+    } catch (error) {
+      setShortlistMsg(error instanceof Error ? error.message : "Couldn’t update the application.")
+    } finally {
+      setSaving(false)
+      setTimeout(() => setShortlistMsg(null), 3000)
     }
   }
 
@@ -87,9 +131,9 @@ export default function RecruiterCandidateProfile() {
         {/* HEADER PROFILE CARD */}
         <motion.div variants={slideUp}>
           <PremiumCard className="overflow-hidden border-none shadow-md">
-            <div className="h-24 w-full bg-gradient-to-r from-brand-indigo via-brand-blue to-brand-navy/80" />
-            <PremiumCardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 relative flex flex-col md:flex-row justify-between md:items-end gap-4 sm:gap-6">
-              <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-5 -mt-10 mb-2 sm:mb-0 relative z-10 min-w-0">
+            <div className="h-12 w-full bg-gradient-to-r from-brand-indigo via-brand-blue to-brand-navy/80" />
+            <PremiumCardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 sm:pt-5 relative flex flex-col md:flex-row justify-between md:items-end gap-4 sm:gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-5 mb-2 sm:mb-0 relative z-10 min-w-0">
                 <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white p-1.5 shadow-lg shrink-0">
                   <div className="w-full h-full bg-gradient-to-br from-brand-indigo/10 to-brand-blue/10 rounded-xl flex items-center justify-center border border-brand-gray/30">
                     <span className="text-2xl sm:text-3xl font-display font-bold text-brand-indigo">
@@ -103,86 +147,94 @@ export default function RecruiterCandidateProfile() {
                     <CandidateStatusBadge status={candidate.status} />
                   </div>
                   <div className="text-sm sm:text-base font-medium text-brand-navy/80 break-words">{candidate.title}</div>
+                  {candidate.applicationId && <p className="text-sm text-brand-navy/70">Application for {candidate.appliedRole}</p>}
                   <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-brand-navy/60 pt-1">
                     <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> {candidate.location}</span>
                     <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> {candidate.email}</span>
-                    <span className="flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> {candidate.experience} exp.</span>
+                    <span className="flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> {candidate.experience}</span>
                   </div>
                 </div>
               </div>
               
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0">
-                {candidate.status !== "Rejected" && candidate.status !== "Shortlisted" && (
+                {["Applied", "Screening"].includes(candidate.status) && (
                   <Button variant="outline" className="w-full sm:w-auto text-semantic-error hover:bg-semantic-error/5 hover:text-semantic-error border-brand-gray/40 bg-white" onClick={() => setCandidateToReject(true)}>
                     Reject
                   </Button>
                 )}
-                {candidate.status !== "Shortlisted" && (
-                  <Button variant="outline" className="w-full sm:w-auto bg-white border-brand-gray/40 hover:bg-brand-light text-brand-navy" onClick={handleShortlist}>
+                {["Applied", "Screening"].includes(candidate.status) && (
+                  <Button variant="outline" className="w-full sm:w-auto bg-white border-brand-gray/40 hover:bg-brand-light text-brand-navy" disabled={saving} onClick={() => void changeStatus("Shortlisted")}>
                     Shortlist
                   </Button>
                 )}
-                <Button onClick={() => navigate("/recruiter/interviews")} className="w-full sm:w-auto bg-gradient-to-r from-brand-indigo to-brand-blue shadow-sm">
+                {["Hired", "Rejected", "Withdrawn"].includes(candidate.status) ? (
+                  <Button variant="outline" onClick={() => navigate("/recruiter/hiring")}>View Hiring Pipeline</Button>
+                ) : (
+                <Button onClick={() => navigate("/recruiter/interviews", { state: { applicationId: candidate.applicationId } })} className="w-full sm:w-auto bg-gradient-to-r from-brand-indigo to-brand-blue shadow-sm">
                   <Calendar className="w-4 h-4 mr-2" /> Schedule Interview
                 </Button>
+                )}
               </div>
             </PremiumCardContent>
           </PremiumCard>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 items-start gap-4">
           {/* MAIN CONTENT COLUMN */}
           <motion.div variants={slideUp} className="lg:col-span-2 space-y-6">
             
             {/* OVERVIEW */}
-            <PremiumCard>
+            <PremiumCard style={{ height: "auto" }}>
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Professional Summary</PremiumCardTitle>
               </PremiumCardHeader>
               <PremiumCardContent className="p-4 sm:p-6">
                 <p className="text-brand-navy/80 leading-relaxed text-sm">
-                  Results-driven {candidate.title} with {candidate.experience} of experience specializing in {candidate.skills.slice(0,2).map(s => s.name).join(" and ")}. 
-                  Proven track record in delivering high-quality software solutions and collaborating effectively with cross-functional teams.
-                  Passionate about continuous learning and adopting new technologies to solve complex problems.
+                  {candidate.summary || "No summary was extracted from the submitted résumé."}
                 </p>
               </PremiumCardContent>
             </PremiumCard>
 
             {/* EXPERIENCE */}
-            <PremiumCard>
+            <PremiumCard style={{ height: "auto" }}>
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Experience</PremiumCardTitle>
               </PremiumCardHeader>
               <PremiumCardContent className="p-4 sm:p-6">
-                {candidate.experience === "Fresher" ? (
-                  <div className="text-sm text-brand-navy/60 italic">No professional experience listed.</div>
+                {!candidate.workHistory?.length ? (
+                  <p className="text-sm text-brand-navy/60">No experience section was extracted from the submitted résumé.</p>
                 ) : (
-                  <div className="space-y-6 relative before:absolute before:inset-0 before:ml-2.5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-brand-indigo/20 before:via-brand-blue/20 before:to-transparent">
-                    {/* Mock static experience entries for visual structure */}
-                    <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full border-2 border-brand-indigo bg-white text-brand-indigo shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10" />
-                      <div className="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] bg-brand-light p-4 rounded-xl border border-brand-gray/30 shadow-sm ml-4 md:ml-0">
-                        <div className="flex justify-between items-start mb-1">
-                          <h4 className="font-semibold text-brand-navy text-sm">{candidate.title}</h4>
-                          <span className="text-[10px] font-medium bg-white px-2 py-0.5 rounded-full border border-brand-gray/30 text-brand-navy/70 whitespace-nowrap">Current</span>
-                        </div>
-                        <div className="text-xs text-brand-indigo font-medium mb-2">TechCorp Solutions</div>
-                        <p className="text-xs text-brand-navy/70 leading-relaxed">
-                          Spearheaded the development of core infrastructure. Reduced latency by 40% and improved overall system reliability.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <ul className="space-y-3 text-sm text-brand-navy/80">
+                    {candidate.workHistory.map((entry, idx) => (
+                      <li key={idx} className="rounded-lg border border-brand-gray/30 p-3">
+                        {typeof entry === "string" ? entry : (
+                          <>
+                            <h4 className="font-semibold">{entry.title}</h4>
+                            <p className="text-brand-navy/70">{[entry.company, entry.duration].filter(Boolean).join(" · ")}</p>
+                            {Array.isArray(entry.description) && entry.description.map((line, index) => <p key={index} className="mt-1">{line}</p>)}
+                          </>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </PremiumCardContent>
             </PremiumCard>
 
             {/* PROJECTS */}
-            <PremiumCard>
+            <PremiumCard style={{ height: "auto" }}>
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Projects</PremiumCardTitle>
               </PremiumCardHeader>
               <PremiumCardContent className="p-4 sm:p-6 space-y-4">
+                {!candidate.projects.length && !candidate.projectText?.length && (
+                  <p className="text-sm text-brand-navy/60">No projects section was extracted from the submitted résumé.</p>
+                )}
+                {!!candidate.projectText?.length && (
+                  <ul className="space-y-2 text-sm text-brand-navy/80">
+                    {candidate.projectText.map((line, index) => <li key={index}>{line}</li>)}
+                  </ul>
+                )}
                 {candidate.projects.map((proj, idx) => (
                   <div key={idx} className="bg-brand-light/50 p-4 rounded-xl border border-brand-gray/30">
                     <h4 className="font-semibold text-brand-navy text-sm mb-1">{proj.title}</h4>
@@ -200,11 +252,12 @@ export default function RecruiterCandidateProfile() {
             </PremiumCard>
 
             {/* EDUCATION */}
-            <PremiumCard>
+            <PremiumCard style={{ height: "auto" }}>
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Education</PremiumCardTitle>
               </PremiumCardHeader>
               <PremiumCardContent className="p-4 sm:p-6 space-y-4">
+                {!candidate.education.length && <p className="text-sm text-brand-navy/60">No education was extracted.</p>}
                 {candidate.education.map((edu, idx) => (
                   <div key={idx} className="flex justify-between items-start">
                     <div>
@@ -223,7 +276,7 @@ export default function RecruiterCandidateProfile() {
           <motion.div variants={slideUp} className="space-y-6">
             
             {/* AI MATCH PREVIEW */}
-            <PremiumCard className="border-brand-indigo/20 shadow-[0_4px_20px_-10px_rgba(79,70,229,0.1)] relative overflow-hidden">
+            <PremiumCard style={{ height: "auto" }} className="border-brand-indigo/20 shadow-[0_4px_20px_-10px_rgba(79,70,229,0.1)] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-indigo/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-indigo/[0.02] pb-4">
                 <PremiumCardTitle className="flex items-center gap-2 text-brand-indigo">
@@ -236,38 +289,9 @@ export default function RecruiterCandidateProfile() {
                     <div className="text-sm font-semibold text-brand-navy">Overall Match</div>
                     <div className="text-xs text-brand-navy/50 mt-0.5">Based on job requirements</div>
                   </div>
-                  <CandidateMatchScore score={candidate.matchScore} size="lg" showLabel={false} />
+                  {candidate.hasMatchScore !== false ? <CandidateMatchScore score={candidate.matchScore} size="lg" showLabel={false} /> : <span className="text-sm text-brand-navy/60">Awaiting score</span>}
                 </div>
                 
-                <div className="space-y-3 mb-6">
-                  {[
-                    { label: "Skills Match", score: Math.min(100, candidate.matchScore + 4) },
-                    { label: "Experience Match", score: Math.max(0, candidate.matchScore - 5) },
-                    { label: "Role Similarity", score: Math.min(100, candidate.matchScore + 2) }
-                  ].map(stat => (
-                    <div key={stat.label}>
-                      <div className="flex justify-between text-xs font-medium text-brand-navy/70 mb-1">
-                        <span>{stat.label}</span>
-                        <span>{stat.score}%</span>
-                      </div>
-                      <div className="w-full bg-brand-gray/20 rounded-full h-1.5 overflow-hidden">
-                        <div className={cn("h-full rounded-full transition-all duration-1000", stat.score >= 80 ? "bg-semantic-success" : stat.score >= 60 ? "bg-semantic-warning" : "bg-semantic-error")} style={{ width: `${stat.score}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-2 pt-4 border-t border-brand-gray/20">
-                  <div className="text-xs font-semibold text-brand-navy/60 uppercase tracking-wider mb-2">Key Insights</div>
-                  <div className="flex items-start gap-2 text-xs text-brand-navy/80">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-semantic-success shrink-0 mt-0.5" />
-                    <span>Strong alignment with core technical requirements.</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-xs text-brand-navy/80">
-                    <AlertCircle className="w-3.5 h-3.5 text-semantic-warning shrink-0 mt-0.5" />
-                    <span>Slightly less experience than ideally preferred.</span>
-                  </div>
-                </div>
               </PremiumCardContent>
               <div className="p-4 bg-brand-indigo/5 border-t border-brand-gray/20">
                 <Button onClick={() => navigate("/recruiter/screening")} className="w-full bg-white text-brand-indigo border-brand-indigo/20 hover:bg-brand-indigo hover:text-white transition-colors">
@@ -277,23 +301,17 @@ export default function RecruiterCandidateProfile() {
             </PremiumCard>
 
             {/* SKILLS */}
-            <PremiumCard>
+            <PremiumCard style={{ height: "auto" }}>
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Skills & Expertise</PremiumCardTitle>
               </PremiumCardHeader>
               <PremiumCardContent className="p-5">
                 <div className="flex flex-col gap-3">
+                  {!candidate.skills.length && <p className="text-sm text-brand-navy/60">No skills were extracted.</p>}
                   {candidate.skills.map(skill => (
                     <div key={skill.name} className="flex items-center justify-between">
                       <span className="text-sm font-medium text-brand-navy">{skill.name}</span>
-                      <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border",
-                        skill.proficiency === "Strong" ? "bg-brand-indigo/10 text-brand-indigo border-brand-indigo/20" :
-                        skill.proficiency === "Intermediate" ? "bg-brand-blue/10 text-brand-blue border-brand-blue/20" :
-                        "bg-brand-gray/20 text-brand-navy/60 border-brand-gray/30"
-                      )}>
-                        {skill.proficiency}
-                      </span>
+
                     </div>
                   ))}
                 </div>
@@ -301,40 +319,45 @@ export default function RecruiterCandidateProfile() {
             </PremiumCard>
 
             {/* RESUME */}
-            <PremiumCard>
+            <PremiumCard style={{ height: "auto" }}>
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Resume</PremiumCardTitle>
               </PremiumCardHeader>
               <PremiumCardContent className="p-5">
-                <div className="bg-brand-light rounded-xl border border-brand-gray/30 p-4 flex flex-col items-center justify-center text-center gap-3">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
-                    <FileText className="w-6 h-6 text-brand-indigo" />
+                {candidate.resume ? (
+                  <div className="rounded-xl border border-brand-gray/30 bg-brand-light p-4">
+                    <p className="flex items-center gap-2 break-all text-sm font-semibold">
+                      <FileText className="h-5 w-5 shrink-0 text-brand-indigo" /> {candidate.resume.fileName}
+                    </p>
+                    <p className="mt-1 text-xs text-brand-navy/60">Submitted with this application</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {candidate.resume.mimeType === "application/pdf" && (
+                        <Button variant="outline" size="sm" disabled={fileLoading} onClick={() => void openResume(true)}>
+                          <Eye className="mr-1.5 h-4 w-4" /> Preview
+                        </Button>
+                      )}
+                      <Button variant="outline" size="sm" disabled={fileLoading} onClick={() => void openResume(false)}>
+                        <Download className="mr-1.5 h-4 w-4" /> Download
+                      </Button>
+                    </div>
+                    {resumeError && <p role="alert" className="mt-2 text-sm text-semantic-error">{resumeError}</p>}
                   </div>
-                  <div>
-                    <div className="text-sm font-semibold text-brand-navy mb-0.5">{candidate.name.replace(" ", "_")}_Resume.pdf</div>
-                    <div className="text-xs text-brand-navy/50">Updated {candidate.appliedDate}</div>
-                  </div>
-                  <div className="flex w-full gap-2 mt-2">
-                    <Button variant="outline" className="flex-1 h-9 text-xs bg-white">
-                      <Eye className="w-3.5 h-3.5 mr-1.5" /> Preview
-                    </Button>
-                    <Button variant="outline" className="flex-1 h-9 text-xs bg-white">
-                      <Download className="w-3.5 h-3.5 mr-1.5" /> Download
-                    </Button>
-                  </div>
-                </div>
+                ) : <p className="text-sm text-brand-navy/60">The original upload is unavailable for this application.</p>}
+                <Modal isOpen={!!previewUrl} onClose={() => setPreviewUrl(undefined)} title={candidate.resume?.fileName} className="max-w-5xl">
+                  {previewUrl && <iframe title="Submitted résumé preview" src={previewUrl} className="h-[65vh] w-full rounded-lg border" />}
+                </Modal>
               </PremiumCardContent>
             </PremiumCard>
 
             {/* APPLICATION HISTORY */}
-            <PremiumCard>
+            <PremiumCard style={{ height: "auto" }}>
               <PremiumCardHeader className="border-b border-brand-gray/20 bg-brand-light/30 pb-4">
                 <PremiumCardTitle>Application History</PremiumCardTitle>
               </PremiumCardHeader>
               <PremiumCardContent className="p-5">
                 <div className="space-y-4">
                   {candidate.applicationHistory.map((hist, idx) => (
-                    <div key={idx} className="flex gap-3">
+                    <div key={hist.id || idx} className="flex gap-3">
                       <div className="flex flex-col items-center">
                         <div className={cn(
                           "w-2.5 h-2.5 rounded-full mt-1.5",
@@ -363,7 +386,7 @@ export default function RecruiterCandidateProfile() {
         isOpen={candidateToReject}
         candidateName={candidate?.name}
         onClose={() => setCandidateToReject(false)}
-        onConfirm={handleReject}
+        onConfirm={() => void changeStatus("Rejected")}
       />
     </DashboardShell>
   )

@@ -19,6 +19,7 @@ export const VALID_PIPELINE_STAGES: PipelineStage[] = [
 
 export const pipelineService = {
   getCandidates(): PipelineCandidate[] {
+    if (!env.useMock) return []
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(PIPELINE_STORAGE_KEY)
       if (stored) {
@@ -51,13 +52,17 @@ export const pipelineService = {
     return list.find(c => c.id === id)
   },
 
+  async listInterviewApplications(): Promise<PipelineCandidate[]> {
+    if (env.useMock) return this.getCandidates()
+    return (await httpClient.get<{ data: PipelineCandidate[] }>("/recruiter/pipeline?includeApplied=true")).data
+  },
+
   async fetchLivePipeline(jobId?: string): Promise<PipelineCandidate[]> {
     if (env.useMock) return this.getCandidates()
     try {
       const endpoint = jobId ? `/recruiter/pipeline?jobId=${jobId}` : "/recruiter/pipeline"
       const res = await httpClient.get<{ success: boolean; data: any[] }>(endpoint)
       if (res?.data && Array.isArray(res.data)) {
-        this.saveCandidates(res.data)
         return res.data
       }
     } catch (err) {
@@ -66,15 +71,11 @@ export const pipelineService = {
     return this.getCandidates()
   },
 
-  updateCandidateStage(id: string, stage: PipelineStage): PipelineCandidate | null {
-    if (!id || !VALID_PIPELINE_STAGES.includes(stage)) {
-      return null
-    }
-
+  async updateCandidateStage(id: string, stage: PipelineStage): Promise<PipelineCandidate | null> {
+    if (!id || !VALID_PIPELINE_STAGES.includes(stage)) return null
     if (!env.useMock) {
-      httpClient.patch(`/recruiter/pipeline/${id}/stage`, { stage }).catch((err) => {
-        console.warn("[PipelineService] Live stage update warning:", err)
-      })
+      await httpClient.patch(`/recruiter/pipeline/${id}/stage`, { stage })
+      return (await this.fetchLivePipeline()).find(candidate => candidate.applicationId === id) ?? null
     }
 
     const candidates = this.getCandidates()
@@ -153,6 +154,12 @@ export const pipelineService = {
     const updated = [candidate, ...list]
     this.saveCandidates(updated)
     return candidate
+  },
+
+  async removeShortlistedCandidate(candidate: { id: string; applicationId?: string }) {
+    if (env.useMock) return this.removeCandidate(candidate.id)
+    if (!candidate.applicationId) throw new Error("This candidate has no application.")
+    await httpClient.patch(`/applications/${candidate.applicationId}/status`, { status: "screened" })
   },
 
   removeCandidate(id: string): boolean {

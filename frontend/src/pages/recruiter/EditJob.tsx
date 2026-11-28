@@ -28,16 +28,16 @@ export default function EditJob() {
         setInitialData({
           title: job.title,
           company: job.company,
-          category: (job as any).category || "Software Development",
+          category: job.category || "Software Development",
           location: job.location,
           type: job.jobType,
           workMode: job.workMode,
           experience: job.experience,
-          salary: job.salary === "Salary not disclosed" ? "" : job.salary,
-          salaryNotDisclosed: job.salary === "Salary not disclosed",
+          salary: ["Salary not disclosed", "Salary not listed"].includes(job.salary) ? "" : job.salary,
+          salaryNotDisclosed: ["Salary not disclosed", "Salary not listed"].includes(job.salary),
           description: job.description,
           requiredSkills: job.skills,
-          preferredSkills: (job as any).preferredSkills || []
+          preferredSkills: job.preferredSkills || []
         })
       }
       setLoading(false)
@@ -74,8 +74,9 @@ export default function EditJob() {
         type: data.type as any,
         workMode: data.workMode as any,
         experience: data.experience,
-        salary: data.salaryNotDisclosed ? "Salary not disclosed" : (data.salary.trim() || "Salary not disclosed"),
-        salaryNotDisclosed: data.salaryNotDisclosed,
+        ...(data.salary !== initialData?.salary || data.salaryNotDisclosed !== initialData?.salaryNotDisclosed
+          ? { salary: data.salary.trim(), salaryNotDisclosed: data.salaryNotDisclosed }
+          : {}),
         description: data.description.trim(),
         skills: Array.from(new Set([...data.requiredSkills, ...data.preferredSkills])),
         requiredSkills: data.requiredSkills,
@@ -88,7 +89,7 @@ export default function EditJob() {
       })
     } catch (err) {
       console.error("Failed to update job:", err)
-      setErrorMsg("An error occurred while updating the job. Please try again.")
+      setErrorMsg(err instanceof Error ? err.message : "Unable to update the job. Please try again.")
       setIsSubmitting(false)
     }
   }
@@ -126,34 +127,20 @@ export default function EditJob() {
           </div>
         </motion.div>
 
-        <AnimatePresence mode="wait">
-          {loading ? (
-            <motion.div 
-              key="loading"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="flex justify-center items-center py-24 text-brand-navy/40"
-            >
-              <Loader2 className="w-8 h-8 animate-spin" />
-            </motion.div>
-          ) : !initialData ? (
-            <motion.div 
-              key="error"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="text-center py-12 text-semantic-error"
-            >
-              Job not found.
-            </motion.div>
-          ) : (
-            <motion.div key="form" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <JobForm 
-                initialData={initialData}
-                onSubmit={handleSubmit}
-                onCancel={handleCancel}
-                isSubmitting={isSubmitting}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {loading ? (
+          <div role="status" aria-label="Loading job" className="flex justify-center py-24 text-brand-navy/40">
+            <Loader2 className="w-8 h-8 animate-spin" />
+          </div>
+        ) : !initialData ? (
+          <p className="text-center py-12 text-semantic-error">Job not found.</p>
+        ) : (
+          <JobForm
+            initialData={initialData}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            isSubmitting={isSubmitting}
+          />
+        )}
       </motion.div>
     </DashboardShell>
   )

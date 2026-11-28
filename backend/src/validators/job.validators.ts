@@ -8,6 +8,7 @@ import {
 
 const jobBaseSchema = z.object({
   title: z.string().trim().min(3, 'Title must be at least 3 characters').max(150),
+  department: z.string().trim().max(150).optional(),
   companyName: z.string().trim().max(150).optional(),
   description: z.string().trim().min(10, 'Description must be at least 10 characters'),
   location: z.string().trim().max(150).optional(),
@@ -18,7 +19,7 @@ const jobBaseSchema = z.object({
     .min(1, 'At least one required skill must be specified'),
   niceToHaveSkills: z.array(z.string().trim().min(1)).optional(),
   minExperienceYears: z.coerce.number().min(0).optional(),
-  maxExperienceYears: z.coerce.number().min(0).optional(),
+  maxExperienceYears: z.coerce.number().min(0).nullable().optional(),
   educationLevel: z.enum(EDUCATION_LEVELS).optional(),
   salary: z
     .object({

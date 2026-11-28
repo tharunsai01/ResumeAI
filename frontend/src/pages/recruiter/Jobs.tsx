@@ -103,22 +103,32 @@ export default function RecruiterJobs() {
   }
 
   const handleDuplicate = async (job: RecruiterJob) => {
-    await jobService.createJob({
-      ...job,
-      title: `${job.title} — Copy`,
-      status: "Draft",
-      applications: 0,
-      postedDate: "Just now"
-    })
-    setToastMsg("Job duplicated as draft ✓")
+    try {
+      const copy = await jobService.createJob({
+        ...job,
+        title: `${job.title} — Copy`,
+        status: "Draft",
+        applications: 0,
+        postedDate: "Just now"
+      })
+      setJobs(previous => previous.some(job => job.id === copy.id) ? previous : [copy, ...previous])
+      setToastMsg("Job duplicated as draft ✓")
+    } catch {
+      setToastMsg("Couldn’t duplicate the job. Please try again.")
+    }
     setTimeout(() => setToastMsg(null), 3000)
   }
 
   const handleToggleStatus = async (jobId: string, currentStatus: JobStatus) => {
     const newStatus: JobStatus = currentStatus === "Closed" ? "Active" : "Closed"
-    await jobService.updateJob(jobId, { status: newStatus })
-    setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: newStatus } : j))
-    setToastMsg(`Job status updated to ${newStatus} ✓`)
+    try {
+      const updated = await jobService.updateJob(jobId, { status: newStatus })
+      if (!updated) throw new Error("Job is unavailable")
+      setJobs(prev => prev.map(job => job.id === jobId ? { ...job, status: updated.status } : job))
+      setToastMsg(`Job status updated to ${newStatus} ✓`)
+    } catch {
+      setToastMsg("Couldn’t update the job status. Please try again.")
+    }
     setTimeout(() => setToastMsg(null), 3000)
   }
 

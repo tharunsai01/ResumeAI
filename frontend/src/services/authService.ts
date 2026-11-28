@@ -1,11 +1,10 @@
 import { env } from "../config/env"
-import { httpClient } from "./api/httpClient"
+import { httpClient, SESSION_KEY } from "./api/httpClient"
 import type { UserRole, User } from "../types/auth"
 
 export type { UserRole, User }
 
 const USERS_KEY = "hiresmart_users"
-const SESSION_KEY = "hiresmart_session"
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -109,38 +108,6 @@ export const authService = {
       }
       if (!password) {
         throw new Error("Password is required.")
-      }
-
-      // Check admin credentials
-      if ((email.trim().toLowerCase() === "admin@hiresmart.ai" || email.trim().toLowerCase() === "admin") && password === "admin123") {
-        try {
-          const res = await httpClient.post<{ success: boolean; data: { accessToken: string; user: any } }>("/auth/login", {
-            email: "admin@hiresmart.ai",
-            password,
-          })
-          if (res?.data?.accessToken) {
-            httpClient.setAuthToken(res.data.accessToken)
-            const sessionUser: User = {
-              id: res.data.user.id || res.data.user._id,
-              email: res.data.user.email,
-              name: res.data.user.fullName || "Admin User",
-              role: "admin",
-            }
-            localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
-            window.dispatchEvent(new Event('hiresmart_auth_changed'))
-            return sessionUser
-          }
-        } catch {
-          const sessionUser: User = {
-            id: "mock_admin_123",
-            email: "admin@hiresmart.ai",
-            name: "Admin User",
-            role: "admin",
-          }
-          localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
-          window.dispatchEvent(new Event('hiresmart_auth_changed'))
-          return sessionUser
-        }
       }
 
       const res = await httpClient.post<{ success: boolean; data: { accessToken: string; user: any } }>("/auth/login", {
@@ -618,7 +585,7 @@ export const authService = {
 
   logout() {
     if (!env.useMock) {
-      httpClient.post("/auth/logout").catch(() => {})
+      httpClient.endSession().catch(() => {})
       httpClient.setAuthToken(null)
     }
 

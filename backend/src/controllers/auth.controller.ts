@@ -35,7 +35,9 @@ export async function refresh(req: Request, res: Response) {
     res.cookie(COOKIE_NAME, refreshToken, cookieOptions);
     sendSuccess(res, { user, accessToken });
   } catch (err) {
-    res.clearCookie(COOKIE_NAME, { path: cookieOptions.path });
+    if (err instanceof ApiError && (err.statusCode === 401 || err.statusCode === 403)) {
+      res.clearCookie(COOKIE_NAME, { path: cookieOptions.path });
+    }
     throw err;
   }
 }

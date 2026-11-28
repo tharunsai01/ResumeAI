@@ -48,12 +48,27 @@ export async function extractRawText(buffer: Buffer, mimeType: string): Promise<
   throw new Error(`Unsupported MIME type for text extraction: ${mimeType}`);
 }
 
+function extractSection(rawText: string, heading: RegExp): string[] {
+  const lines = rawText.split(/\r?\n/).map(line => line.trim());
+  const start = lines.findIndex(line => heading.test(line));
+  if (start < 0) return [];
+  const nextHeading = /^(?:(?:professional |work |relevant |employment |internship )?experience|employment history|work history|internships|(?:(?:personal|academic|selected|technical) )?projects|education|(?:technical )?skills|certifications?|achievements|awards|publications|languages|interests|volunteering|references|summary|profile)\s*:?$/i;
+  const content: string[] = [];
+  for (const line of lines.slice(start + 1)) {
+    if (nextHeading.test(line)) break;
+    if (line && !/^--\s*\d+ of \d+\s*--$/.test(line)) content.push(line);
+    if (content.length === 40) break;
+  }
+  return content;
+}
+
 export function parseResumeDeterministic(rawText: string) {
   if (!rawText || rawText.trim().length === 0) {
     return {
       skills: [],
       totalExperienceYears: 0,
       experience: [],
+      projects: [],
       education: [],
       contact: { email: undefined, phone: undefined },
     };
@@ -101,7 +116,8 @@ export function parseResumeDeterministic(rawText: string) {
   return {
     skills: matchedSkills,
     totalExperienceYears: estimatedYears,
-    experience: [],
+    experience: extractSection(rawText, /^(?:(?:professional |work |relevant |internship )?experience|employment history|work history|internships)\s*:?$/i),
+    projects: extractSection(rawText, /^(?:(?:personal|academic|selected|technical) )?projects\s*:?$/i),
     education,
     contact: {
       email: emailMatch ? emailMatch[0] : undefined,

@@ -14,11 +14,35 @@ import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import { jobService } from "../../services/jobService"
+import { authService } from "../../services/authService"
+import type { Application, ApplicationStatus, TimelineEvent } from "../../types/application"
+import { downloadSampleOfferLetter } from "../../services/sampleOfferLetter"
 import { applicationService } from "../../services/applicationService"
 import type { JobMatchResult } from "../../services/jobService"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
 let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
+
+const statusLabels: Record<string, ApplicationStatus> = {
+  applied: "Applied", screened: "AI Screened", shortlisted: "Shortlisted",
+  interview: "Interview", hired: "Hired", rejected: "Rejected", withdrawn: "Withdrawn",
+}
+
+const interviewLabels: Record<string, string> = {
+  "Moved to pipeline stage: Interview Completed": "Interview Completed",
+  "Moved to pipeline stage: Decision Pending": "Decision Pending",
+}
+
+function getTimelineLabel(event: TimelineEvent) {
+  if (event.label) return event.label
+  const labels: Partial<Record<ApplicationStatus, string>> = {
+    Applied: "Application Submitted",
+    "Under Review": "Resume Reviewed",
+    Interview: "Interview Scheduled",
+    Offer: "Offer Extended",
+  }
+  return labels[event.status] ?? event.status
+}
 
 export default function CandidateApplicationDetails() {
   const { applicationId } = useParams<{ applicationId: string }>()
@@ -49,12 +73,36 @@ export default function CandidateApplicationDetails() {
 
     try {
       setAttachedResume(null)
+      const cached = applicationService.getApplication(applicationId)
+      let appRecord: Application | undefined = cached
       if (!env.useMock) {
-        const { data } = await httpClient.get<{ data: { resume?: typeof attachedResume } }>(`/applications/${encodeURIComponent(applicationId)}`)
+        const { data } = await httpClient.get<{ data: {
+          _id: string
+          job: { _id: string }
+          candidate: { _id: string }
+          status: string
+          matchScore?: number
+          createdAt: string
+          resume?: typeof attachedResume
+          statusHistory: { status: string; note?: string; changedAt?: string }[]
+        } }>(`/applications/${encodeURIComponent(applicationId)}`)
         setAttachedResume(data.resume ?? null)
+        const status = statusLabels[data.status] ?? "Applied"
+        appRecord = {
+          id: data._id,
+          jobId: data.job._id,
+          candidateId: data.candidate._id,
+          status,
+          matchScore: data.matchScore ?? cached?.matchScore ?? 0,
+          appliedDate: data.createdAt,
+          notes: cached?.notes ?? "",
+          timeline: data.statusHistory?.map(event => ({
+            status: statusLabels[event.status] ?? status,
+            date: event.changedAt || data.createdAt,
+            label: event.note ? interviewLabels[event.note] : undefined,
+          })) ?? [],
+        }
       }
-      const appRecord = applicationService.getApplication(applicationId)
-        ?? (!env.useMock ? (await applicationService.fetchLiveApplications()).find(app => app.id === applicationId) : undefined)
       if (!appRecord) {
         // Genuinely not found - loading completes, application stays null
         setApplication(null)
@@ -100,8 +148,10 @@ export default function CandidateApplicationDetails() {
     }
 
     window.addEventListener("hiresmart_applications_updated", handleUpdate)
+    window.addEventListener("focus", handleUpdate)
     return () => {
       window.removeEventListener("hiresmart_applications_updated", handleUpdate)
+      window.removeEventListener("focus", handleUpdate)
     }
   }, [loadApplication])
 
@@ -172,6 +222,7 @@ export default function CandidateApplicationDetails() {
       case "Under Review": return <Badge variant="secondary" className="bg-brand-violet/10 text-brand-violet border-brand-violet/20">Under Review</Badge>
       case "Shortlisted": return <Badge variant="success" className="bg-semantic-success/20 text-semantic-success border-semantic-success/30">Shortlisted</Badge>
       case "Interview": return <Badge variant="secondary" className="bg-brand-indigo/10 text-brand-indigo border-brand-indigo/20">Interview</Badge>
+      case "Hired": return <Badge variant="success">Hired</Badge>
       case "Offer": return <Badge variant="success" className="bg-semantic-success/20 text-semantic-success border-semantic-success/30">Offer</Badge>
       case "Rejected": return <Badge variant="secondary" className="bg-semantic-error/10 text-semantic-error border-semantic-error/20">Rejected</Badge>
       case "Withdrawn": return <Badge variant="secondary" className="bg-brand-gray/50 text-brand-navy/60 border-brand-gray">Withdrawn</Badge>
@@ -181,6 +232,15 @@ export default function CandidateApplicationDetails() {
 
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })
   const isWithdrawn = application.status === "Withdrawn"
+  const isHired = application.status === "Hired"
+  const isFinal = ["Hired", "Rejected", "Withdrawn", "Offer"].includes(application.status)
+  const timeline = application.timeline.filter((event, index, events) =>
+    !index || event.status !== "Interview" || getTimelineLabel(event) !== getTimelineLabel(events[index - 1])
+    || event.date !== events[index - 1].date
+  )
+  if (timeline.at(-1)?.status !== application.status) {
+    timeline.push({ status: application.status, date: application.appliedDate })
+  }
 
   return (
     <DashboardShell type="candidate" userName={activeResume.personalInfo.name}>
@@ -233,7 +293,10 @@ export default function CandidateApplicationDetails() {
                     >
                       View Original Job
                     </Button>
-                    {!isWithdrawn && application.status !== "Rejected" && application.status !== "Offer" && (
+                {application.status === "Interview" && (
+                  <Button variant="outline" onClick={() => navigate("/candidate/interviews")}>View Interview</Button>
+                )}
+                    {!isFinal && (
                       <Button 
                         variant="ghost"
                         className="text-semantic-error hover:text-semantic-error hover:bg-semantic-error/10"
@@ -256,6 +319,22 @@ export default function CandidateApplicationDetails() {
           </Card>
         </motion.div>
 
+        {isHired && (
+          <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100">
+            <div>
+              <h2 className="font-semibold">You’ve been hired</h2>
+              <p className="mt-1 text-sm">Download a HireSmart AI sample offer letter. Your employer provides the official offer and terms.</p>
+            </div>
+            <Button onClick={() => downloadSampleOfferLetter({
+              candidate: authService.getCurrentUser()?.name || "Candidate",
+              company: application.company,
+              position: application.title,
+              hiringDate: formatDate(timeline[timeline.length - 1].date),
+              reference: application.applicationId,
+            })}><FileText className="mr-2 h-4 w-4" /> Download Offer Letter PDF</Button>
+          </section>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Info Column */}
           <div className="lg:col-span-2 space-y-6">
@@ -267,12 +346,12 @@ export default function CandidateApplicationDetails() {
                   <CardTitle>Application Timeline</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="relative pl-6 space-y-8">
+                  <div className="relative pl-6 space-y-5">
                     {/* Vertical line connecting timeline dots */}
                     <div className="absolute top-2 bottom-2 left-[11px] w-px bg-brand-gray" />
                     
-                    {application.timeline.map((event, idx) => {
-                      const isLast = idx === application.timeline.length - 1
+                    {timeline.map((event, idx) => {
+                      const isLast = idx === timeline.length - 1
                       return (
                         <div key={idx} className="relative">
                           {/* Dot */}
@@ -288,10 +367,7 @@ export default function CandidateApplicationDetails() {
                                 "font-medium",
                                 isLast && !isWithdrawn ? "text-brand-indigo font-semibold" : "text-brand-navy"
                               )}>
-                                {event.status === "Applied" ? "Application Submitted" :
-                                 event.status === "Under Review" ? "Resume Reviewed" :
-                                 event.status === "Interview" ? "Interview Scheduled" :
-                                 event.status === "Offer" ? "Offer Extended" : event.status}
+                                {getTimelineLabel(event)}
                               </p>
                               <p className="text-sm text-brand-navy/60">{formatDate(event.date)}</p>
                             </div>
@@ -305,7 +381,7 @@ export default function CandidateApplicationDetails() {
                     })}
                     
                     {/* Anticipated future steps if still active */}
-                    {!isWithdrawn && application.status !== "Offer" && application.status !== "Rejected" && (
+                    {!isFinal && (
                       <div className="relative opacity-40">
                         <div className="absolute -left-6 w-3.5 h-3.5 rounded-full border-2 border-brand-gray/50 bg-white" />
                         <p className="font-medium text-brand-navy/60">

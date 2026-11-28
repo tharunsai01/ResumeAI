@@ -9,6 +9,7 @@ import { Modal } from "../../components/ui/Modal"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { interviewService } from "../../services/interviewService"
 import type { MockInterview } from "../../services/interviewService"
+import type { InterviewSchedule } from "../../services/interviewService"
 import { ScheduleInterviewModal } from "./components/ScheduleInterviewModal"
 import { cn } from "../../lib/utils"
 
@@ -54,34 +55,40 @@ export default function RecruiterInterviewDetails() {
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    setLoading(false)
-    
-  }, [])
+    let active = true
+    setLoading(true)
+    void interviewService.fetchLiveRecruiterInterviews().then(items => {
+      if (active) setInterview(items.find(item => item.id === interviewId))
+    }).catch(() => {
+      if (active) setInterview(undefined)
+    }).finally(() => {
+      if (active) setLoading(false)
+    })
+    return () => { active = false }
+  }, [interviewId])
 
   const showToast = (msg: string) => {
     setToastMsg(msg)
     setTimeout(() => setToastMsg(null), 3000)
   }
 
-  const handleReschedule = (data: any) => {
-    if (interview) {
-      setInterview({
-        ...interview,
-        date: data.date,
-        time: data.time,
-        duration: data.duration,
-        type: data.type,
-        interviewer: data.interviewer
-      })
-      showToast("Interview rescheduled successfully.")
-    }
+  const handleReschedule = async (data: InterviewSchedule) => {
+    if (!interview) return
+    const updated = await interviewService.rescheduleRecruiterInterview(interview.id, data)
+    if (!updated) throw new Error("Couldn’t load the updated interview.")
+    setInterview(updated)
+    showToast("Interview rescheduled successfully.")
   }
 
-  const handleCancel = () => {
-    if (interview) {
+  const handleCancel = async () => {
+    if (!interview) return
+    try {
+      await interviewService.cancelRecruiterInterview(interview.id)
       setInterview({ ...interview, status: "Cancelled" })
       setCancelModalOpen(false)
       showToast("Interview cancelled.")
+    } catch {
+      showToast("Couldn’t cancel the interview. Please try again.")
     }
   }
 
@@ -362,7 +369,7 @@ export default function RecruiterInterviewDetails() {
         isOpen={rescheduleModalOpen}
         onClose={() => setRescheduleModalOpen(false)}
         onSchedule={handleReschedule}
-        initialCandidate={{ id: interview.candidateId, name: interview.candidateName, role: interview.jobTitle }}
+        initialCandidate={{ id: interview.candidateId, name: interview.candidateName, role: interview.jobTitle, applicationId: interview.applicationId }}
       />
 
       <Modal isOpen={cancelModalOpen} onClose={() => setCancelModalOpen(false)} title="Cancel Interview?" className="max-w-md">

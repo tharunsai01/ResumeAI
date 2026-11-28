@@ -13,18 +13,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Initial load from session storage
+    let active = true
+    // Validate a cached user before mounting protected routes.
     const current = authService.getCurrentUser()
     setUser(current)
-    setIsLoading(false)
-
-    // Rehydrate and verify with live backend if authenticated
     if (current) {
-      authService.getMe().then(liveUser => {
-        if (liveUser) {
-          setUser(liveUser)
-        }
-      }).catch(() => {})
+      void authService.getMe().then(liveUser => {
+        if (active) setUser(liveUser)
+      }).finally(() => {
+        if (active) setIsLoading(false)
+      })
+    } else {
+      setIsLoading(false)
     }
 
     // Listen to changes (login, logout, multi-tab sync)
@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.addEventListener("storage", handleAuthChange) // for cross-tab auth state syncing
 
     return () => {
+      active = false
       window.removeEventListener("hiresmart_auth_changed", handleAuthChange)
       window.removeEventListener("storage", handleAuthChange)
     }

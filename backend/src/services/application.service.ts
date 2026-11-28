@@ -95,7 +95,7 @@ export async function applyToJob(candidateId: string, input: CreateApplicationIn
     type: 'system',
     title: 'Application Submitted',
     message: `Your application for ${job.title} was submitted successfully`,
-    link: '/candidate/applications',
+    link: `/candidate/applications/${application._id}`,
     entityId: application._id.toString(),
     entityType: 'Application',
   }).catch(() => {});
@@ -250,6 +250,8 @@ export async function updateApplicationStatus(
     throw ApiError.badRequest('Cannot update status of a hired candidate');
   }
 
+  if (application.status === input.status) return application;
+
   application.status = input.status;
   application.statusHistory.push({
     status: input.status,
@@ -271,11 +273,11 @@ export async function updateApplicationStatus(
   });
 
   const notifType = input.status === 'shortlisted' ? 'shortlisted' : 'status_changed';
-  createNotification(application.candidate.toString(), {
+  await createNotification(application.candidate.toString(), {
     type: notifType,
-    title: `Application Status: ${input.status.toUpperCase()}`,
+    title: input.status === "shortlisted" ? "Application Shortlisted" : `Application Status: ${input.status.toUpperCase()}`,
     message: `Your application for ${(application.job as any)?.title || 'the position'} has been updated to "${input.status}"`,
-    link: '/candidate/applications',
+    link: `/candidate/applications/${application._id}`,
     entityId: application._id.toString(),
     entityType: 'Application',
   }).catch(() => {});

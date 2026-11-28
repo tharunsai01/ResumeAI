@@ -2,7 +2,7 @@
  * Recruiter Portal and Candidate Review Domain Types
  */
 
-export type AppStatus = "Applied" | "Screening" | "Shortlisted" | "Interview" | "Rejected" | "Hired"
+export type AppStatus = "Applied" | "Screening" | "Shortlisted" | "Interview" | "Rejected" | "Hired" | "Withdrawn"
 export type AIScreeningStatus = "Not Screened" | "Screened" | "Strong Match" | "Potential Match" | "Low Match"
 
 export interface CandidateExperience {
@@ -25,6 +25,11 @@ export interface CandidateProject {
 }
 
 export interface RecruiterCandidate {
+  applicationId?: string
+  summary?: string
+  workHistory?: (string | { title?: string; company?: string; duration?: string; description?: string[] })[]
+  projectText?: string[]
+  resume?: { id: string; fileName: string; mimeType?: string; uploadedAt?: string } | null
   id: string
   name: string
   title: string
@@ -34,12 +39,13 @@ export interface RecruiterCandidate {
   skills: { name: string; proficiency: "Strong" | "Intermediate" | "Basic" }[]
   education: CandidateEducation[]
   projects: CandidateProject[]
+  hasMatchScore?: boolean
   matchScore: number
   status: AppStatus
   appliedRole: string
   appliedDate: string
   screeningStatus: AIScreeningStatus
-  applicationHistory: { role: string; date: string; status: AppStatus }[]
+  applicationHistory: { id?: string; role: string; date: string; status: AppStatus }[]
 }
 
 export interface RecruiterProfile {

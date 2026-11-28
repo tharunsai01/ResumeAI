@@ -230,7 +230,7 @@ export async function searchJobs(query: JobQueryInput) {
   const [jobs, total] = await Promise.all([
     Job.find(filter)
       .populate('recruiter', 'fullName companyName')
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
       .limit(limit),
     Job.countDocuments(filter),

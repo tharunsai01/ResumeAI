@@ -104,6 +104,7 @@ export const EvaluationBody = z.object({
     .object({
       components: z.array(z.enum(["skills", "stability", "fairness", "security", "blind"])).optional(),
       stabilityRuns: z.number().int().min(1).max(10).optional(),
+      fairnessResumes: z.number().int().min(1).max(3).optional(),
       fairnessThreshold: z.number().min(0).optional(),
       attackTolerance: z.number().min(0).optional(),
       variantIds: z.array(str).optional(),

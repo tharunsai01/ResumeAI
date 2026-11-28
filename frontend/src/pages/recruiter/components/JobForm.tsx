@@ -217,13 +217,10 @@ export function JobForm({ initialData, onSubmit, onCancel, isSubmitting }: JobFo
                   onChange={e => setFormData({ ...formData, experience: e.target.value })}
                   className="w-full bg-white border border-brand-gray/50 rounded-xl px-4 py-2.5 outline-none focus:border-brand-indigo/50 text-brand-navy"
                 >
-                  <option>Fresher</option>
-                  <option>0–2 years</option>
-                  <option>1–3 Years</option>
-                  <option>2–4 years</option>
-                  <option>3–5 Years</option>
-                  <option>5–8 Years</option>
-                  <option>8+ Years</option>
+                  {Array.from(new Set([
+                    "Fresher", "0–2 Years", "1–3 Years", "2–4 Years", "3–5 Years", "5–8 Years", "8+ Years",
+                    formData.experience,
+                  ])).map(experience => <option key={experience}>{experience}</option>)}
                 </select>
               </div>
             </div>

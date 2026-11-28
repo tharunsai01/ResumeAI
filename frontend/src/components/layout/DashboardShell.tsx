@@ -89,6 +89,11 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
     // Load initial
     setNotifications(notificationService.getNotifications(type))
     
+    const refresh = () => { void notificationService.fetchLiveNotifications() }
+    refresh()
+    window.addEventListener("focus", refresh)
+    const timer = window.setInterval(() => { if (document.visibilityState === "visible") refresh() }, 30000)
+
     // Listen for custom event from our service
     const handleUpdate = () => setNotifications(notificationService.getNotifications(type))
     
@@ -99,6 +104,8 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
     window.addEventListener('storage', handleStorage)
     
     return () => {
+      window.clearInterval(timer)
+      window.removeEventListener('focus', refresh)
       window.removeEventListener('hiresmart_notifications_updated', handleUpdate)
       window.removeEventListener('storage', handleStorage)
     }
@@ -109,6 +116,7 @@ export function DashboardShell({ children, type, userName = "User" }: DashboardS
     { name: "My Resume", icon: FileText, href: "/candidate/resume", iconBg: "bg-blue-600/10 text-blue-600 dark:bg-blue-600/20" },
     { name: "Find Jobs", icon: Search, href: "/candidate/jobs", iconBg: "bg-sky-500/10 text-sky-500 dark:bg-sky-500/20" },
     { name: "Recommended", icon: Briefcase, href: "/candidate/recommended", iconBg: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20" },
+    { name: "Interviews", icon: Calendar, href: "/candidate/interviews", iconBg: "bg-indigo-500/10 text-indigo-500" },
     { name: "Applications", icon: FileText, href: "/candidate/applications", iconBg: "bg-amber-500/10 text-amber-500 dark:bg-amber-500/20" },
     { name: "Skill Analysis", icon: BarChart, href: "/candidate/skills", iconBg: "bg-purple-500/10 text-purple-500 dark:bg-purple-500/20" },
     { name: "Profile", icon: User, href: "/candidate/profile", iconBg: "bg-pink-500/10 text-pink-500 dark:bg-pink-500/20" },

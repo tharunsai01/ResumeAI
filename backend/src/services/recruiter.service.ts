@@ -9,6 +9,7 @@ import {
   ScreeningSettings,
   MatchResult,
 } from '../models';
+import { parseResumeDeterministic } from './resumeParser.service';
 import { ApiError } from '../utils/ApiError';
 import { recordAuditLog } from './audit.service';
 import { createNotification } from './notification.service';
@@ -129,18 +130,26 @@ export async function getRecruiterDashboard(recruiterId: string) {
 
 export async function searchCandidates(
   recruiterId: string,
-  query: { skills?: string; minExperience?: number; location?: string; search?: string },
+  query: { skills?: string; minExperience?: number; location?: string; search?: string; candidateId?: string },
 ) {
   const jobs = await Job.find({ recruiter: recruiterId }).select('_id').lean();
-  const applications = await Application.find({ job: { $in: jobs.map(job => job._id) } })
-    .select('candidate resume').sort({ createdAt: -1 })
-    .populate('resume', 'aiAnalysis');
-  const resumesByCandidate = new Map();
+  const applications = await Application.find({
+    job: { $in: jobs.map(job => job._id) },
+    ...(query.candidateId ? { candidate: query.candidateId } : {}),
+  })
+    .select('candidate resume job status matchScore createdAt').sort({ createdAt: -1, _id: -1 })
+    .populate('job', 'title')
+    .populate('resume', query.candidateId
+      ? 'aiAnalysis parsedData fileName originalFilename mimeType storedFileName createdAt +rawText securityResult'
+      : 'aiAnalysis');
+  const applicationsByCandidate = new Map<string, typeof applications>();
   for (const application of applications) {
     const candidateId = application.candidate.toString();
-    if (!resumesByCandidate.has(candidateId)) resumesByCandidate.set(candidateId, application.resume);
+    const candidateApplications = applicationsByCandidate.get(candidateId);
+    if (candidateApplications) candidateApplications.push(application);
+    else applicationsByCandidate.set(candidateId, [application]);
   }
-  const filter: any = { user: { $in: [...resumesByCandidate.keys()] } };
+  const filter: any = { user: { $in: [...applicationsByCandidate.keys()] } };
 
   if (query.skills) {
     const skillsArr = query.skills.split(',').map((s) => new RegExp(escapeRegex(s.trim()), 'i'));
@@ -167,16 +176,44 @@ export async function searchCandidates(
 
   return profiles.map((p) => {
     const u = p.user as any;
-    const r = u?._id ? resumesByCandidate.get(u._id.toString()) : undefined;
+    const candidateApplications = u?._id ? applicationsByCandidate.get(u._id.toString()) ?? [] : [];
+    const application = candidateApplications[0];
+    const r = application?.resume as any;
+    const extracted = query.candidateId && r?.rawText && r.securityResult?.isSafe !== false
+      && (!r.aiAnalysis?.experience?.length || !r.aiAnalysis?.projects?.length)
+      ? parseResumeDeterministic(r.rawText)
+      : null;
     return {
       id: p.user?._id || p._id,
       name: u?.fullName || 'Candidate',
+      applicationId: application?._id,
+      applicationStatus: application?.status,
+      appliedAt: application?.createdAt,
+      jobTitle: (application?.job as any)?.title,
+      applicationHistory: candidateApplications.map(item => ({
+        id: item._id,
+        role: (item.job as any)?.title || 'Application',
+        date: item.createdAt,
+        status: item.status,
+      })),
+      screeningScore: application?.matchScore,
       email: u?.email,
       headline: p.headline || 'Software Professional',
       location: p.location || 'Remote',
-      skills: p.skills || [],
-      experience: p.experience || [],
-      education: p.education || [],
+      skills: query.candidateId ? r?.parsedData?.skills ?? [] : p.skills || [],
+      ...(query.candidateId ? {
+        summary: r?.aiAnalysis?.summary || '',
+        totalExperienceYears: r?.parsedData?.totalExperienceYears,
+        workHistory: r?.aiAnalysis?.experience?.length ? r.aiAnalysis.experience : extracted?.experience ?? [],
+        projects: r?.aiAnalysis?.projects?.length ? r.aiAnalysis.projects : extracted?.projects ?? [],
+        education: r?.aiAnalysis?.education?.length ? r.aiAnalysis.education : r?.parsedData?.education ?? [],
+        resume: r?.storedFileName ? {
+          id: r._id,
+          fileName: r.fileName || r.originalFilename || 'Résumé',
+          mimeType: r.mimeType,
+          uploadedAt: r.createdAt,
+        } : null,
+      } : { experience: p.experience || [], education: p.education || [] }),
       profileCompletion: p.profileCompletion,
       resumeAnalysis: r?.aiAnalysis
         ? {
@@ -258,7 +295,7 @@ export async function updateScreeningSettings(recruiterId: string, updates: any)
   return settings;
 }
 
-export async function getHiringPipeline(recruiterId: string, jobId?: string) {
+export async function getHiringPipeline(recruiterId: string, jobId?: string, includeApplied = false) {
   const filter: any = {};
   if (jobId) {
     filter.job = jobId;
@@ -271,12 +308,25 @@ export async function getHiringPipeline(recruiterId: string, jobId?: string) {
     filter.job = { $in: jobs.map((j) => j._id) };
   }
 
+  filter.status = { $in: includeApplied
+    ? ['applied', 'screened', 'shortlisted', 'interview']
+    : ['shortlisted', 'interview', 'hired', 'rejected'] };
   const applications = await Application.find(filter)
     .populate('candidate', 'fullName email')
     .populate('job', 'title')
     .populate('resume', 'fileName aiAnalysis')
     .populate('matchResult')
     .sort({ createdAt: -1 });
+
+  const interviews = await Interview.find({
+    application: { $in: applications.map(app => app._id) },
+    status: { $in: ['scheduled', 'rescheduled', 'completed'] },
+  }).sort({ scheduledAt: -1, _id: -1 }).select('application status scheduledAt').lean();
+  const interviewByApplication = new Map<string, (typeof interviews)[number]>();
+  for (const interview of interviews) {
+    const id = interview.application.toString();
+    if (!interviewByApplication.has(id)) interviewByApplication.set(id, interview);
+  }
 
   // Map to pipeline candidate structures
   const pipelineCandidates = applications.map((app) => {
@@ -285,10 +335,15 @@ export async function getHiringPipeline(recruiterId: string, jobId?: string) {
     const match = app.matchResult as any;
 
     let stage = 'Shortlisted';
-    if (app.status === 'applied') stage = 'Shortlisted';
-    else if (app.status === 'screened') stage = 'Shortlisted';
-    else if (app.status === 'shortlisted') stage = 'Shortlisted';
-    else if (app.status === 'interview') stage = 'Interview Scheduled';
+    const interview = interviewByApplication.get(app._id.toString());
+    const lastUpdate = app.statusHistory.at(-1);
+    if (app.status === 'applied') stage = 'Applied';
+    else if (app.status === 'screened') stage = 'Screened';
+    else if (app.status === 'interview') {
+      if (lastUpdate?.note === 'Moved to pipeline stage: Decision Pending') stage = 'Decision Pending';
+      else if (interview?.status === 'completed' || lastUpdate?.note === 'Moved to pipeline stage: Interview Completed') stage = 'Interview Completed';
+      else stage = interview ? 'Interview Scheduled' : 'Shortlisted';
+    }
     else if (app.status === 'hired') stage = 'Hired';
     else if (app.status === 'rejected') stage = 'Rejected';
 
@@ -297,7 +352,10 @@ export async function getHiringPipeline(recruiterId: string, jobId?: string) {
       applicationId: app._id.toString(),
       name: cand?.fullName || 'Candidate',
       role: job?.title || 'Applicant',
-      matchScore: match?.overallScore ?? app.matchScore ?? 85,
+      matchScore: match?.overallScore ?? app.matchScore,
+      overallMatch: match?.overallScore ?? app.matchScore,
+      interviewId: interview?._id,
+      scheduledAt: interview?.scheduledAt,
       stage,
       skills: match?.matchedSkills || [],
       experience: '2+ Years',
@@ -323,6 +381,21 @@ export async function updatePipelineStage(
   const jobRecruiter = (application.job as any)?.recruiter?.toString();
   if (jobRecruiter !== recruiterId) {
     throw ApiError.forbidden('Unauthorized to update this application pipeline stage');
+  }
+
+  const validStages = ['Shortlisted', 'Interview Scheduled', 'Interview Completed', 'Decision Pending', 'Hired', 'Rejected'];
+  if (!validStages.includes(stage)) throw ApiError.badRequest('Invalid pipeline stage');
+  if (application.status === 'withdrawn') throw ApiError.badRequest('This application was withdrawn');
+  if (stage.startsWith('Interview') || stage === 'Decision Pending') {
+    const interview = await Interview.findOne({
+      application: application._id,
+      status: { $in: ['scheduled', 'rescheduled', 'completed'] },
+    }).sort({ scheduledAt: -1 });
+    if (!interview) throw ApiError.badRequest('Schedule an interview for this application first');
+    if (stage === 'Interview Completed' && interview.status !== 'completed') {
+      interview.status = 'completed';
+      await interview.save();
+    }
   }
 
   let newStatus: string = application.status;

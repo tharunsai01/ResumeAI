@@ -14,6 +14,8 @@ import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
 import SpotlightCard from "../../components/ui/SpotlightCard";
 
+const JOBS_PER_PAGE = 10
+
 let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 export default function CandidateJobs() {
@@ -23,6 +25,9 @@ export default function CandidateJobs() {
   const activeResume = React.useMemo(() => resumeService.getActiveResumeAnalysis(), [])
 
   const [loading, setLoading] = React.useState(true)
+  const [loadError, setLoadError] = React.useState(false)
+  const [loadAttempt, setLoadAttempt] = React.useState(0)
+  const [page, setPage] = React.useState(1)
   const [allJobs, setAllJobs] = React.useState<JobMatchResult[]>([])
 
   const [searchTerm, setSearchTerm] = React.useState(() => searchParams.get("search") || "")
@@ -94,18 +99,28 @@ export default function CandidateJobs() {
   ];
 
   React.useEffect(() => {
+    const controller = new AbortController()
     const fetchJobs = async () => {
+      setLoading(true)
+      setLoadError(false)
       try {
-        const jobs = await jobService.getJobs()
-        // Score all jobs against candidate
-        const scored = jobs.map(j => jobService.calculateJobMatch(activeResume, j))
-        setAllJobs(scored)
+        const jobs = await jobService.getJobs(controller.signal)
+        if (!controller.signal.aborted) {
+          setAllJobs(jobs.map(job => jobService.calculateJobMatch(activeResume, job)))
+        }
+      } catch {
+        if (!controller.signal.aborted) setLoadError(true)
       } finally {
-        setLoading(false)
+        if (!controller.signal.aborted) setLoading(false)
       }
     }
-    fetchJobs()
-  }, [activeResume])
+    void fetchJobs()
+    return () => controller.abort()
+  }, [activeResume, loadAttempt])
+
+  React.useEffect(() => {
+    setPage(1)
+  }, [debouncedSearchTerm, filters, sortBy])
 
   // Apply filters and sort using useMemo
   const filteredJobs = React.useMemo(() => {
@@ -113,7 +128,7 @@ export default function CandidateJobs() {
 
     // Search (Debounced)
     if (debouncedSearchTerm) {
-      const q = debouncedSearchTerm.toLowerCase()
+      const q = debouncedSearchTerm.trim().toLowerCase()
       result = result.filter(r =>
         r.job.title.toLowerCase().includes(q) ||
         r.job.company.toLowerCase().includes(q) ||
@@ -123,7 +138,7 @@ export default function CandidateJobs() {
 
     // Filters
     if (filters.category) result = result.filter(r => r.job.category === filters.category)
-    if (filters.location) result = result.filter(r => r.job.location.includes(filters.location))
+    if (filters.location) result = result.filter(r => r.job.location.toLowerCase().includes(filters.location.toLowerCase()))
     if (filters.type) result = result.filter(r => r.job.type === filters.type)
     if (filters.experience) result = result.filter(r => r.job.experience === filters.experience)
     if (filters.salary) result = result.filter(r => r.job.salary === filters.salary)
@@ -152,6 +167,10 @@ export default function CandidateJobs() {
 
     return result
   }, [allJobs, debouncedSearchTerm, filters, sortBy])
+
+  const totalPages = Math.max(1, Math.ceil(filteredJobs.length / JOBS_PER_PAGE))
+  const currentPage = Math.min(page, totalPages)
+  const visibleJobs = filteredJobs.slice((currentPage - 1) * JOBS_PER_PAGE, currentPage * JOBS_PER_PAGE)
 
   const clearFilters = () => {
     setFilters({ category: "", location: "", type: "", experience: "", salary: "", skills: [] })
@@ -310,7 +329,7 @@ export default function CandidateJobs() {
           <div className="flex-1 w-full space-y-6">
             <motion.div variants={slideUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-brand-light/50 p-3 sm:p-4 rounded-xl border border-brand-gray/30">
               <p className="text-sm sm:text-base text-brand-navy/70 font-medium">
-                {loading ? "Searching..." : `${filteredJobs.length} jobs found`}
+                {loading ? "Searching..." : loadError ? "Jobs unavailable" : `${filteredJobs.length} jobs found`}
               </p>
 
               <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
@@ -334,31 +353,45 @@ export default function CandidateJobs() {
                   <div key={i} className="h-64 bg-white rounded-xl border border-brand-gray/30 animate-pulse" />
                 ))}
               </div>
+            ) : loadError ? (
+              <div role="alert" className="bg-white rounded-xl border border-brand-gray/50 p-8 text-center">
+                <p className="mb-4 text-brand-navy">Couldn’t load jobs. Please try again.</p>
+                <Button variant="outline" onClick={() => setLoadAttempt(attempt => attempt + 1)}>Retry</Button>
+              </div>
             ) : filteredJobs.length > 0 ? (
-              <motion.div layout className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <AnimatePresence mode="popLayout">
-                  {filteredJobs.map(({ job, overallMatch }) => (
-                    <motion.div
-                      key={job.id}
-                      layout
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                      transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
-                    >
-                      <JobCard
-                        {...job}
-                        matchScore={overallMatch}
-                        isSaved={savedJobs.includes(job.id)}
-                        isApplied={hasApplied(job.id)}
-                        onSave={() => toggleSaveJob(job.id)}
-                        onClick={() => navigate(`/candidate/jobs/${job.id}`)}
-                        onApply={() => navigate(`/candidate/jobs/${job.id}?apply=true`)}
-                      />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
+              <>
+                <motion.div layout className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                  <AnimatePresence mode="popLayout">
+                    {visibleJobs.map(({ job, overallMatch }) => (
+                      <motion.div
+                        key={job.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                        transition={{ duration: 0.3, type: "spring", bounce: 0.2 }}
+                      >
+                        <JobCard
+                          {...job}
+                          matchScore={overallMatch}
+                          isSaved={savedJobs.includes(job.id)}
+                          isApplied={hasApplied(job.id)}
+                          onSave={() => toggleSaveJob(job.id)}
+                          onClick={() => navigate(`/candidate/jobs/${job.id}`)}
+                          onApply={() => navigate(`/candidate/jobs/${job.id}?apply=true`)}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
+                {totalPages > 1 && (
+                  <nav aria-label="Job result pages" className="flex items-center justify-center gap-3 py-4">
+                    <Button variant="outline" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>Previous</Button>
+                    <span aria-live="polite">Page {currentPage} of {totalPages}</span>
+                    <Button variant="outline" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)}>Next</Button>
+                  </nav>
+                )}
+              </>
             ) : (
               <div className="bg-white rounded-xl border border-brand-gray/50 p-12 text-center flex flex-col items-center justify-center">
                 <Search className="w-12 h-12 text-brand-navy/20 mb-4" />

@@ -10,6 +10,7 @@ import { ApiError } from "./apiError"
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS"
 
 export interface HttpRequestOptions extends Omit<RequestInit, "body" | "method"> {
+  responseType?: "blob"
   /** Optional URL query parameters serialized into the URL */
   params?: Record<string, string | number | boolean | undefined | null>
   /** Custom request headers */
@@ -30,6 +31,9 @@ export interface HttpClientConfig {
 }
 
 const DEFAULT_TIMEOUT_MS = 15000
+const ACCESS_TOKEN_KEY = "hiresmart_access_token"
+export const SESSION_KEY = "hiresmart_session"
+const SESSION_LOCK = "hiresmart-session-refresh"
 
 /**
  * Reusable HTTP Client wrapping native fetch.
@@ -39,6 +43,7 @@ export class HttpClient {
   readonly defaultTimeoutMs: number
   readonly defaultHeaders: Record<string, string>
   private authToken: string | null = null
+  private refreshRequest: Promise<boolean> | null = null
 
   constructor(config: HttpClientConfig = {}) {
     this.baseUrl = config.baseUrl ?? env.apiBaseUrl
@@ -50,19 +55,60 @@ export class HttpClient {
     this.authToken = token
     if (typeof window !== "undefined") {
       if (token) {
-        localStorage.setItem("hiresmart_access_token", token)
+        localStorage.setItem(ACCESS_TOKEN_KEY, token)
       } else {
-        localStorage.removeItem("hiresmart_access_token")
+        localStorage.removeItem(ACCESS_TOKEN_KEY)
       }
     }
   }
 
   getAuthToken(): string | null {
-    if (this.authToken) return this.authToken
-    if (typeof window !== "undefined") {
-      this.authToken = localStorage.getItem("hiresmart_access_token")
+    return typeof window === "undefined" ? this.authToken : localStorage.getItem(ACCESS_TOKEN_KEY)
+  }
+
+  async endSession(): Promise<void> {
+    const logout = async () => {
+      await this.refreshRequest?.catch(() => {})
+      await this.post("/auth/logout")
     }
-    return this.authToken
+    if (navigator.locks) {
+      await navigator.locks.request(SESSION_LOCK, async () => { await this.post("/auth/logout") })
+    } else {
+      await logout()
+    }
+  }
+
+  private refreshSession(rejectedToken: string): Promise<boolean> {
+    if (this.refreshRequest) return this.refreshRequest
+    const renew = async () => {
+      const current = this.getAuthToken()
+      if (current !== rejectedToken) return Boolean(current)
+
+      const response = await fetch(this.buildUrl("/auth/refresh"), {
+        method: "POST",
+        credentials: "include",
+        signal: AbortSignal.timeout(this.defaultTimeoutMs),
+      })
+      if (this.getAuthToken() !== rejectedToken) return false
+      if (response.status === 401 || response.status === 403) {
+        this.setAuthToken(null)
+        localStorage.removeItem(SESSION_KEY)
+        window.dispatchEvent(new Event("hiresmart_auth_changed"))
+        return false
+      }
+      if (!response.ok) throw ApiError.fromResponse(response)
+      const { data } = await response.json()
+      if (typeof data?.accessToken !== "string" || !data.accessToken) {
+        throw new ApiError("Session renewal returned no access token.")
+      }
+      if (this.getAuthToken() !== rejectedToken) return false
+      this.setAuthToken(data.accessToken)
+      return true
+    }
+
+    const renewal = navigator.locks ? navigator.locks.request(SESSION_LOCK, renew) : renew()
+    this.refreshRequest = renewal.finally(() => { this.refreshRequest = null })
+    return this.refreshRequest
   }
 
   /**
@@ -175,7 +221,8 @@ export class HttpClient {
   async request<T = unknown>(
     endpoint: string,
     options: HttpRequestOptions = {},
-    method: HttpMethod = "GET"
+    method: HttpMethod = "GET",
+    retryAfterRefresh = true
   ): Promise<T> {
     const timeoutMs = options.timeoutMs ?? this.defaultTimeoutMs
     const url = this.buildUrl(endpoint, options.params)
@@ -210,6 +257,19 @@ export class HttpClient {
         signal: controller.signal,
       })
 
+      const usedToken = headers.Authorization
+      const authPath = url.split("?")[0].split("/auth/")[1]
+      if (
+        response.status === 401 && retryAfterRefresh && !env.useMock && typeof window !== "undefined" &&
+        !controller.signal.aborted && !/^https?:\/\//i.test(endpoint) &&
+        (!authPath || authPath === "me") && usedToken?.startsWith("Bearer ") &&
+        !Object.keys(options.headers ?? {}).some(key => key.toLowerCase() === "authorization")
+      ) {
+        if (await this.refreshSession(usedToken.slice(7)) && !controller.signal.aborted) {
+          return await this.request<T>(endpoint, options, method, false)
+        }
+      }
+
       // Handle non-2xx responses
       if (!response.ok) {
         let errorBody: unknown = null
@@ -232,6 +292,8 @@ export class HttpClient {
       if (response.status === 204 || response.status === 205 || method === "HEAD") {
         return null as T
       }
+
+      if (options.responseType === "blob") return await response.blob() as T
 
       // Safe body extraction
       const text = await response.text()

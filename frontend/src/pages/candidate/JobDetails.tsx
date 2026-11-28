@@ -15,9 +15,7 @@ import { useJobActions } from "../../hooks/useJobActions"
 import { resumeService } from "../../services/resumeService"
 import { staggerContainer, slideUp } from "../../lib/animations"
 import { cn } from "../../lib/utils"
-import SpotlightCard from "../../components/ui/SpotlightCard";
 
-let MotionSpotlightCard = motion.create ? motion.create(SpotlightCard) : motion(SpotlightCard);
 
 export default function CandidateJobDetails() {
   const { jobId } = useParams<{ jobId: string }>()
@@ -373,14 +371,15 @@ export default function CandidateJobDetails() {
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }} 
-              className="absolute inset-0 bg-brand-navy/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-950/50"
               onClick={closeApplyModal}
             />
-            <MotionSpotlightCard 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               exit={{ opacity: 0, scale: 0.95, y: 20 }} 
-              className="glass-card relative w-full max-w-lg overflow-hidden z-10 my-auto max-h-[calc(100dvh-2rem)] flex flex-col"
+              role="dialog" aria-modal="true" aria-label={`Apply for ${job.title}`}
+              className="relative isolate rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-2xl w-full max-w-lg overflow-hidden z-10 my-auto max-h-[calc(100dvh-2rem)] flex flex-col"
             >
               {isSuccess ? (
                 <div className="p-6 sm:p-10 text-center flex flex-col items-center overflow-y-auto">
@@ -449,7 +448,7 @@ export default function CandidateJobDetails() {
                   </div>
                 </>
               )}
-            </MotionSpotlightCard>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>

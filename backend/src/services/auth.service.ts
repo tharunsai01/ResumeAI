@@ -196,6 +196,7 @@ export async function refresh(rawToken: string | undefined, meta: Meta) {
 
   const user = await User.findById(stored.user);
   if (!user) throw ApiError.unauthorized('User no longer exists');
+  if (user.status !== 'active') throw ApiError.forbidden('This account is no longer active');
 
   const tokens = await issueTokens(user, meta);
   stored.revokedAt = new Date();

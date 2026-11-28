@@ -32,6 +32,8 @@ export interface RecruiterJob {
   location: string
   workMode: WorkMode
   jobType: JobType
+  category?: string
+  preferredSkills?: string[]
   experience: string
   salary: string
   skills: string[]

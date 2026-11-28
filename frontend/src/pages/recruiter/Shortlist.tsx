@@ -1,3 +1,4 @@
+import { interviewService, type InterviewSchedule } from "../../services/interviewService"
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, Calendar, User, CheckCircle2, AlertCircle, Trash2 } from "lucide-react"
@@ -22,8 +23,8 @@ export default function RecruiterShortlist() {
   
   // Modals
   const [scheduleModalOpen, setScheduleModalOpen] = React.useState(false)
-  const [candidateToSchedule, setCandidateToSchedule] = React.useState<{id: string, name: string, role: string} | undefined>()
-  const [candidateToRemove, setCandidateToRemove] = React.useState<{id: string, name: string} | null>(null)
+  const [candidateToSchedule, setCandidateToSchedule] = React.useState<{id: string, name: string, role: string, applicationId?: string} | undefined>()
+  const [candidateToRemove, setCandidateToRemove] = React.useState<{id: string, name: string, applicationId?: string} | null>(null)
   
   // Filters
   const [searchTerm, setSearchTerm] = React.useState("")
@@ -35,12 +36,20 @@ export default function RecruiterShortlist() {
   const [toastMsg, setToastMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    setLoading(false)
-    const handleUpdate = () => {
-      setCandidates(pipelineService.getCandidates().filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage)))
+    let active = true
+    const load = () => {
+      void pipelineService.fetchLivePipeline().then(items => {
+        if (active) {
+          setCandidates(items.filter(candidate => ["Shortlisted", "Interview Scheduled"].includes(candidate.stage)))
+          setLoading(false)
+        }
+      }).catch(() => {
+        if (active) { setToastMsg("Couldn’t load the shortlist."); setLoading(false) }
+      })
     }
-    window.addEventListener("hiresmart_pipeline_updated", handleUpdate)
-    return () => window.removeEventListener("hiresmart_pipeline_updated", handleUpdate)
+    load()
+    window.addEventListener("hiresmart_pipeline_updated", load)
+    return () => { active = false; window.removeEventListener("hiresmart_pipeline_updated", load) }
   }, [])
 
   const showToast = (msg: string) => {
@@ -48,18 +57,22 @@ export default function RecruiterShortlist() {
     setTimeout(() => setToastMsg(null), 3000)
   }
 
-  const handleSchedule = (data: any) => {
-    pipelineService.updateCandidateStage(data.candidateId, "Interview Scheduled")
-    setCandidates(pipelineService.getCandidates().filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage)))
+  const handleSchedule = async (data: InterviewSchedule) => {
+    await interviewService.createRecruiterInterview(data)
+    setCandidates((await pipelineService.fetchLivePipeline()).filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage)))
     showToast("Interview scheduled successfully.")
   }
 
-  const handleRemove = () => {
-    if (candidateToRemove) {
-      pipelineService.removeCandidate(candidateToRemove.id)
-      setCandidates(pipelineService.getCandidates().filter(c => ["Shortlisted", "Interview Scheduled"].includes(c.stage)))
+  const handleRemove = async () => {
+    if (!candidateToRemove) return
+    try {
+      await pipelineService.removeShortlistedCandidate(candidateToRemove)
+      const key = candidateToRemove.applicationId || candidateToRemove.id
+      setCandidates(list => list.filter(candidate => (candidate.applicationId || candidate.id) !== key))
       setCandidateToRemove(null)
       showToast("Candidate removed from shortlist.")
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Couldn’t remove this candidate.")
     }
   }
 
@@ -74,8 +87,8 @@ export default function RecruiterShortlist() {
       const matchesJob = jobFilter === "All" || cand.role === jobFilter
       
       let matchesMatch = true
-      if (matchFilter === "90+") matchesMatch = cand.overallMatch >= 90
-      else if (matchFilter === "80-89") matchesMatch = cand.overallMatch >= 80 && cand.overallMatch < 90
+      if (matchFilter === "90+") matchesMatch = (cand.overallMatch ?? -1) >= 90
+      else if (matchFilter === "80-89") matchesMatch = (cand.overallMatch ?? -1) >= 80 && (cand.overallMatch ?? -1) < 90
       
       let matchesInterview = true
       if (interviewFilter === "Scheduled") matchesInterview = cand.stage === "Interview Scheduled"
@@ -205,9 +218,9 @@ export default function RecruiterShortlist() {
                     </tr>
                   ) : filteredCandidates.length > 0 ? (
                     filteredCandidates.map((cand) => {
-                      const isQualified = cand.overallMatch >= AI_SCREENING_THRESHOLD
+                      const isQualified = (cand.overallMatch ?? -1) >= AI_SCREENING_THRESHOLD
                       return (
-                        <tr key={cand.id} className="hover:bg-brand-light/50 transition-colors group">
+                        <tr key={cand.applicationId || cand.id} className="hover:bg-brand-light/50 transition-colors group">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/recruiter/candidates/${cand.id}`)}>
                               <div className="w-9 h-9 rounded-full bg-brand-indigo/10 flex items-center justify-center text-brand-indigo font-bold border border-brand-indigo/20">
@@ -221,7 +234,7 @@ export default function RecruiterShortlist() {
                           </td>
                           <td className="px-6 py-4 text-center">
                             <div className="flex flex-col items-center gap-1">
-                              <span className="font-bold text-brand-indigo">{cand.overallMatch}%</span>
+                              <span className="font-bold text-brand-indigo">{cand.overallMatch == null ? "—" : `${cand.overallMatch}%`}</span>
                               <span className={cn(
                                 "text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border",
                                 isQualified ? "bg-semantic-success/10 text-semantic-success border-semantic-success/20" : "bg-brand-gray/10 text-brand-navy/50 border-brand-gray/20"
@@ -258,7 +271,7 @@ export default function RecruiterShortlist() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="h-8 text-semantic-error hover:bg-semantic-error/10 hover:text-semantic-error"
-                                onClick={() => setCandidateToRemove({id: cand.id, name: cand.name})}
+                                onClick={() => setCandidateToRemove({id: cand.id, name: cand.name, applicationId: cand.applicationId})}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -275,7 +288,7 @@ export default function RecruiterShortlist() {
                                   size="sm" 
                                   className="h-8 bg-brand-indigo hover:bg-brand-blue"
                                   onClick={() => {
-                                    setCandidateToSchedule({id: cand.id, name: cand.name, role: cand.role})
+                                    setCandidateToSchedule({id: cand.id, name: cand.name, role: cand.role, applicationId: cand.applicationId})
                                     setScheduleModalOpen(true)
                                   }}
                                 >

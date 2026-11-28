@@ -13,7 +13,8 @@ export type { NotificationRole }
 const BASE_STORAGE_KEY = "hiresmart_notifications"
 
 function getStorageKey(role: NotificationRole): string {
-  return `${BASE_STORAGE_KEY}_${role}`
+  const user = !env.useMock ? authService.getCurrentUser() : null
+  return `${BASE_STORAGE_KEY}_${role}${user ? `_${user.id}` : ""}`
 }
 
 function resolveRole(explicitRole?: string): NotificationRole {
@@ -69,7 +70,7 @@ export const notificationService = {
       let stored = localStorage.getItem(storageKey)
       
       // Backward compatibility: If candidate storage doesn't exist yet, check legacy key
-      if (!stored && targetRole === "candidate") {
+      if (!stored && env.useMock && targetRole === "candidate") {
         stored = localStorage.getItem(BASE_STORAGE_KEY)
       }
 
@@ -89,12 +90,12 @@ export const notificationService = {
       }
 
       // Initialize with role-specific defaults
-      const defaults = getDefaultNotifications(targetRole)
+      const defaults = env.useMock ? getDefaultNotifications(targetRole) : []
       localStorage.setItem(storageKey, JSON.stringify(defaults))
       return defaults
     }
 
-    return getDefaultNotifications(targetRole)
+    return env.useMock ? getDefaultNotifications(targetRole) : []
   },
 
   saveNotifications(notifications: AppNotification[], role?: string): void {
@@ -116,8 +117,11 @@ export const notificationService = {
     if (env.useMock) {
       return this.getNotifications()
     }
+    const userId = authService.getCurrentUser()?.id
+    if (!userId) return []
     try {
       const res = await httpClient.get<{ success: boolean; data: { notifications: any[] } }>("/notifications")
+      if (authService.getCurrentUser()?.id !== userId) return []
       if (res?.data?.notifications && Array.isArray(res.data.notifications)) {
         const targetRole = resolveRole()
         const mapped: AppNotification[] = res.data.notifications.map((n) => ({

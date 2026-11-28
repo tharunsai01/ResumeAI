@@ -7,6 +7,7 @@ import { validate } from '../middleware/validate';
 import { recordIdParamSchema } from '../validators/recordId.validators';
 
 const recruiterCandidateQuery = z.object({
+  candidateId: z.string().regex(/^[a-f0-9]{24}$/i).optional(),
   skills: z.string().trim().max(500).optional(),
   location: z.string().trim().max(200).optional(),
   search: z.string().trim().max(200).optional(),
